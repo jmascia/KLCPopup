@@ -76,6 +76,11 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 @end
 
 
+@interface UIColor (KLCPopup)
++ (UIColor*)klcLightGreenColor;
++ (UIColor*)klcGreenColor;
+@end
+
 
 @implementation ViewController
 
@@ -374,7 +379,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   [showButton setTitle:@"Show" forState:UIControlStateNormal];
   showButton.backgroundColor = [UIColor lightGrayColor];
   [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-  [showButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+  [showButton setTitleColor:[[showButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
   showButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
   [showButton.layer setCornerRadius:6.0];
   [showButton addTarget:self action:@selector(showButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -681,10 +686,48 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 
 - (void)showButtonPressed:(id)sender {
   
+  // Generate content view to present
   UIView* contentView = [[UIView alloc] init];
-  contentView.backgroundColor = [UIColor purpleColor];
-  contentView.frame = CGRectMake(0, 0, 100, 100);
+  contentView.translatesAutoresizingMaskIntoConstraints = NO;
+  contentView.backgroundColor = [UIColor klcLightGreenColor];
+  contentView.layer.cornerRadius = 12.0;
   
+  UILabel* hideLabel = [[UILabel alloc] init];
+  hideLabel.translatesAutoresizingMaskIntoConstraints = NO;
+  hideLabel.backgroundColor = [UIColor clearColor];
+  hideLabel.textColor = [UIColor whiteColor];
+  hideLabel.font = [UIFont boldSystemFontOfSize:72.0];
+  hideLabel.text = @"Hi.";
+  
+  UIButton* hideButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  hideButton.translatesAutoresizingMaskIntoConstraints = NO;
+  hideButton.contentEdgeInsets = UIEdgeInsetsMake(6, 12, 6, 12);
+  hideButton.backgroundColor = [UIColor klcGreenColor];
+  [hideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+  [hideButton setTitleColor:[[hideButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
+  hideButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
+  [hideButton setTitle:@"Hide" forState:UIControlStateNormal];
+  hideButton.layer.cornerRadius = 6.0;
+  [hideButton addTarget:self action:@selector(hideButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  
+  [contentView addSubview:hideLabel];
+  [contentView addSubview:hideButton];
+  
+  NSDictionary* views = NSDictionaryOfVariableBindings(contentView, hideButton, hideLabel);
+  
+  [contentView addConstraints:
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[hideLabel]-(10)-[hideButton]-(12)-|"
+                                           options:NSLayoutFormatAlignAllCenterX
+                                           metrics:nil
+                                             views:views]];
+  
+  [contentView addConstraints:
+   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[hideLabel]-(36)-|"
+                                           options:0
+                                           metrics:nil
+                                             views:views]];
+  
+  // Show in popup
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
                                           showType:_selectedShowType
                                           hideType:_selectedHideType
@@ -696,6 +739,12 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   popup.shouldHideOnContentTouch = _contentSwitch.on;
   [popup show];
   //[popup showWithDuration:0.5];
+}
+
+- (void)hideButtonPressed:(id)sender {
+  if ([sender isKindOfClass:[UIView class]]) {
+    [(UIView*)sender hidePresentingPopup];
+  }
 }
 
 - (void)pickerDoneButtonPressed:(id)sender {
@@ -976,6 +1025,21 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
       }
     }
   }
+}
+
+@end
+
+
+
+
+@implementation UIColor (KLCPopup)
+
++ (UIColor*)klcLightGreenColor {
+  return [UIColor colorWithRed:(184.0/255.0) green:(233.0/255.0) blue:(122.0/255.0) alpha:1.0];
+}
+
++ (UIColor*)klcGreenColor {
+  return [UIColor colorWithRed:(0.0/255.0) green:(204.0/255.0) blue:(134.0/255.0) alpha:1.0];
 }
 
 @end
