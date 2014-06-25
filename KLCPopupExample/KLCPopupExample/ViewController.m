@@ -706,7 +706,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   [hideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [hideButton setTitleColor:[[hideButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
   hideButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
-  [hideButton setTitle:@"Hide" forState:UIControlStateNormal];
+  [hideButton setTitle:@"Bye" forState:UIControlStateNormal];
   hideButton.layer.cornerRadius = 6.0;
   [hideButton addTarget:self action:@selector(hideButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
