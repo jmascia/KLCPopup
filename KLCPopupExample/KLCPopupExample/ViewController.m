@@ -360,14 +360,13 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   // PRESENT
   UIButton* showButton = [UIButton buttonWithType:UIButtonTypeCustom];
   showButton.translatesAutoresizingMaskIntoConstraints = NO;
-  showButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
-  [showButton setTitle:@"Show Popup" forState:UIControlStateNormal];
-  [showButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-  [showButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
-  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  showButton.contentEdgeInsets = UIEdgeInsetsMake(9, 24, 9, 24);
+  [showButton setTitle:@"Show" forState:UIControlStateNormal];
+  showButton.backgroundColor = [UIColor lightGrayColor];
+  [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+  [showButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
   [showButton.layer setCornerRadius:6.0];
-  [showButton.layer setBorderColor:[[UIColor darkGrayColor] CGColor]];
-  [showButton.layer setBorderWidth:1.0];
   [showButton addTarget:self action:@selector(showButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
   // View hierarchy
