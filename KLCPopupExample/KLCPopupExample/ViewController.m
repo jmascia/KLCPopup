@@ -165,6 +165,16 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   spacer2.translatesAutoresizingMaskIntoConstraints = NO;
   spacer2.backgroundColor = [UIColor clearColor];
   
+  // HEADER
+  UILabel* header = [[UILabel alloc] init];
+  header.translatesAutoresizingMaskIntoConstraints = NO;
+  header.numberOfLines = 1;
+  header.backgroundColor = [UIColor clearColor];
+  header.textColor = [UIColor grayColor];
+  header.font = [UIFont boldSystemFontOfSize:28];
+  header.textAlignment = NSTextAlignmentCenter;
+  header.text = @"KLCPopup";
+  
   // HORIZONTAL LAYOUT
   UILabel* horizontalTitle = [[UILabel alloc] init];
   horizontalTitle.translatesAutoresizingMaskIntoConstraints = NO;
@@ -372,6 +382,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   // View hierarchy
   [self.view addSubview:spacer1];
   [self.view addSubview:spacer2];
+  [self.view addSubview:header];
   [horizontalButton addSubview:horizontalTitle];
   [horizontalButton addSubview:horizontalDetail];
   [self.view addSubview:horizontalButton];
@@ -398,6 +409,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   // Set high level AutoLayout constraints
   NSDictionary* views = NSDictionaryOfVariableBindings(spacer1,
                                                        spacer2,
+                                                       header,
                                                        horizontalButton,
                                                        verticalButton,
                                                        maskTypeButton,
@@ -408,9 +420,9 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
                                                        showButton);
   NSDictionary* metrics = @{@"minHSpacing" : @20.0,
                             @"fieldVSpacing" : @10.0};
-  
+
   [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[spacer1][horizontalButton]-(fieldVSpacing)-[verticalButton]-(fieldVSpacing)-[maskTypeButton]-(fieldVSpacing)-[showTypeButton]-(fieldVSpacing)-[hideTypeButton]-(fieldVSpacing)-[backgroundContainer]-(fieldVSpacing)-[contentContainer]"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[spacer1][header]-(fieldVSpacing)-[horizontalButton]-(fieldVSpacing)-[verticalButton]-(fieldVSpacing)-[maskTypeButton]-(fieldVSpacing)-[showTypeButton]-(fieldVSpacing)-[hideTypeButton]-(fieldVSpacing)-[backgroundContainer]-(fieldVSpacing)-[contentContainer]"
                                            options:(NSLayoutFormatAlignAllLeft | NSLayoutFormatAlignAllRight)
                                            metrics:metrics
                                              views:views]];
