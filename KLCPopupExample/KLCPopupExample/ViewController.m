@@ -57,6 +57,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   UIButton* _hideTypeButton;
   UISwitch* _backgroundSwitch;
   UISwitch* _contentSwitch;
+  UISwitch* _delaySwitch;
   
   NSArray* _horizontalLayouts;
   NSArray* _verticalLayouts;
@@ -372,6 +373,24 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   contentContainer.translatesAutoresizingMaskIntoConstraints = NO;
   contentContainer.backgroundColor = [UIColor clearColor];
   
+  // DELAY
+  UILabel* delayLabel = [[UILabel alloc] init];
+  delayLabel.translatesAutoresizingMaskIntoConstraints = NO;
+  delayLabel.numberOfLines = 1;
+  delayLabel.lineBreakMode = fieldLineBreakMode;
+  delayLabel.backgroundColor = [UIColor clearColor];
+  delayLabel.textColor = fieldTitleColor;
+  delayLabel.font = fieldTitleFont;
+  delayLabel.text = @"Hide after delay:";
+  
+  UISwitch* delaySwitch = [[UISwitch alloc] init];
+  delaySwitch.translatesAutoresizingMaskIntoConstraints = NO;
+  _delaySwitch = delaySwitch;
+  
+  UIView* delayContainer = [[UIView alloc] init];
+  delayContainer.translatesAutoresizingMaskIntoConstraints = NO;
+  delayContainer.backgroundColor = [UIColor clearColor];
+  
   // PRESENT
   UIButton* showButton = [UIButton buttonWithType:UIButtonTypeCustom];
   showButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -409,6 +428,9 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   [contentContainer addSubview:contentLabel];
   [contentContainer addSubview:contentSwitch];
   [self.view addSubview:contentContainer];
+  [delayContainer addSubview:delayLabel];
+  [delayContainer addSubview:delaySwitch];
+  [self.view addSubview:delayContainer];
   [self.view addSubview:showButton];
   
   // Set high level AutoLayout constraints
@@ -422,18 +444,19 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
                                                        hideTypeButton,
                                                        backgroundContainer,
                                                        contentContainer,
+                                                       delayContainer,
                                                        showButton);
   NSDictionary* metrics = @{@"minHSpacing" : @20.0,
                             @"fieldVSpacing" : @10.0};
 
   [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[spacer1][header]-(fieldVSpacing)-[horizontalButton]-(fieldVSpacing)-[verticalButton]-(fieldVSpacing)-[maskTypeButton]-(fieldVSpacing)-[showTypeButton]-(fieldVSpacing)-[hideTypeButton]-(fieldVSpacing)-[backgroundContainer]-(fieldVSpacing)-[contentContainer]"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[spacer1][header]-(fieldVSpacing)-[horizontalButton]-(fieldVSpacing)-[verticalButton]-(fieldVSpacing)-[maskTypeButton]-(fieldVSpacing)-[showTypeButton]-(fieldVSpacing)-[hideTypeButton]-(fieldVSpacing)-[backgroundContainer]-(fieldVSpacing)-[contentContainer]-(fieldVSpacing)-[delayContainer]"
                                            options:(NSLayoutFormatAlignAllLeft | NSLayoutFormatAlignAllRight)
                                            metrics:metrics
                                              views:views]];
   
   [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:[contentContainer]-(20)-[showButton][spacer2(==spacer1)]|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:[delayContainer]-(20)-[showButton][spacer2(==spacer1)]|"
                                            options:(NSLayoutFormatAlignAllCenterX)
                                            metrics:metrics
                                              views:views]];
@@ -540,6 +563,20 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   
   [contentContainer addConstraints:
    [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[contentSwitch]|"
+                                           options:0
+                                           metrics:metrics
+                                             views:views]];
+
+  // Auto layout after-delay field
+  views = NSDictionaryOfVariableBindings(delayLabel, delaySwitch);
+  [delayContainer addConstraints:
+   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[delayLabel]-(>=minHSpacing)-[delaySwitch]|"
+                                           options:NSLayoutFormatAlignAllCenterY
+                                           metrics:metrics
+                                             views:views]];
+  
+  [delayContainer addConstraints:
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[delaySwitch]|"
                                            options:0
                                            metrics:metrics
                                              views:views]];
@@ -737,8 +774,12 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   popup.verticalLayout = _selectedVerticalLayout;
   popup.shouldHideOnBackgroundTouch = _backgroundSwitch.on;
   popup.shouldHideOnContentTouch = _contentSwitch.on;
-  [popup show];
-  //[popup showWithDuration:0.5];
+  
+  if (_delaySwitch.on) {
+    [popup showWithDuration:2.5];
+  } else {
+    [popup show];
+  }
 }
 
 - (void)hideButtonPressed:(id)sender {
