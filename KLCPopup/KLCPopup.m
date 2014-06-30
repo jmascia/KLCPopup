@@ -100,25 +100,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
-                        showType:(KLCPopupShowType)showType
-                        hideType:(KLCPopupHideType)hideType
-                        maskType:(KLCPopupMaskType)maskType
-{
-  KLCPopup* popup = [[[self class] alloc] init];
-  popup.contentView = contentView;
-  popup.showType = showType;
-  popup.hideType = hideType;
-  popup.maskType = maskType;
-  return popup;
-}
-
-
-
-
 #pragma mark - UIView
-
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
   
@@ -150,9 +132,20 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-
-
 #pragma mark - Class Public
+
++ (KLCPopup*)popupWithContentView:(UIView*)contentView
+                         showType:(KLCPopupShowType)showType
+                         hideType:(KLCPopupHideType)hideType
+                         maskType:(KLCPopupMaskType)maskType
+{
+  KLCPopup* popup = [[[self class] alloc] init];
+  popup.contentView = contentView;
+  popup.showType = showType;
+  popup.hideType = hideType;
+  popup.maskType = maskType;
+  return popup;
+}
 
 
 + (void)hideAllPopups {
@@ -165,10 +158,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-
-
 #pragma mark - Public
-
 
 - (void)show {
   [self showWithDuration:0.0];
@@ -939,17 +929,13 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 #pragma mark - Private
 
-
 - (void)hide {
   // Use this for calling hide from selector
   [self hide:YES];
 }
 
 
-
-
 #pragma mark - Subclassing
-
 
 - (void)willStartShowing {
   
