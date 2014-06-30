@@ -24,6 +24,8 @@
 
 #import "KLCPopup.h"
 
+static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
+
 
 @interface KLCPopup () {
   // views
@@ -356,11 +358,11 @@
           _containerView.alpha = 0.0;
           // set frame before transform here...
           _containerView.frame = finalContainerFrame;
-          _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+          _containerView.transform = CGAffineTransformMakeScale(0.85, 0.85);
           
           [UIView animateWithDuration:0.15
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.alpha = 1.0;
                              // set transform before frame here...
@@ -379,11 +381,11 @@
           _containerView.alpha = 0.0;
           // set frame before transform here...
           _containerView.frame = finalContainerFrame;
-          _containerView.transform = CGAffineTransformMakeScale(3.0, 3.0);
+          _containerView.transform = CGAffineTransformMakeScale(1.25, 1.25);
           
           [UIView animateWithDuration:0.15
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.alpha = 1.0;
                              // set transform before frame here...
@@ -406,7 +408,7 @@
           
           [UIView animateWithDuration:0.30
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
@@ -427,7 +429,7 @@
           
           [UIView animateWithDuration:0.30
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
@@ -448,7 +450,7 @@
           
           [UIView animateWithDuration:0.30
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
@@ -469,7 +471,7 @@
         
           [UIView animateWithDuration:0.30
                                 delay:0
-                              options:UIViewAnimationOptionCurveEaseOut
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
@@ -661,10 +663,10 @@
           case KLCPopupHideTypeGrowOut: {
             [UIView animateWithDuration:0.15
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                _containerView.alpha = 0.0;
-                               _containerView.transform = CGAffineTransformMakeScale(3.0, 3.0);
+                               _containerView.transform = CGAffineTransformMakeScale(1.1, 1.1);
                              } completion:^(BOOL finished) {
                                if (finished) {
                                  completionBlock();
@@ -676,10 +678,10 @@
           case KLCPopupHideTypeShrinkOut: {
             [UIView animateWithDuration:0.15
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                _containerView.alpha = 0.0;
-                               _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+                               _containerView.transform = CGAffineTransformMakeScale(0.8, 0.8);
                              } completion:^(BOOL finished) {
                                if (finished) {
                                  completionBlock();
@@ -691,7 +693,7 @@
           case KLCPopupHideTypeSlideOutToTop: {
             [UIView animateWithDuration:0.30
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
                                finalFrame.origin.y = -CGRectGetHeight(finalFrame);
@@ -708,7 +710,7 @@
           case KLCPopupHideTypeSlideOutToBottom: {
             [UIView animateWithDuration:0.30
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
                                finalFrame.origin.y = CGRectGetHeight(self.frame);
@@ -725,7 +727,7 @@
           case KLCPopupHideTypeSlideOutToLeft: {
             [UIView animateWithDuration:0.30
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
                                finalFrame.origin.x = -CGRectGetWidth(finalFrame);
@@ -742,7 +744,7 @@
           case KLCPopupHideTypeSlideOutToRight: {
             [UIView animateWithDuration:0.30
                                   delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
+                                options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
                                finalFrame.origin.x = CGRectGetWidth(self.frame);
