@@ -37,12 +37,6 @@ static NSInteger const kFieldDetailTag = 1102;
 
 @interface ViewController () {
   
-  NSInteger _selectedRowInHorizontalField;
-  NSInteger _selectedRowInVerticalField;
-  NSInteger _selectedRowInMaskField;
-  NSInteger _selectedRowInShowField;
-  NSInteger _selectedRowInHideField;
-  
   UIPickerView* _pickerView;
   UILabel* _pickerLabel;
   UIButton* _pickerButton;
@@ -62,17 +56,23 @@ static NSInteger const kFieldDetailTag = 1102;
   NSArray* _maskTypes;
   NSArray* _showTypes;
   NSArray* _hideTypes;
+  
+  NSInteger _selectedRowInHorizontalField;
+  NSInteger _selectedRowInVerticalField;
+  NSInteger _selectedRowInMaskField;
+  NSInteger _selectedRowInShowField;
+  NSInteger _selectedRowInHideField;
+  
+  NSDictionary* _namesForHorizontalLayouts;
+  NSDictionary* _namesForVerticalLayouts;
+  NSDictionary* _namesForMaskTypes;
+  NSDictionary* _namesForShowTypes;
+  NSDictionary* _namesForHideTypes;
 }
 
 @property (nonatomic, strong) UIPopoverController* popover;
 
 - (void)updateLabelsForState;
-- (NSInteger)valueForRow:(NSInteger)row inList:(NSArray*)list;
-- (NSString*)nameForHorizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout;
-- (NSString*)nameForVerticalLayout:(KLCPopupVerticalLayout)verticalLayout;
-- (NSString*)nameForMaskType:(KLCPopupMaskType)maskType;
-- (NSString*)nameForShowType:(KLCPopupShowType)showType;
-- (NSString*)nameForHideType:(KLCPopupHideType)hideType;
 
 @end
 
@@ -143,6 +143,51 @@ static NSInteger const kFieldDetailTag = 1102;
                    @(KLCPopupHideTypeBounceOutToBottom),
                    @(KLCPopupHideTypeBounceOutToLeft),
                    @(KLCPopupHideTypeBounceOutToRight)];
+    
+    
+    _namesForHorizontalLayouts = @{@(KLCPopupHorizontalLayoutLeft) : @"Left",
+                                   @(KLCPopupHorizontalLayoutLeftOfCenter) : @"Left of Center",
+                                   @(KLCPopupHorizontalLayoutCenter) : @"Center",
+                                   @(KLCPopupHorizontalLayoutRightOfCenter) : @"Right of Center",
+                                   @(KLCPopupHorizontalLayoutRight) : @"Right"};
+    
+    _namesForVerticalLayouts = @{@(KLCPopupVerticalLayoutTop) : @"Top",
+                                 @(KLCPopupVerticalLayoutAboveCenter) : @"Above Center",
+                                 @(KLCPopupVerticalLayoutCenter) : @"Center",
+                                 @(KLCPopupVerticalLayoutBelowCenter) : @"Below Center",
+                                 @(KLCPopupVerticalLayoutBottom) : @"Bottom"};
+    
+    _namesForMaskTypes = @{@(KLCPopupMaskTypeNone) : @"None",
+                           @(KLCPopupMaskTypeClear) : @"Clear",
+                           @(KLCPopupMaskTypeDimmed) : @"Dimmed"};
+    
+    _namesForShowTypes = @{@(KLCPopupShowTypeNone) : @"None",
+                           @(KLCPopupShowTypeFadeIn) : @"Fade in",
+                           @(KLCPopupShowTypeGrowIn) : @"Grow in",
+                           @(KLCPopupShowTypeShrinkIn) : @"Shrink in",
+                           @(KLCPopupShowTypeSlideInFromTop) : @"Slide from Top",
+                           @(KLCPopupShowTypeSlideInFromBottom) : @"Slide from Bottom",
+                           @(KLCPopupShowTypeSlideInFromLeft) : @"Slide from Left",
+                           @(KLCPopupShowTypeSlideInFromRight) : @"Slide from Right",
+                           @(KLCPopupShowTypeBounceIn) : @"Bounce in",
+                           @(KLCPopupShowTypeBounceInFromTop) : @"Bounce from Top",
+                           @(KLCPopupShowTypeBounceInFromBottom) : @"Bounce from Bottom",
+                           @(KLCPopupShowTypeBounceInFromLeft) : @"Bounce from Left",
+                           @(KLCPopupShowTypeBounceInFromRight) : @"Bounce from Right"};
+    
+    _namesForHideTypes = @{@(KLCPopupHideTypeNone) : @"None",
+                           @(KLCPopupHideTypeFadeOut) : @"Fade out",
+                           @(KLCPopupHideTypeGrowOut) : @"Grow out",
+                           @(KLCPopupHideTypeShrinkOut) : @"Shrink out",
+                           @(KLCPopupHideTypeSlideOutToTop) : @"Slide to Top",
+                           @(KLCPopupHideTypeSlideOutToBottom) : @"Slide to Bottom",
+                           @(KLCPopupHideTypeSlideOutToLeft) : @"Slide to Left",
+                           @(KLCPopupHideTypeSlideOutToRight) : @"Slide to Right",
+                           @(KLCPopupHideTypeBounceOut) : @"Bounce out",
+                           @(KLCPopupHideTypeBounceOutToTop) : @"Bounce to Top",
+                           @(KLCPopupHideTypeBounceOutToBottom) : @"Bounce to Bottom",
+                           @(KLCPopupHideTypeBounceOutToLeft) : @"Bounce to Left",
+                           @(KLCPopupHideTypeBounceOutToRight) : @"Bounce to Right"};
   
     _selectedRowInHorizontalField = [_horizontalLayouts indexOfObject:@(KLCPopupHorizontalLayoutCenter)];
     _selectedRowInVerticalField = [_verticalLayouts indexOfObject:@(KLCPopupVerticalLayoutCenter)];
@@ -824,11 +869,11 @@ static NSInteger const kFieldDetailTag = 1102;
 #pragma mark - Private
 
 - (void)updateLabelsForState {
-  [(UILabel*)[_horizontalButton viewWithTag:kFieldDetailTag] setText:[self nameForHorizontalLayout:[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag]]];
-  [(UILabel*)[_verticalButton viewWithTag:kFieldDetailTag] setText:[self nameForVerticalLayout:[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag]]];
-  [(UILabel*)[_maskTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForMaskType:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]]];
-  [(UILabel*)[_showTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForShowType:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]]];
-  [(UILabel*)[_hideTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForHideType:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]]];
+  [(UILabel*)[_horizontalButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag] inFieldWithTag:kHorizontalFieldTag]];
+  [(UILabel*)[_verticalButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag] inFieldWithTag:kVerticalFieldTag]];
+  [(UILabel*)[_maskTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag] inFieldWithTag:kMaskFieldTag]];
+  [(UILabel*)[_showTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag] inFieldWithTag:kShowFieldTag]];
+  [(UILabel*)[_hideTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag] inFieldWithTag:kHideFieldTag]];
 }
 
 
@@ -904,185 +949,28 @@ static NSInteger const kFieldDetailTag = 1102;
 }
 
 - (NSString*)nameForValue:(NSInteger)value inFieldWithTag:(NSInteger)tag {
+  
+  NSDictionary* namesForField = nil;
   if (tag == kHorizontalFieldTag) {
-    return [self nameForHorizontalLayout:value];
+    namesForField = _namesForHorizontalLayouts;
     
   } else if (tag == kVerticalFieldTag) {
-    return [self nameForVerticalLayout:value];
-  
+    namesForField = _namesForVerticalLayouts;
+    
   } else if (tag == kMaskFieldTag) {
-    return [self nameForMaskType:value];
+    namesForField = _namesForMaskTypes;
   
   } else if (tag == kShowFieldTag) {
-    return [self nameForShowType:value];
+    namesForField = _namesForShowTypes;
   
   } else if (tag == kHideFieldTag) {
-    return [self nameForHideType:value];
+    namesForField = _namesForHideTypes;
+  }
+  
+  if (namesForField != nil) {
+    return [namesForField objectForKey:@(value)];
   }
   return nil;
-}
-
-
-- (NSString*)nameForHorizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout {
-  NSString* name = nil;
-  switch (horizontalLayout) {
-    case KLCPopupHorizontalLayoutLeft:
-      name = @"Left";
-      break;
-    case KLCPopupHorizontalLayoutLeftOfCenter:
-      name = @"Left of Center";
-      break;
-    case KLCPopupHorizontalLayoutCenter:
-      name = @"Center";
-      break;
-    case KLCPopupHorizontalLayoutRightOfCenter:
-      name = @"Right of Center";
-      break;
-    case KLCPopupHorizontalLayoutRight:
-      name = @"Right";
-      break;
-    default:
-      break;
-  }
-  return name;
-}
-
-- (NSString*)nameForVerticalLayout:(KLCPopupVerticalLayout)verticalLayout {
-  NSString* name = nil;
-  switch (verticalLayout) {
-    case KLCPopupVerticalLayoutTop:
-      name = @"Top";
-      break;
-    case KLCPopupVerticalLayoutAboveCenter:
-      name = @"Above Center";
-      break;
-    case KLCPopupVerticalLayoutCenter:
-      name = @"Center";
-      break;
-    case KLCPopupVerticalLayoutBelowCenter:
-      name = @"Below Center";
-      break;
-    case KLCPopupVerticalLayoutBottom:
-      name = @"Bottom";
-      break;
-    default:
-      break;
-  }
-  return name;
-}
-
-- (NSString*)nameForMaskType:(KLCPopupMaskType)maskType {
-  NSString* name = nil;
-  switch (maskType) {
-    case KLCPopupMaskTypeNone:
-      name = @"None";
-      break;
-    case KLCPopupMaskTypeClear:
-      name = @"Clear";
-      break;
-    case KLCPopupMaskTypeDimmed:
-      name = @"Dimmed";
-      break;
-    default:
-      break;
-  }
-  return name;
-}
-
-- (NSString*)nameForShowType:(KLCPopupShowType)showType {
-  NSString* name = nil;
-  switch (showType) {
-    case KLCPopupShowTypeNone:
-      name = @"None";
-      break;
-    case KLCPopupShowTypeFadeIn:
-      name = @"Fade in";
-      break;
-    case KLCPopupShowTypeGrowIn:
-      name = @"Grow in";
-      break;
-    case KLCPopupShowTypeShrinkIn:
-      name = @"Shrink in";
-      break;
-    case KLCPopupShowTypeSlideInFromTop:
-      name = @"Slide from Top";
-      break;
-    case KLCPopupShowTypeSlideInFromBottom:
-      name = @"Slide from Bottom";
-      break;
-    case KLCPopupShowTypeSlideInFromLeft:
-      name = @"Slide from Left";
-      break;
-    case KLCPopupShowTypeSlideInFromRight:
-      name = @"Slide from Right";
-      break;
-    case KLCPopupShowTypeBounceIn:
-      name = @"Bounce in";
-      break;
-    case KLCPopupShowTypeBounceInFromTop:
-      name = @"Bounce from Top";
-      break;
-    case KLCPopupShowTypeBounceInFromBottom:
-      name = @"Bounce from Bottom";
-      break;
-    case KLCPopupShowTypeBounceInFromLeft:
-      name = @"Bounce from Left";
-      break;
-    case KLCPopupShowTypeBounceInFromRight:
-      name = @"Bounce from Right";
-      break;
-    default:
-      break;
-  }
-  return name;
-}
-
-- (NSString*)nameForHideType:(KLCPopupHideType)hideType {
-  NSString* name = nil;
-  switch (hideType) {
-    case KLCPopupHideTypeNone:
-      name = @"None";
-      break;
-    case KLCPopupHideTypeFadeOut:
-      name = @"Fade out";
-      break;
-    case KLCPopupHideTypeGrowOut:
-      name = @"Grow out";
-      break;
-    case KLCPopupHideTypeShrinkOut:
-      name = @"Shrink out";
-      break;
-    case KLCPopupHideTypeSlideOutToTop:
-      name = @"Slide to Top";
-      break;
-    case KLCPopupHideTypeSlideOutToBottom:
-      name = @"Slide to Bottom";
-      break;
-    case KLCPopupHideTypeSlideOutToLeft:
-      name = @"Slide to Left";
-      break;
-    case KLCPopupHideTypeSlideOutToRight:
-      name = @"Slide to Right";
-      break;
-    case KLCPopupHideTypeBounceOut:
-      name = @"Bounce out";
-      break;
-    case KLCPopupHideTypeBounceOutToTop:
-      name = @"Bounce to Top";
-      break;
-    case KLCPopupHideTypeBounceOutToBottom:
-      name = @"Bounce to Bottom";
-      break;
-    case KLCPopupHideTypeBounceOutToLeft:
-      name = @"Bounce to Left";
-      break;
-    case KLCPopupHideTypeBounceOutToRight:
-      name = @"Bounce to Right";
-      break;
-    default:
-      break;
-  }
-  return name;
 }
 
 
