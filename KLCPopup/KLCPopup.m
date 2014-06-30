@@ -484,6 +484,30 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           break;
         }
           
+        case KLCPopupShowTypeBounceIn: {
+          _containerView.alpha = 0.0;
+          // set frame before transform here...
+          _containerView.frame = finalContainerFrame;
+          _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:15.0
+                              options:0
+                           animations:^{
+                             _containerView.alpha = 1.0;
+                             _containerView.transform = CGAffineTransformIdentity;
+                           }
+                           completion: ^(BOOL finished) {
+                             if (finished) {
+                               completionBlock();
+                             }
+                           }];
+          
+          break;
+        }
+          
         case KLCPopupShowTypeBounceInFromTop: {
           _containerView.alpha = 1.0;
           _containerView.transform = CGAffineTransformIdentity;
@@ -754,6 +778,32 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                if (finished) {
                                  completionBlock();
                                }
+                             }];
+            
+            break;
+          }
+            
+          case KLCPopupHideTypeBounceOut: {
+            [UIView animateWithDuration:bounce1Duration
+                                  delay:0
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:^(void){
+                               _containerView.transform = CGAffineTransformMakeScale(1.1, 1.1);
+                             }
+                             completion:^(BOOL finished){
+                               
+                               [UIView animateWithDuration:bounce2Duration
+                                                     delay:0
+                                                   options:UIViewAnimationOptionCurveEaseIn
+                                                animations:^(void){
+                                                  _containerView.alpha = 0.0;
+                                                  _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+                                                }
+                                                completion:^(BOOL finished) {
+                                                  if (finished) {
+                                                    completionBlock();
+                                                  }
+                                                }];
                              }];
             
             break;

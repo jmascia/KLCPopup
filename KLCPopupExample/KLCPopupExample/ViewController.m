@@ -124,6 +124,7 @@ static NSInteger const kFieldDetailTag = 1102;
                    @(KLCPopupShowTypeSlideInFromBottom),
                    @(KLCPopupShowTypeSlideInFromLeft),
                    @(KLCPopupShowTypeSlideInFromRight),
+                   @(KLCPopupShowTypeBounceIn),
                    @(KLCPopupShowTypeBounceInFromTop),
                    @(KLCPopupShowTypeBounceInFromBottom),
                    @(KLCPopupShowTypeBounceInFromLeft),
@@ -137,6 +138,7 @@ static NSInteger const kFieldDetailTag = 1102;
                    @(KLCPopupHideTypeSlideOutToBottom),
                    @(KLCPopupHideTypeSlideOutToLeft),
                    @(KLCPopupHideTypeSlideOutToRight),
+                   @(KLCPopupHideTypeBounceOut),
                    @(KLCPopupHideTypeBounceOutToTop),
                    @(KLCPopupHideTypeBounceOutToBottom),
                    @(KLCPopupHideTypeBounceOutToLeft),
@@ -1014,6 +1016,9 @@ static NSInteger const kFieldDetailTag = 1102;
     case KLCPopupShowTypeSlideInFromRight:
       name = @"Slide from Right";
       break;
+    case KLCPopupShowTypeBounceIn:
+      name = @"Bounce in";
+      break;
     case KLCPopupShowTypeBounceInFromTop:
       name = @"Bounce from Top";
       break;
@@ -1025,6 +1030,7 @@ static NSInteger const kFieldDetailTag = 1102;
       break;
     case KLCPopupShowTypeBounceInFromRight:
       name = @"Bounce from Right";
+      break;
     default:
       break;
   }
@@ -1058,6 +1064,9 @@ static NSInteger const kFieldDetailTag = 1102;
     case KLCPopupHideTypeSlideOutToRight:
       name = @"Slide to Right";
       break;
+    case KLCPopupHideTypeBounceOut:
+      name = @"Bounce out";
+      break;
     case KLCPopupHideTypeBounceOutToTop:
       name = @"Bounce to Top";
       break;
@@ -1069,6 +1078,7 @@ static NSInteger const kFieldDetailTag = 1102;
       break;
     case KLCPopupHideTypeBounceOutToRight:
       name = @"Bounce to Right";
+      break;
     default:
       break;
   }
