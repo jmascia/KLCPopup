@@ -99,13 +99,13 @@ typedef enum {
 // If YES, then popup will get dismissed when content view is touched. default = NO.
 @property (nonatomic, assign) BOOL shouldHideOnContentTouch;
 
-// Block gets called after show animation finishes.
+// Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishShowingCompletion)();
 
-// Block gets called when hide animation starts.
+// Block gets called when hide animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^willStartHidingCompletion)();
 
-// Block gets called after hide animation finishes.
+// Block gets called after hide animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishHidingCompletion)();
 
 // Convenience method for creating a popup.

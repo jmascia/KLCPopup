@@ -25,25 +25,23 @@
 #import "ViewController.h"
 #import "KLCPopup.h"
 
-static NSInteger const kMaskPickerTag = 1001;
-static NSInteger const kShowPickerTag = 1002;
-static NSInteger const kHidePickerTag = 1003;
-static NSInteger const kHorizontalPickerTag = 1004;
-static NSInteger const kVerticalPickerTag = 1005;
+static NSInteger const kMaskFieldTag = 1001;
+static NSInteger const kShowFieldTag = 1002;
+static NSInteger const kHideFieldTag = 1003;
+static NSInteger const kHorizontalFieldTag = 1004;
+static NSInteger const kVerticalFieldTag = 1005;
 
 static NSInteger const kFieldTitleTag = 1101;
 static NSInteger const kFieldDetailTag = 1102;
 
-static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
-
 
 @interface ViewController () {
   
-  KLCPopupHorizontalLayout _selectedHorizontalLayout;
-  KLCPopupVerticalLayout _selectedVerticalLayout;
-  KLCPopupMaskType _selectedMaskType;
-  KLCPopupShowType _selectedShowType;
-  KLCPopupHideType _selectedHideType;
+  NSInteger _selectedRowInHorizontalField;
+  NSInteger _selectedRowInVerticalField;
+  NSInteger _selectedRowInMaskField;
+  NSInteger _selectedRowInShowField;
+  NSInteger _selectedRowInHideField;
   
   UIPickerView* _pickerView;
   UILabel* _pickerLabel;
@@ -66,6 +64,8 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   NSArray* _hideTypes;
 }
 
+@property (nonatomic, strong) UIPopoverController* popover;
+
 - (void)updateLabelsForState;
 - (NSInteger)valueForRow:(NSInteger)row inList:(NSArray*)list;
 - (NSString*)nameForHorizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout;
@@ -85,7 +85,6 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 
 @implementation ViewController
 
-
 - (void)dealloc {
 	[_horizontalButton removeObserver:self forKeyPath:@"highlighted"];
   [_verticalButton removeObserver:self forKeyPath:@"highlighted"];
@@ -100,12 +99,6 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    
-    _selectedMaskType = KLCPopupMaskTypeClear;
-    _selectedHorizontalLayout = KLCPopupHorizontalLayoutCenter;
-    _selectedVerticalLayout = KLCPopupVerticalLayoutCenter;
-    _selectedShowType = KLCPopupShowTypeBounceInFromTop;
-    _selectedHideType = KLCPopupHideTypeBounceOutToBottom;
     
     _horizontalLayouts = @[@(KLCPopupHorizontalLayoutLeft),
                            @(KLCPopupHorizontalLayoutLeftOfCenter),
@@ -148,6 +141,13 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
                    @(KLCPopupHideTypeBounceOutToBottom),
                    @(KLCPopupHideTypeBounceOutToLeft),
                    @(KLCPopupHideTypeBounceOutToRight)];
+  
+    _selectedRowInHorizontalField = [_horizontalLayouts indexOfObject:@(KLCPopupHorizontalLayoutCenter)];
+    _selectedRowInVerticalField = [_verticalLayouts indexOfObject:@(KLCPopupVerticalLayoutCenter)];
+    _selectedRowInMaskField = [_maskTypes indexOfObject:@(KLCPopupMaskTypeClear)];
+    _selectedRowInShowField = [_showTypes indexOfObject:@(KLCPopupShowTypeBounceInFromTop)];
+    _selectedRowInHideField = [_hideTypes indexOfObject:@(KLCPopupHideTypeBounceOutToBottom)];
+
   }
   return self;
 }
@@ -209,7 +209,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   horizontalButton.translatesAutoresizingMaskIntoConstraints = NO;
   horizontalButton.backgroundColor = [UIColor clearColor];
   [horizontalButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [horizontalButton addObserver:self forKeyPath:@"highlighted" options:0 context:kFieldButtonObservingContext];
+  [horizontalButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
   _horizontalButton = horizontalButton;
   
   // VERTICAL LAYOUT
@@ -240,7 +240,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   verticalButton.translatesAutoresizingMaskIntoConstraints = NO;
   verticalButton.backgroundColor = [UIColor clearColor];
   [verticalButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [verticalButton addObserver:self forKeyPath:@"highlighted" options:0 context:kFieldButtonObservingContext];
+  [verticalButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
   _verticalButton = verticalButton;
   
   // MASK TYPE
@@ -271,7 +271,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   maskTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
   maskTypeButton.backgroundColor = [UIColor clearColor];
   [maskTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [maskTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:kFieldButtonObservingContext];
+  [maskTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
   _maskTypeButton = maskTypeButton;
   
   // SHOW TYPE
@@ -302,7 +302,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   showTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
   showTypeButton.backgroundColor = [UIColor clearColor];
   [showTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [showTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:kFieldButtonObservingContext];
+  [showTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
   _showTypeButton = showTypeButton;
   
   // HIDE TYPE
@@ -333,7 +333,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   hideTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
   hideTypeButton.backgroundColor = [UIColor clearColor];
   [hideTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [hideTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:kFieldButtonObservingContext];
+  [hideTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
   _hideTypeButton = hideTypeButton;
   
   // BACKGROUND TAP
@@ -676,30 +676,34 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   
   // Initialize picker for pressed field
   NSInteger rowToSelect = 0;
+  NSInteger fieldTag = 0;
   if (sender == _horizontalButton) {
-    _pickerView.tag = kHorizontalPickerTag;
-    rowToSelect = [_horizontalLayouts indexOfObject:@(_selectedHorizontalLayout)];
+    fieldTag = kHorizontalFieldTag;
+    rowToSelect = _selectedRowInHorizontalField;
     
   } else if (sender == _verticalButton) {
-    _pickerView.tag = kVerticalPickerTag;
-    rowToSelect = [_verticalLayouts indexOfObject:@(_selectedVerticalLayout)];
+    fieldTag = kVerticalFieldTag;
+    rowToSelect = _selectedRowInVerticalField;
     
   } else if (sender == _maskTypeButton) {
-    _pickerView.tag = kMaskPickerTag;
-    rowToSelect = [_maskTypes indexOfObject:@(_selectedMaskType)];
+    fieldTag = kMaskFieldTag;
+    rowToSelect = _selectedRowInMaskField;
     
   } else if (sender == _showTypeButton) {
-    _pickerView.tag = kShowPickerTag;
-    rowToSelect = [_showTypes indexOfObject:@(_selectedShowType)];
+    fieldTag = kShowFieldTag;
+    rowToSelect = _selectedRowInShowField;
     
   } else if (sender == _hideTypeButton) {
-    _pickerView.tag = kHidePickerTag;
-    rowToSelect = [_showTypes indexOfObject:@(_selectedHideType)];
+    fieldTag = kHideFieldTag;
+    rowToSelect = _selectedRowInHideField;
   }
+  
+  _pickerView.tag = fieldTag;
   [_pickerView reloadAllComponents];
   [_pickerView selectRow:rowToSelect inComponent:0 animated:NO];
   
   // Show field's title text
+  
   if ([sender isKindOfClass:[UIView class]]) {
     UIView* view = [(UIView*)sender viewWithTag:kFieldTitleTag];
     if ([view isKindOfClass:[UILabel class]]) {
@@ -707,18 +711,41 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
     }
   }
   
-  KLCPopup* popup = [KLCPopup popupWithContentView:_pickerContainer
-                                          showType:KLCPopupShowTypeSlideInFromBottom
-                                          hideType:KLCPopupHideTypeSlideOutToBottom
-                                          maskType:KLCPopupMaskTypeDimmed];
   
-  popup.verticalLayout = KLCPopupVerticalLayoutBottom;
-  popup.shouldHideOnBackgroundTouch = YES;
-  popup.shouldHideOnContentTouch = NO;
-  popup.willStartHidingCompletion = ^{
-    [self updateLabelsForState];
-  };
-  [popup show];
+  if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    
+    UIViewController* controller = [[UIViewController alloc] init];
+    
+    UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 100, 200) style:UITableViewStylePlain];
+    tableView.delegate = self;
+    tableView.dataSource = self;
+    tableView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+    tableView.tag = fieldTag;
+    [tableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
+    controller.view = tableView;
+    
+    UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:controller];
+    popover.delegate = self;
+    self.popover = popover;
+    
+    UIView* senderView = (UIView*)sender;
+    CGRect senderFrameInView = [senderView convertRect:senderView.bounds toView:self.view];
+    [popover presentPopoverFromRect:senderFrameInView inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    
+  } else {
+    KLCPopup* popup = [KLCPopup popupWithContentView:_pickerContainer
+                                            showType:KLCPopupShowTypeSlideInFromBottom
+                                            hideType:KLCPopupHideTypeSlideOutToBottom
+                                            maskType:KLCPopupMaskTypeDimmed];
+    
+    popup.verticalLayout = KLCPopupVerticalLayoutBottom;
+    popup.shouldHideOnBackgroundTouch = YES;
+    popup.shouldHideOnContentTouch = NO;
+    popup.willStartHidingCompletion = ^{
+      [self updateLabelsForState];
+    };
+    [popup show];
+  }
 }
 
 - (void)showButtonPressed:(id)sender {
@@ -766,12 +793,12 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   
   // Show in popup
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
-                                          showType:_selectedShowType
-                                          hideType:_selectedHideType
-                                          maskType:_selectedMaskType];
+                                          showType:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]
+                                          hideType:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]
+                                          maskType:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]];
   
-  popup.horizontalLayout = _selectedHorizontalLayout;
-  popup.verticalLayout = _selectedVerticalLayout;
+  popup.horizontalLayout = [self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag];
+  popup.verticalLayout = [self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag];
   popup.shouldHideOnBackgroundTouch = _backgroundSwitch.on;
   popup.shouldHideOnContentTouch = _contentSwitch.on;
   
@@ -795,11 +822,11 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 #pragma mark - Private
 
 - (void)updateLabelsForState {
-  [(UILabel*)[_horizontalButton viewWithTag:kFieldDetailTag] setText:[self nameForHorizontalLayout:_selectedHorizontalLayout]];
-  [(UILabel*)[_verticalButton viewWithTag:kFieldDetailTag] setText:[self nameForVerticalLayout:_selectedVerticalLayout]];
-  [(UILabel*)[_maskTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForMaskType:_selectedMaskType]];
-  [(UILabel*)[_showTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForShowType:_selectedShowType]];
-  [(UILabel*)[_hideTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForHideType:_selectedHideType]];
+  [(UILabel*)[_horizontalButton viewWithTag:kFieldDetailTag] setText:[self nameForHorizontalLayout:[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag]]];
+  [(UILabel*)[_verticalButton viewWithTag:kFieldDetailTag] setText:[self nameForVerticalLayout:[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag]]];
+  [(UILabel*)[_maskTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForMaskType:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]]];
+  [(UILabel*)[_showTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForShowType:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]]];
+  [(UILabel*)[_hideTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForHideType:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]]];
 }
 
 
@@ -818,6 +845,79 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   }
   
   return 0;
+}
+
+
+- (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag {
+
+  NSArray* listForField = nil;
+  if (tag == kHorizontalFieldTag) {
+    listForField = _horizontalLayouts;
+    
+  } else if (tag == kVerticalFieldTag) {
+    listForField = _verticalLayouts;
+    
+  } else if (tag == kMaskFieldTag) {
+    listForField = _maskTypes;
+    
+  } else if (tag == kShowFieldTag) {
+    listForField = _showTypes;
+    
+  } else if (tag == kHideFieldTag) {
+    listForField = _hideTypes;
+  }
+  
+  // If row is out of bounds, try using first row.
+  if (row >= listForField.count) {
+    row = 0;
+  }
+  
+  if (row < listForField.count) {
+    id obj = [listForField objectAtIndex:row];
+    if ([obj isKindOfClass:[NSNumber class]]) {
+      return [(NSNumber*)obj integerValue];
+    }
+  }
+  
+  return 0;
+}
+
+- (NSInteger)selectedRowForFieldWithTag:(NSInteger)tag {
+  if (tag == kHorizontalFieldTag) {
+    return _selectedRowInHorizontalField;
+    
+  } else if (tag == kVerticalFieldTag) {
+    return _selectedRowInVerticalField;
+    
+  } else if (tag == kMaskFieldTag) {
+    return _selectedRowInMaskField;
+    
+  } else if (tag == kShowFieldTag) {
+    return _selectedRowInShowField;
+    
+  } else if (tag == kHideFieldTag) {
+    return _selectedRowInHideField;
+  }
+  return 0;
+}
+
+- (NSString*)nameForValue:(NSInteger)value inFieldWithTag:(NSInteger)tag {
+  if (tag == kHorizontalFieldTag) {
+    return [self nameForHorizontalLayout:value];
+    
+  } else if (tag == kVerticalFieldTag) {
+    return [self nameForVerticalLayout:value];
+  
+  } else if (tag == kMaskFieldTag) {
+    return [self nameForMaskType:value];
+  
+  } else if (tag == kShowFieldTag) {
+    return [self nameForShowType:value];
+  
+  } else if (tag == kHideFieldTag) {
+    return [self nameForHideType:value];
+  }
+  return nil;
 }
 
 
@@ -976,7 +1076,7 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 }
 
 
-#pragma mark - UIPickerViewDataSource
+#pragma mark - <UIPickerViewDataSource>
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
   return 1;
@@ -987,19 +1087,19 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
   
   if (component == 0) {
     
-    if (pickerView.tag == kHorizontalPickerTag) {
+    if (pickerView.tag == kHorizontalFieldTag) {
       return _horizontalLayouts.count;
       
-    } else if (pickerView.tag == kVerticalPickerTag) {
+    } else if (pickerView.tag == kVerticalFieldTag) {
       return _verticalLayouts.count;
       
-    } else if (pickerView.tag == kMaskPickerTag) {
+    } else if (pickerView.tag == kMaskFieldTag) {
       return _maskTypes.count;
       
-    } else if (pickerView.tag == kShowPickerTag) {
+    } else if (pickerView.tag == kShowFieldTag) {
       return _showTypes.count;
       
-    } else if (pickerView.tag == kHidePickerTag) {
+    } else if (pickerView.tag == kHideFieldTag) {
       return _hideTypes.count;
     }
   }
@@ -1007,66 +1107,194 @@ static void *kFieldButtonObservingContext = &kFieldButtonObservingContext;
 }
 
 
-#pragma mark - UIPickerViewDelegate
+#pragma mark - <UIPickerViewDelegate>
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
   
-  if (pickerView.tag == kHorizontalPickerTag) {
-    return [self nameForHorizontalLayout:[self valueForRow:row inList:_horizontalLayouts]];
-    
-  } else if (pickerView.tag == kVerticalPickerTag) {
-    return [self nameForVerticalLayout:[self valueForRow:row inList:_verticalLayouts]];
-    
-  } else if (pickerView.tag == kMaskPickerTag) {
-    return [self nameForMaskType:[self valueForRow:row inList:_maskTypes]];
-    
-  } else if (pickerView.tag == kShowPickerTag) {
-    return [self nameForShowType:[self valueForRow:row inList:_showTypes]];
-    
-  } else if (pickerView.tag == kHidePickerTag) {
-    return [self nameForHideType:[self valueForRow:row inList:_hideTypes]];
-  }
-  return nil;
+  NSInteger fieldTag = pickerView.tag;
+  return [self nameForValue:[self valueForRow:row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
 }
 
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
   
-  if (pickerView.tag == kHorizontalPickerTag) {
-    _selectedHorizontalLayout = [self valueForRow:row inList:_horizontalLayouts];
+  if (pickerView.tag == kHorizontalFieldTag) {
+    _selectedRowInHorizontalField = row;
     
-  } else if (pickerView.tag == kVerticalPickerTag) {
-    _selectedVerticalLayout = [self valueForRow:row inList:_verticalLayouts];
+  } else if (pickerView.tag == kVerticalFieldTag) {
+    _selectedRowInVerticalField = row;
     
-  } else if (pickerView.tag == kMaskPickerTag) {
-    _selectedMaskType = [self valueForRow:row inList:_maskTypes];
+  } else if (pickerView.tag == kMaskFieldTag) {
+    _selectedRowInMaskField = row;
     
-  } else if (pickerView.tag == kShowPickerTag) {
-    _selectedShowType = [self valueForRow:row inList:_showTypes];
+  } else if (pickerView.tag == kShowFieldTag) {
+    _selectedRowInShowField = row;
     
-  } else if (pickerView.tag == kHidePickerTag) {
-    _selectedHideType = [self valueForRow:row inList:_hideTypes];
+  } else if (pickerView.tag == kHideFieldTag) {
+    _selectedRowInHideField = row;
   }
 }
 
-#pragma mark - <NSKeyValueObserving>
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-	if (context == kFieldButtonObservingContext ) {
+#pragma mark - <UITableViewDataSource>
 
-    if ([keyPath isEqualToString:@"highlighted"]) {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+  
+  if (tableView.tag == kHorizontalFieldTag) {
+    return _horizontalLayouts.count;
+    
+  } else if (tableView.tag == kVerticalFieldTag) {
+    return _verticalLayouts.count;
+    
+  } else if (tableView.tag == kMaskFieldTag) {
+    return _maskTypes.count;
+    
+  } else if (tableView.tag == kShowFieldTag) {
+    return _showTypes.count;
+    
+  } else if (tableView.tag == kHideFieldTag) {
+    return _hideTypes.count;
+  }
+  
+  return 0;
+}
 
-      if ([object isKindOfClass:[UIButton class]]) {
-        UIButton* button = (UIButton*)object;
-        for (UIView* subview in button.subviews) {
-          if ([subview isKindOfClass:[UILabel class]]) {
-            [(UILabel*)subview setHighlighted:button.highlighted];
-          }
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+  UITableViewCell* cell = nil;
+  
+  Class cellClass = [UITableViewCell class];
+  NSString* identifier = NSStringFromClass(cellClass);
+  
+  cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+  
+  if (nil == cell) {
+    UITableViewCellStyle style = UITableViewCellStyleDefault;
+    cell = [[cellClass alloc] initWithStyle:style reuseIdentifier:identifier];
+  }
+  
+  NSInteger fieldTag = tableView.tag;
+  
+  cell.textLabel.text = [self nameForValue:[self valueForRow:indexPath.row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
+  
+  if (indexPath.row == [self selectedRowForFieldWithTag:fieldTag]) {
+    cell.accessoryType = UITableViewCellAccessoryCheckmark;
+  } else {
+    cell.accessoryType = UITableViewCellAccessoryNone;
+  }
+
+  return cell;
+}
+
+
+- (void)updateTableView:(UITableView*)tableView {
+  
+  if (tableView != nil) {
+    
+    NSInteger fieldTag = tableView.tag;
+    NSInteger selectedRow = [self selectedRowForFieldWithTag:fieldTag];
+    
+    for (NSIndexPath* indexPath in [tableView indexPathsForVisibleRows]) {
+      
+      UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+      if (cell != nil) {
+        
+        if (indexPath.row == selectedRow) {
+          cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+          cell.accessoryType = UITableViewCellAccessoryNone;
         }
       }
     }
   }
 }
+
+
+
+
+#pragma mark - <UITableViewDelegate>
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+  
+  if (tableView.tag == kHorizontalFieldTag) {
+    _selectedRowInHorizontalField = indexPath.row;
+    
+  } else if (tableView.tag == kVerticalFieldTag) {
+    _selectedRowInVerticalField = indexPath.row;
+    
+  } else if (tableView.tag == kMaskFieldTag) {
+    _selectedRowInMaskField = indexPath.row;
+    
+  } else if (tableView.tag == kShowFieldTag) {
+    _selectedRowInShowField = indexPath.row;
+    
+  } else if (tableView.tag == kHideFieldTag) {
+    _selectedRowInHideField = indexPath.row;
+  }
+  
+  [tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+  [self updateTableView:tableView];
+  
+  [self updateLabelsForState];
+  
+  [self.popover dismissPopoverAnimated:YES];
+}
+
+
+#pragma mark - <UIPopoverControllerDelegate>
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+  
+  //
+  UIView* view = popoverController.contentViewController.view;
+  if ([view isKindOfClass:[UITableView class]]) {
+    [(UITableView*)view removeObserver:self forKeyPath:@"contentSize"];
+  }
+  
+  //
+  self.popover = nil;
+}
+
+
+#pragma mark - <NSKeyValueObserving>
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+  
+  //
+  if ([keyPath isEqualToString:@"highlighted"]) {
+    
+    if ([object isKindOfClass:[UIButton class]]) {
+      UIButton* button = (UIButton*)object;
+      for (UIView* subview in button.subviews) {
+        if ([subview isKindOfClass:[UILabel class]]) {
+          [(UILabel*)subview setHighlighted:button.highlighted];
+        }
+      }
+    }
+  }
+  
+  //
+  else if ([keyPath isEqualToString:@"contentSize"]) {
+   
+    if ([object isKindOfClass:[UITableView class]]) {
+      UITableView* tableView = (UITableView*)object;
+      
+      if (self.popover != nil) {
+        [self.popover setPopoverContentSize:tableView.contentSize animated:NO];
+      }
+      
+      NSInteger fieldTag = tableView.tag;
+      NSInteger selectedRow = [self selectedRowForFieldWithTag:fieldTag];
+      
+      if ([tableView numberOfRowsInSection:0] > selectedRow) {
+        [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+      }
+    }
+  }
+}
+
 
 @end
 
