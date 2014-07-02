@@ -52,6 +52,9 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 - (void)dealloc {
   [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
+  // stop listening to notifications
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -68,6 +71,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.backgroundColor = [UIColor clearColor];
 		self.alpha = 0;
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.autoresizesSubviews = YES;
     
     self.shouldHideOnBackgroundTouch = YES;
     self.shouldHideOnContentTouch = NO;
@@ -95,6 +99,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     
     [self addSubview:_backgroundView];
     [self addSubview:_containerView];
+    
+    // register for notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didChangeStatusBarOrientation:)
+                                                 name:UIApplicationDidChangeStatusBarFrameNotification
+                                               object:nil];
   }
   return self;
 }
@@ -167,8 +177,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 - (void)showWithDuration:(NSTimeInterval)duration {
   
-  
-  // If can be shown
+  // If popup can be shown
   if (!_isBeingShown && !_isShowing && !_isBeingHidden) {
     _isBeingShown = YES;
     _isShowing = NO;
@@ -191,7 +200,10 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
         }
       }
       
-      // Make sure not hidden
+      // Before we calculate layout for containerView, make sure we are transformed for current orientation.
+      [self updateForInterfaceOrientation];
+      
+      // Make sure we're not hidden
       self.hidden = NO;
       self.alpha = 1.0;
       
@@ -220,7 +232,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       }
       
       // Setup completion block
-      void (^completionBlock)(void) = ^(void) {
+      void (^completionBlock)(BOOL) = ^(BOOL finished) {
         _isBeingShown = NO;
         _isShowing = YES;
         _isBeingHidden = NO;
@@ -254,32 +266,39 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       contentViewFrame.origin = CGPointZero;
       self.contentView.frame = contentViewFrame;
       
-      // Determine final position for container based on horizontal and vertical layouts.
+      
+      // Determine final position and necessary autoresizingMask for container based on horizontal and vertical layouts.
       CGRect finalContainerFrame = containerFrame;
+      UIViewAutoresizing containerAutoresizingMask = UIViewAutoresizingNone;
       switch (_horizontalLayout) {
           
         case KLCPopupHorizontalLayoutLeft: {
           finalContainerFrame.origin.x = 0.0;
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleRightMargin;
           break;
         }
           
         case KLCPopupHorizontalLayoutLeftOfCenter: {
-          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.frame)/3.0 - CGRectGetWidth(containerFrame)/2.0);
+          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)/3.0 - CGRectGetWidth(containerFrame)/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
           break;
         }
           
         case KLCPopupHorizontalLayoutCenter: {
-          finalContainerFrame.origin.x = floorf((CGRectGetWidth(self.frame) - CGRectGetWidth(containerFrame))/2.0);
+          finalContainerFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame))/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
           break;
         }
           
         case KLCPopupHorizontalLayoutRightOfCenter: {
-          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.frame)*2.0/3.0 - CGRectGetWidth(containerFrame)/2.0);
+          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)*2.0/3.0 - CGRectGetWidth(containerFrame)/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
           break;
         }
           
         case KLCPopupHorizontalLayoutRight: {
-          finalContainerFrame.origin.x = CGRectGetWidth(self.frame) - CGRectGetWidth(containerFrame);
+          finalContainerFrame.origin.x = CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin;
           break;
         }
           
@@ -292,32 +311,39 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           
         case KLCPopupVerticalLayoutTop: {
           finalContainerFrame.origin.y = 0;
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleBottomMargin;
           break;
         }
 
         case KLCPopupVerticalLayoutAboveCenter: {
-          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.frame)/3.0 - CGRectGetHeight(containerFrame)/2.0);
+          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)/3.0 - CGRectGetHeight(containerFrame)/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
           break;
         }
           
         case KLCPopupVerticalLayoutCenter: {
-          finalContainerFrame.origin.y = floorf((CGRectGetHeight(self.frame) - CGRectGetHeight(containerFrame))/2.0);
+          finalContainerFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame))/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
           break;
         }
           
         case KLCPopupVerticalLayoutBelowCenter: {
-          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.frame)*2.0/3.0 - CGRectGetHeight(containerFrame)/2.0);
+          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)*2.0/3.0 - CGRectGetHeight(containerFrame)/2.0);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
           break;
         }
           
         case KLCPopupVerticalLayoutBottom: {
-          finalContainerFrame.origin.y = CGRectGetHeight(self.frame) - CGRectGetHeight(containerFrame);
+          finalContainerFrame.origin.y = CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame);
+          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin;
           break;
         }
 
         default:
           break;
       }
+      _containerView.autoresizingMask = containerAutoresizingMask;
+      
       
       // Animate content if needed
       switch (_showType) {
@@ -332,11 +358,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                               options:UIViewAnimationOptionCurveLinear
                            animations:^{
                              _containerView.alpha = 1.0;
-                           } completion:^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           }
+                           completion:completionBlock];
           break;
         }
           
@@ -355,11 +378,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                              // set transform before frame here...
                              _containerView.transform = CGAffineTransformIdentity;
                              _containerView.frame = finalContainerFrame;
-                           } completion:^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           }
+                           completion:completionBlock];
           
           break;
         }
@@ -378,11 +398,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                              // set transform before frame here...
                              _containerView.transform = CGAffineTransformIdentity;
                              _containerView.frame = finalContainerFrame;
-                           } completion:^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           }
+                           completion:completionBlock];
           break;
         }
           
@@ -399,11 +416,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion: ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -413,18 +426,14 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           CGRect startFrame = finalContainerFrame;
           startFrame.origin.y = CGRectGetHeight(self.frame);
           _containerView.frame = startFrame;
-          
+
           [UIView animateWithDuration:0.30
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion: ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
         
@@ -441,11 +450,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion: ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -462,11 +467,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion: ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           
           break;
         }
@@ -476,7 +477,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           // set frame before transform here...
           _containerView.frame = finalContainerFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
-          
+
           [UIView animateWithDuration:0.6
                                 delay:0.0
                usingSpringWithDamping:0.8
@@ -486,11 +487,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                              _containerView.alpha = 1.0;
                              _containerView.transform = CGAffineTransformIdentity;
                            }
-                           completion: ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           
           break;
         }
@@ -501,7 +498,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           CGRect startFrame = finalContainerFrame;
           startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
           _containerView.frame = startFrame;
-          
+
           [UIView animateWithDuration:0.6
                                 delay:0.0
                usingSpringWithDamping:0.8
@@ -510,11 +507,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion:  ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -533,11 +526,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion:  ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -547,7 +536,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           CGRect startFrame = finalContainerFrame;
           startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
           _containerView.frame = startFrame;
-          
+
           [UIView animateWithDuration:0.6
                                 delay:0.0
                usingSpringWithDamping:0.8
@@ -556,11 +545,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion:  ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -579,11 +564,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                            animations:^{
                              _containerView.frame = finalContainerFrame;
                            }
-                           completion:  ^(BOOL finished) {
-                             if (finished) {
-                               completionBlock();
-                             }
-                           }];
+                           completion:completionBlock];
           break;
         }
           
@@ -592,11 +573,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
           self.containerView.transform = CGAffineTransformIdentity;
           self.containerView.frame = finalContainerFrame;
   
-          completionBlock();
+          completionBlock(YES);
           
           break;
         }
       }
+      
     });
   }
 }
@@ -636,7 +618,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       }
       
       // Setup completion block
-      void (^completionBlock)(void) = ^(void) {
+      void (^completionBlock)(BOOL) = ^(BOOL finished) {
         
         [self removeFromSuperview];
         
@@ -663,11 +645,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                 options:UIViewAnimationOptionCurveLinear
                              animations:^{
                                _containerView.alpha = 0.0;
-                             } completion:^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             } completion:completionBlock];
             break;
           }
             
@@ -678,11 +656,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                              animations:^{
                                _containerView.alpha = 0.0;
                                _containerView.transform = CGAffineTransformMakeScale(1.1, 1.1);
-                             } completion:^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             } completion:completionBlock];
             break;
           }
             
@@ -693,11 +667,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                              animations:^{
                                _containerView.alpha = 0.0;
                                _containerView.transform = CGAffineTransformMakeScale(0.8, 0.8);
-                             } completion:^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             } completion:completionBlock];
             break;
           }
             
@@ -710,11 +680,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                finalFrame.origin.y = -CGRectGetHeight(finalFrame);
                                _containerView.frame = finalFrame;
                              }
-                             completion: ^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             completion:completionBlock];
             break;
           }
             
@@ -727,11 +693,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                finalFrame.origin.y = CGRectGetHeight(self.frame);
                                _containerView.frame = finalFrame;
                              }
-                             completion: ^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             completion:completionBlock];
             break;
           }
             
@@ -744,11 +706,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                finalFrame.origin.x = -CGRectGetWidth(finalFrame);
                                _containerView.frame = finalFrame;
                              }
-                             completion: ^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             completion:completionBlock];
             break;
           }
             
@@ -761,11 +719,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                finalFrame.origin.x = CGRectGetWidth(self.frame);
                                _containerView.frame = finalFrame;
                              }
-                             completion: ^(BOOL finished) {
-                               if (finished) {
-                                 completionBlock();
-                               }
-                             }];
+                             completion:completionBlock];
             
             break;
           }
@@ -786,11 +740,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                                   _containerView.alpha = 0.0;
                                                   _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
                                                 }
-                                                completion:^(BOOL finished) {
-                                                  if (finished) {
-                                                    completionBlock();
-                                                  }
-                                                }];
+                                                completion:completionBlock];
                              }];
             
             break;
@@ -815,11 +765,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                                   finalFrame.origin.y = -CGRectGetHeight(finalFrame);
                                                   _containerView.frame = finalFrame;
                                                 }
-                                                completion:^(BOOL finished) {
-                                                  if (finished) {
-                                                    completionBlock();
-                                                  }
-                                                }];
+                                                completion:completionBlock];
                              }];
             
             break;
@@ -844,11 +790,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                                   finalFrame.origin.y = CGRectGetHeight(self.frame);
                                                   _containerView.frame = finalFrame;
                                                 }
-                                                completion:^(BOOL finished) {
-                                                  if (finished) {
-                                                    completionBlock();
-                                                  }
-                                                }];
+                                                completion:completionBlock];
                              }];
             
             break;
@@ -873,11 +815,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                                   finalFrame.origin.x = -CGRectGetWidth(finalFrame);
                                                   _containerView.frame = finalFrame;
                                                 }
-                                                completion:^(BOOL finished) {
-                                                  if (finished) {
-                                                    completionBlock();
-                                                  }
-                                                }];
+                                                completion:completionBlock];
                              }];
             break;
           }
@@ -901,24 +839,20 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                                                   finalFrame.origin.x = CGRectGetWidth(self.frame);
                                                   _containerView.frame = finalFrame;
                                                 }
-                                                completion:^(BOOL finished) {
-                                                  if (finished) {
-                                                    completionBlock();
-                                                  }
-                                                }];
+                                                completion:completionBlock];
                              }];
             break;
           }
             
           default: {
             self.containerView.alpha = 0.0;
-            completionBlock();
+            completionBlock(YES);
             break;
           }
         }
       } else {
         self.containerView.alpha = 0.0;
-        completionBlock();
+        completionBlock(YES);
       }
       
     });
@@ -930,8 +864,41 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 #pragma mark - Private
 
 - (void)hide {
-  // Use this for calling hide from selector
+  // Use this for calling hide from selector because you can't pass primitives, thanks objc
   [self hide:YES];
+}
+
+- (void)updateForInterfaceOrientation {
+  
+  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+  CGFloat angle;
+  
+  switch (orientation) {
+    case UIInterfaceOrientationPortraitUpsideDown:
+      angle = M_PI;
+      break;
+    case UIInterfaceOrientationLandscapeLeft:
+      angle = -M_PI/2.0f;;
+      
+      break;
+    case UIInterfaceOrientationLandscapeRight:
+      angle = M_PI/2.0f;
+      
+      break;
+    default: // as UIInterfaceOrientationPortrait
+      angle = 0.0;
+      break;
+  }
+  
+  self.transform = CGAffineTransformMakeRotation(angle);
+  self.frame = self.window.bounds;
+}
+
+
+#pragma mark - Notification handlers
+
+- (void)didChangeStatusBarOrientation:(NSNotification*)notification {
+  [self updateForInterfaceOrientation];
 }
 
 
@@ -961,7 +928,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 
 
-
+#pragma mark - UIView Category
 
 @implementation UIView(KLCPopup)
 
@@ -981,11 +948,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 - (void)hidePresentingPopup {
   
-  // Iterate over superviews until you find a KLCPopup and hide it.
+  // Iterate over superviews until you find a KLCPopup and hide it, then gtfo
   UIView* view = self;
   while (view != nil) {
     if ([view isKindOfClass:[KLCPopup class]]) {
       [(KLCPopup*)view hide:YES];
+      break;
     }
     view = [view superview];
   }

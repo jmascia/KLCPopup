@@ -143,7 +143,7 @@ typedef enum {
 @end
 
 
-
+#pragma mark - UIView Category
 @interface UIView(KLCPopup)
 - (void)forEachPopupDoBlock:(void (^)(KLCPopup* popup))block;
 - (void)hidePresentingPopup;

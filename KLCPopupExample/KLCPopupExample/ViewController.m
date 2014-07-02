@@ -840,17 +840,17 @@ static NSInteger const kFieldDetailTag = 1102;
   
   // Show in popup
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
-                                          showType:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]
-                                          hideType:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]
-                                          maskType:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]];
+                                          showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]
+                                          hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]
+                                          maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]];
   
-  popup.horizontalLayout = [self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag];
-  popup.verticalLayout = [self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag];
+  popup.horizontalLayout = (KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag];
+  popup.verticalLayout = (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag];
   popup.shouldHideOnBackgroundTouch = _backgroundSwitch.on;
   popup.shouldHideOnContentTouch = _contentSwitch.on;
   
   if (_delaySwitch.on) {
-    [popup showWithDuration:2.5];
+    [popup showWithDuration:2.0];
   } else {
     [popup show];
   }
