@@ -812,7 +812,7 @@ static NSInteger const kFieldDetailTag = 1102;
   
   UIButton* hideButton = [UIButton buttonWithType:UIButtonTypeCustom];
   hideButton.translatesAutoresizingMaskIntoConstraints = NO;
-  hideButton.contentEdgeInsets = UIEdgeInsetsMake(6, 12, 6, 12);
+  hideButton.contentEdgeInsets = UIEdgeInsetsMake(8, 16, 8, 16);
   hideButton.backgroundColor = [UIColor klcGreenColor];
   [hideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [hideButton setTitleColor:[[hideButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
