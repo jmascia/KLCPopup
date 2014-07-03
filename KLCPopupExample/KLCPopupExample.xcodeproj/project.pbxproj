@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F7E1B061965CF7D00D576D8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7E1B051965CF7D00D576D8 /* QuartzCore.framework */; };
 		1FA76AB2195893080075A8E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA76AB1195893080075A8E4 /* Foundation.framework */; };
 		1FA76AB4195893080075A8E4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA76AB3195893080075A8E4 /* CoreGraphics.framework */; };
 		1FA76AB6195893080075A8E4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA76AB5195893080075A8E4 /* UIKit.framework */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1F7E1B051965CF7D00D576D8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		1FA76AAE195893080075A8E4 /* KLCPopupExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KLCPopupExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FA76AB1195893080075A8E4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1FA76AB3195893080075A8E4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -61,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F7E1B061965CF7D00D576D8 /* QuartzCore.framework in Frameworks */,
 				1FA76AB4195893080075A8E4 /* CoreGraphics.framework in Frameworks */,
 				1FA76AB6195893080075A8E4 /* UIKit.framework in Frameworks */,
 				1FA76AB2195893080075A8E4 /* Foundation.framework in Frameworks */,
@@ -103,6 +106,7 @@
 		1FA76AB0195893080075A8E4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1F7E1B051965CF7D00D576D8 /* QuartzCore.framework */,
 				1FA76AB1195893080075A8E4 /* Foundation.framework */,
 				1FA76AB3195893080075A8E4 /* CoreGraphics.framework */,
 				1FA76AB5195893080075A8E4 /* UIKit.framework */,

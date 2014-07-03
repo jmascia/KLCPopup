@@ -24,6 +24,7 @@
 
 #import "ViewController.h"
 #import "KLCPopup.h"
+#import <QuartzCore/QuartzCore.h>
 
 
 typedef NS_ENUM(NSInteger, FieldTag) {
@@ -387,7 +388,7 @@ typedef NS_ENUM(NSInteger, CellType) {
                                 hideOnContentTouch:_shouldHideOnContentTouch];
   
   if (_shouldHideAfterDelay) {
-    [popup showWithDuration:1.5];
+    [popup showWithDuration:2.0];
   } else {
     [popup show];
   }
