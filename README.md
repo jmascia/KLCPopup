@@ -3,16 +3,16 @@ KLCPopup
 
 KLCPopup is a simple and flexible iOS class for presenting any custom view as a popup. It includes a variety of options controlling how your popup appears and behaves.
 
-#Installation
+##Installation
 
 - Drag the `KLCPopup/KLCPopup` folder into your project.
 - `#import "KLCPopup.h"` where appropriate. 
 
-#Usage
+##Usage
 
 (see sample Xcode project in `/KLCPopupExample`)
 
-## Creating a Popup
+### Creating a Popup
 
 This method creates a popup for displaying a UIView, using the default layouts, animations, and behaviors (similar to a UIAlertView)
 
@@ -33,8 +33,7 @@ Note: You may pass `nil` for `contentView` when creating the popup, but **you mu
 
 Also **you must give your `contentView` a size** before showing it (by setting its frame), or **it must size itself with AutoLayout**.
 					
-
-## Showing a Popup
+### Showing a Popup
 	
 	- (void)show;
 	
@@ -42,8 +41,7 @@ Or if you want your popup to dismiss automatically (like a toast in Android) you
 	
 	- (void)showWithDuration:(NSTimeInterval)duration;
 
-		
-## Dismissing a Popup
+### Dismissing a Popup
 		
 There are a few ways to dismiss a popup:
 
@@ -59,9 +57,7 @@ Also you can call this category method from `UIView(KLCPopup)` on your contentVi
 	
 	- (void)dismissPresentingPopup; // UIView category
 
-
-## Customization
-
+### Customization
 
 The final horizontal position of your popup when shown:
 
@@ -92,7 +88,7 @@ The popup will automatically dismiss if the contentView is touched:
 	@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
 
 
-## Blocks
+### Blocks
 
 You can use these blocks to synchronize other actions with popup events:
 
@@ -103,7 +99,7 @@ You can use these blocks to synchronize other actions with popup events:
 	@property (nonatomic, copy) void (^didFinishDismissingCompletion)();
 
 
-## Example
+### Example
 
 	UIView* contentView = [[UIView alloc] init];
 	contentView.backgroundColor = [UIColor orangeColor];
@@ -112,7 +108,7 @@ You can use these blocks to synchronize other actions with popup events:
 	KLCPopup* popup = [KLCPopup popupWithContentView:contentView];
 	[popup show];
 
-# Notes
+## Notes
 
 ### Interface Orientation
 `KLCPopup` supports **Portrait** and **Landscape** by default.
@@ -126,6 +122,5 @@ You can use these blocks to synchronize other actions with popup events:
 ### ARC
 `KLCPopup` was made with ARC enabled by default.
 
-
-#Credits
+##Credits
 KLCPopup was created by Jeff Mascia at Kullect, where we use it in our [Shout Photo Messenger](http://tryshout.com) app for iPhone. Some aspects of this library were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
