@@ -1,7 +1,7 @@
 KLCPopup
 ========
 
-KLCPopup is a simple and flexible iOS class for presenting any custom view as a popup. It includes a variety of options controlling how your popup appears and behaves.
+KLCPopup is a simple and flexible iOS class for presenting any custom view as a popup. It includes a variety of options for controlling how your popup appears and behaves.
 
 ##Installation
 
