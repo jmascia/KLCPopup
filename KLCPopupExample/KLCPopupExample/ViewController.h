@@ -24,6 +24,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <UIPopoverControllerDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface ViewController : UIViewController <UIPopoverControllerDelegate, UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate>
 
 @end

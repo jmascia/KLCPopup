@@ -694,8 +694,7 @@ typedef NS_ENUM(NSInteger, CellType) {
     if ([obj isKindOfClass:[NSNumber class]]) {
       NSInteger fieldTag = [(NSNumber*)obj integerValue];
       
-      NSInteger rowToSelect = [self selectedRowForFieldWithTag:fieldTag];
-      if (rowToSelect != NSNotFound) {
+      if ([self cellTypeForFieldWithTag:fieldTag] == CellTypeNormal) {
 
         UIViewController* fieldController = [[UIViewController alloc] init];
         
@@ -709,6 +708,7 @@ typedef NS_ENUM(NSInteger, CellType) {
         // IPAD
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
           
+          // Present in a popover
           [fieldTableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
           
           UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:fieldController];
@@ -722,13 +722,14 @@ typedef NS_ENUM(NSInteger, CellType) {
         // IPHONE
         else {
 
+          // Present in a modal
           UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
           fieldController.title = cell.textLabel.text;
           UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(fieldCancelButtonPressed:)];
           fieldController.navigationItem.rightBarButtonItem = cancelButton;
  
           UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:fieldController];
-          
+          navigationController.delegate = self;
           [self presentViewController:navigationController animated:YES completion:NULL];
         }
       }
@@ -768,6 +769,22 @@ typedef NS_ENUM(NSInteger, CellType) {
     // IPHONE
     else {
       [self dismissViewControllerAnimated:YES completion:NULL];
+    }
+  }
+}
+
+#pragma mark - <UINavigationControllerDelegate>
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+  
+  // If this is a field table, make sure the selected row is scrolled into view
+  if ((navigationController == self.presentedViewController) && [viewController.view isKindOfClass:[UITableView class]]) {
+    
+    UITableView* fieldTableView = (UITableView*)viewController.view;
+    
+    NSInteger selectedRow = [self selectedRowForFieldWithTag:fieldTableView.tag];
+    if ([fieldTableView numberOfRowsInSection:0] > selectedRow) {
+      [fieldTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
     }
   }
 }
