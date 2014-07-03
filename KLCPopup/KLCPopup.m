@@ -38,6 +38,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
   BOOL _isBeingHidden;
 }
 
+- (void)updateForInterfaceOrientation;
+- (void)didChangeStatusBarOrientation:(NSNotification*)notification;
+
+// Used for calling hide:YES from selector because you can't pass primitives, thanks objc
+- (void)hide;
+
 @end
 
 
@@ -864,7 +870,6 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 #pragma mark - Private
 
 - (void)hide {
-  // Use this for calling hide from selector because you can't pass primitives, thanks objc
   [self hide:YES];
 }
 
