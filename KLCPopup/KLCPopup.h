@@ -23,7 +23,7 @@
 
 
 // KLCPopupShowType: Controls how the popup will be presented.
-typedef enum {
+typedef NS_ENUM(NSInteger, KLCPopupShowType) {
 	KLCPopupShowTypeNone = 0,
 	KLCPopupShowTypeFadeIn,
   KLCPopupShowTypeGrowIn,
@@ -37,10 +37,10 @@ typedef enum {
   KLCPopupShowTypeBounceInFromBottom,
   KLCPopupShowTypeBounceInFromLeft,
   KLCPopupShowTypeBounceInFromRight,
-} KLCPopupShowType;
+};
 
 // KLCPopupHideType: Controls how the popup will be dismissed.
-typedef enum {
+typedef NS_ENUM(NSInteger, KLCPopupHideType) {
 	KLCPopupHideTypeNone = 0,
 	KLCPopupHideTypeFadeOut,
   KLCPopupHideTypeGrowOut,
@@ -54,32 +54,32 @@ typedef enum {
   KLCPopupHideTypeBounceOutToBottom,
   KLCPopupHideTypeBounceOutToLeft,
   KLCPopupHideTypeBounceOutToRight,
-} KLCPopupHideType;
+};
 
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
-typedef enum {
+typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
   KLCPopupHorizontalLayoutLeft = 0,
   KLCPopupHorizontalLayoutLeftOfCenter,
   KLCPopupHorizontalLayoutCenter,
   KLCPopupHorizontalLayoutRightOfCenter,
   KLCPopupHorizontalLayoutRight,
-} KLCPopupHorizontalLayout;
+};
 
 // KLCPopupVerticalLayout: Controls where the popup will come to rest vertically.
-typedef enum {
+typedef NS_ENUM(NSInteger, KLCPopupVerticalLayout) {
 	KLCPopupVerticalLayoutTop = 0,
   KLCPopupVerticalLayoutAboveCenter,
   KLCPopupVerticalLayoutCenter,
   KLCPopupVerticalLayoutBelowCenter,
   KLCPopupVerticalLayoutBottom,
-} KLCPopupVerticalLayout;
+};
 
 // KLCPopupMaskType
-typedef enum {
+typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 	KLCPopupMaskTypeNone = 0, // Allow interaction with underlying views.
 	KLCPopupMaskTypeClear, // Don't allow interaction with underlying views.
 	KLCPopupMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
-} KLCPopupMaskType;
+};
 
 
 @interface KLCPopup : UIView
