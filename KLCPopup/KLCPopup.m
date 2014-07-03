@@ -615,11 +615,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     
     // cancel previous hide requests (i.e. the hide after duration call).
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hide) object:nil];
+
+    [self willStartHiding];
     
     if (self.willStartHidingCompletion != nil) {
       self.willStartHidingCompletion();
     }
-    [self willStartHiding];
     
     dispatch_async( dispatch_get_main_queue(), ^{
 
