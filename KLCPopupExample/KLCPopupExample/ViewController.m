@@ -266,13 +266,13 @@ typedef NS_ENUM(NSInteger, CellType) {
   [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [showButton setTitleColor:[[showButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
   showButton.titleLabel.font = [UIFont boldSystemFontOfSize:18.0];
-  [showButton.layer setCornerRadius:6.0];
+  [showButton.layer setCornerRadius:8.0];
   [showButton addTarget:self action:@selector(showButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
   [footerView addSubview:showButton];
   
-  CGFloat topMargin = 15.0;
-  CGFloat bottomMargin = 5.0;
+  CGFloat topMargin = 10.0;
+  CGFloat bottomMargin = 0.0;
   
   views = NSDictionaryOfVariableBindings(showButton);
   metrics = @{@"topMargin" : @(topMargin),
@@ -725,7 +725,7 @@ typedef NS_ENUM(NSInteger, CellType) {
           UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
           fieldController.title = cell.textLabel.text;
           UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(fieldCancelButtonPressed:)];
-          fieldController.navigationItem.leftBarButtonItem = cancelButton;
+          fieldController.navigationItem.rightBarButtonItem = cancelButton;
  
           UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:fieldController];
           
