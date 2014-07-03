@@ -44,11 +44,6 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 @interface ViewController () {
   
-  UIPickerView* _pickerView;
-  UILabel* _pickerLabel;
-  UIButton* _pickerButton;
-  UIView* _pickerContainer;
-  
   NSArray* _fields;
   NSDictionary* _namesForFields;
   
@@ -287,77 +282,6 @@ typedef NS_ENUM(NSInteger, CellType) {
   footerFrame.size.height += topMargin + bottomMargin;
   footerView.frame = footerFrame;
   self.tableView.tableFooterView = footerView;
-  
-  
-  // PICKER
-  UIPickerView* pickerView = [[UIPickerView alloc] init];
-  pickerView.translatesAutoresizingMaskIntoConstraints = NO;
-  pickerView.backgroundColor = [UIColor colorWithRed:(194.0/255.0) green:(202.0/255.0) blue:(215.0/255.0) alpha:1.0];
-  pickerView.showsSelectionIndicator = YES;
-  pickerView.dataSource = self;
-  pickerView.delegate = self;
-  _pickerView = pickerView;
-  
-  UILabel* pickerLabel = [[UILabel alloc] init];
-  pickerLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  pickerLabel.numberOfLines = 1;
-  pickerLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-  pickerLabel.backgroundColor = [UIColor clearColor];
-  pickerLabel.textColor = [UIColor blackColor];
-  pickerLabel.font = [UIFont systemFontOfSize:16.0];
-  _pickerLabel = pickerLabel;
-  
-  UIButton* pickerButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  pickerButton.translatesAutoresizingMaskIntoConstraints = NO;
-  pickerButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
-  pickerButton.backgroundColor = [UIColor clearColor];
-  [pickerButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-  [pickerButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
-  pickerButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
-  [pickerButton setTitle:@"Done" forState:UIControlStateNormal];
-  [pickerButton addTarget:self action:@selector(pickerDoneButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  
-  UIView* pickerContainer = [[UIView alloc] init];
-  pickerContainer.translatesAutoresizingMaskIntoConstraints = NO;
-  pickerContainer.backgroundColor = [UIColor colorWithRed:(145.0/255.0) green:(150.0/255.0) blue:(155.0/255.0) alpha:1.0];
-  _pickerContainer = pickerContainer;
-  
-  UIView* pickerBar = [[UIView alloc] init];
-  pickerBar.translatesAutoresizingMaskIntoConstraints = NO;
-  pickerBar.backgroundColor = [UIColor colorWithRed:(238.0/255.0) green:(240.0/255.0) blue:(242.0/255.0) alpha:1.0];
-  
-  [pickerContainer addSubview:pickerView];
-  [pickerBar addSubview:pickerLabel];
-  [pickerBar addSubview:pickerButton];
-  [pickerContainer addSubview:pickerBar];
-  
-  // AutoLayout for Picker container
-  views = NSDictionaryOfVariableBindings(pickerView, pickerLabel, pickerButton, pickerBar);
-  metrics = nil;
-  
-  [pickerContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(0.5)-[pickerBar][pickerView]|"
-                                           options:(NSLayoutFormatAlignAllLeft | NSLayoutFormatAlignAllRight)
-                                           metrics:metrics
-                                             views:views]];
-  
-  [pickerContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[pickerView]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  [pickerBar addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(12)-[pickerLabel]-(5)-[pickerButton]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [pickerBar addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(3)-[pickerButton]-(3)-|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
 }
 
 
@@ -465,8 +389,8 @@ typedef NS_ENUM(NSInteger, CellType) {
 }
 
 
-- (void)pickerDoneButtonPressed:(id)sender {
-  [_pickerView hidePresentingPopup];
+- (void)fieldCancelButtonPressed:(id)sender {
+  [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 
@@ -609,66 +533,6 @@ typedef NS_ENUM(NSInteger, CellType) {
       break;
   }
   return cellType;
-}
-
-
-#pragma mark - <UIPickerViewDataSource>
-
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-  return 1;
-}
-
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-  
-  if (component == 0) {
-    
-    if (pickerView.tag == FieldTagHorizontalLayout) {
-      return _horizontalLayouts.count;
-      
-    } else if (pickerView.tag == FieldTagVerticalLayout) {
-      return _verticalLayouts.count;
-      
-    } else if (pickerView.tag == FieldTagMaskType) {
-      return _maskTypes.count;
-      
-    } else if (pickerView.tag == FieldTagShowType) {
-      return _showTypes.count;
-      
-    } else if (pickerView.tag == FieldTagHideType) {
-      return _hideTypes.count;
-    }
-  }
-  return 0;
-}
-
-
-#pragma mark - <UIPickerViewDelegate>
-
-- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-  
-  NSInteger fieldTag = pickerView.tag;
-  return [self nameForValue:[self valueForRow:row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
-}
-
-
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-  
-  if (pickerView.tag == FieldTagHorizontalLayout) {
-    _selectedRowInHorizontalField = row;
-    
-  } else if (pickerView.tag == FieldTagVerticalLayout) {
-    _selectedRowInVerticalField = row;
-    
-  } else if (pickerView.tag == FieldTagMaskType) {
-    _selectedRowInMaskField = row;
-    
-  } else if (pickerView.tag == FieldTagShowType) {
-    _selectedRowInShowField = row;
-    
-  } else if (pickerView.tag == FieldTagHideType) {
-    _selectedRowInHideField = row;
-  }
 }
 
 
@@ -820,46 +684,40 @@ typedef NS_ENUM(NSInteger, CellType) {
       
       NSInteger rowToSelect = [self selectedRowForFieldWithTag:fieldTag];
       if (rowToSelect != NSNotFound) {
-      
-        _pickerView.tag = fieldTag;
-        [_pickerView reloadAllComponents];
-        [_pickerView selectRow:rowToSelect inComponent:0 animated:NO];
+
+        UIViewController* fieldController = [[UIViewController alloc] init];
         
-        UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
-        _pickerLabel.text = cell.textLabel.text;
+        UITableView* fieldTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        fieldTableView.delegate = self;
+        fieldTableView.dataSource = self;
+        fieldTableView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+        fieldTableView.tag = fieldTag;
+        fieldController.view = fieldTableView;
         
+        // IPAD
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
           
-          UIViewController* controller = [[UIViewController alloc] init];
+          [fieldTableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
           
-          UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 100, 200) style:UITableViewStylePlain];
-          tableView.delegate = self;
-          tableView.dataSource = self;
-          tableView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-          tableView.tag = fieldTag;
-          [tableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
-          controller.view = tableView;
-          
-          UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:controller];
+          UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:fieldController];
           popover.delegate = self;
           self.popover = popover;
           
           CGRect senderFrameInView = [self.tableView convertRect:[self.tableView rectForRowAtIndexPath:indexPath] toView:self.view];
           [popover presentPopoverFromRect:senderFrameInView inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        }
+        
+        // IPHONE
+        else {
+
+          UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+          fieldController.title = cell.textLabel.text;
+          UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(fieldCancelButtonPressed:)];
+          fieldController.navigationItem.leftBarButtonItem = cancelButton;
+ 
+          UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:fieldController];
           
-        } else {
-          KLCPopup* popup = [KLCPopup popupWithContentView:_pickerContainer
-                                                  showType:KLCPopupShowTypeSlideInFromBottom
-                                                  hideType:KLCPopupHideTypeSlideOutToBottom
-                                                  maskType:KLCPopupMaskTypeDimmed];
-          
-          popup.verticalLayout = KLCPopupVerticalLayoutBottom;
-          popup.shouldHideOnBackgroundTouch = YES;
-          popup.shouldHideOnContentTouch = NO;
-          popup.willStartHidingCompletion = ^{
-            [self.tableView reloadData];
-          };
-          [popup show];
+          [self presentViewController:navigationController animated:YES completion:NULL];
         }
       }
     }
@@ -891,7 +749,14 @@ typedef NS_ENUM(NSInteger, CellType) {
     
     [self.tableView reloadData];
     
-    [self.popover dismissPopoverAnimated:YES];
+    // IPAD
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+      [self.popover dismissPopoverAnimated:YES];
+    }
+    // IPHONE
+    else {
+      [self dismissViewControllerAnimated:YES completion:NULL];
+    }
   }
 }
 
