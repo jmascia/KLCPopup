@@ -260,18 +260,18 @@ typedef NS_ENUM(NSInteger, CellType) {
   
   UIButton* showButton = [UIButton buttonWithType:UIButtonTypeCustom];
   showButton.translatesAutoresizingMaskIntoConstraints = NO;
-  showButton.contentEdgeInsets = UIEdgeInsetsMake(15, 30, 15, 30);
+  showButton.contentEdgeInsets = UIEdgeInsetsMake(14, 28, 14, 28);
   [showButton setTitle:@"Show it!" forState:UIControlStateNormal];
   showButton.backgroundColor = [UIColor lightGrayColor];
   [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [showButton setTitleColor:[[showButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:18.0];
+  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:20.0];
   [showButton.layer setCornerRadius:8.0];
   [showButton addTarget:self action:@selector(showButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
   [footerView addSubview:showButton];
   
-  CGFloat topMargin = 10.0;
+  CGFloat topMargin = 12.0;
   CGFloat bottomMargin = 0.0;
   
   views = NSDictionaryOfVariableBindings(showButton);
@@ -365,13 +365,13 @@ typedef NS_ENUM(NSInteger, CellType) {
   NSDictionary* views = NSDictionaryOfVariableBindings(contentView, hideButton, hideLabel);
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(18)-[hideLabel]-(12)-[hideButton]-(18)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[hideLabel]-(10)-[hideButton]-(24)-|"
                                            options:NSLayoutFormatAlignAllCenterX
                                            metrics:nil
                                              views:views]];
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(50)-[hideLabel]-(50)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[hideLabel]-(36)-|"
                                            options:0
                                            metrics:nil
                                              views:views]];
@@ -615,6 +615,7 @@ typedef NS_ENUM(NSInteger, CellType) {
         } else if (cellType == CellTypeSwitch) {
           cell.selectionStyle = UITableViewCellSelectionStyleNone;
           UISwitch* toggle = [[UISwitch alloc] init];
+          toggle.onTintColor = [UIColor lightGrayColor];
           [toggle addTarget:self action:@selector(toggleValueDidChange:) forControlEvents:UIControlEventValueChanged];
           cell.accessoryView = toggle;
         }
