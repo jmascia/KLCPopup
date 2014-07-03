@@ -64,8 +64,8 @@ typedef NS_ENUM(NSInteger, CellType) {
   NSInteger _selectedRowInMaskField;
   NSInteger _selectedRowInShowField;
   NSInteger _selectedRowInHideField;
-  BOOL _shouldHideOnBackgroundTap;
-  BOOL _shouldHideOnContentTap;
+  BOOL _shouldHideOnBackgroundTouch;
+  BOOL _shouldHideOnContentTouch;
   BOOL _shouldHideAfterDelay;
 }
 
@@ -124,8 +124,8 @@ typedef NS_ENUM(NSInteger, CellType) {
                         @(FieldTagMaskType) : @"Background mask",
                         @(FieldTagShowType) : @"Show animation",
                         @(FieldTagHideType) : @"Hide animation",
-                        @(FieldTagBackgroundDismiss) : @"Hide on background tap",
-                        @(FieldTagContentDismiss) : @"Hide on content tap",
+                        @(FieldTagBackgroundDismiss) : @"Hide on background touch",
+                        @(FieldTagContentDismiss) : @"Hide on content touch",
                         @(FieldTagTimedDismiss) : @"Hide after delay"};
     
     // FIELD SUB-LISTS
@@ -223,8 +223,8 @@ typedef NS_ENUM(NSInteger, CellType) {
     _selectedRowInMaskField = [_maskTypes indexOfObject:@(KLCPopupMaskTypeDimmed)];
     _selectedRowInShowField = [_showTypes indexOfObject:@(KLCPopupShowTypeBounceInFromTop)];
     _selectedRowInHideField = [_hideTypes indexOfObject:@(KLCPopupHideTypeBounceOutToBottom)];
-    _shouldHideOnBackgroundTap = YES;
-    _shouldHideOnContentTap = NO;
+    _shouldHideOnBackgroundTouch = YES;
+    _shouldHideOnContentTouch = NO;
     _shouldHideAfterDelay = NO;
   }
   return self;
@@ -320,10 +320,10 @@ typedef NS_ENUM(NSInteger, CellType) {
       
       NSInteger fieldTag = [(NSNumber*)obj integerValue];
       if (fieldTag == FieldTagBackgroundDismiss) {
-        _shouldHideOnBackgroundTap = toggle.on;
+        _shouldHideOnBackgroundTouch = toggle.on;
      
       } else if (fieldTag == FieldTagContentDismiss) {
-        _shouldHideOnContentTap = toggle.on;
+        _shouldHideOnContentTouch = toggle.on;
       
       } else if (fieldTag == FieldTagTimedDismiss) {
         _shouldHideAfterDelay = toggle.on;
@@ -383,8 +383,8 @@ typedef NS_ENUM(NSInteger, CellType) {
                                           showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
                                           hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:FieldTagHideType]
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
-                             hideOnBackgroundTouch:_shouldHideOnBackgroundTap
-                                hideOnContentTouch:_shouldHideOnContentTap];
+                             hideOnBackgroundTouch:_shouldHideOnBackgroundTouch
+                                hideOnContentTouch:_shouldHideOnContentTouch];
   
   if (_shouldHideAfterDelay) {
     [popup showWithDuration:1.5];
@@ -634,9 +634,9 @@ typedef NS_ENUM(NSInteger, CellType) {
         if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
           BOOL on = NO;
           if (fieldTag == FieldTagBackgroundDismiss) {
-            on = _shouldHideOnBackgroundTap;
+            on = _shouldHideOnBackgroundTouch;
           } else if (fieldTag == FieldTagContentDismiss) {
-            on = _shouldHideOnContentTap;
+            on = _shouldHideOnContentTouch;
           } else if (fieldTag == FieldTagTimedDismiss) {
             on = _shouldHideAfterDelay;
           }
