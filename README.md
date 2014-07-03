@@ -14,11 +14,11 @@ KLCPopup is a simple and flexible iOS class for presenting any custom view as a 
 
 ### Creating a Popup
 
-This method creates a popup for displaying a UIView, using the default layouts, animations, and behaviors (similar to a UIAlertView)
+Create a popup for displaying a UIView using the default layouts, animations, and behaviors (similar to a UIAlertView)
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
 	
-This method creates a popup with custom layouts, animations, and behaviors. These customizations can also be accessed via properties on the popup instance.
+Creates a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance.
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView
 					 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
@@ -37,7 +37,7 @@ Also **you must give your `contentView` a size** before showing it (by setting i
 	
 	- (void)show;
 	
-Or if you want your popup to dismiss automatically (like a toast in Android) you can set an explicit duration.
+If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit duration.
 	
 	- (void)showWithDuration:(NSTimeInterval)duration;
 
@@ -59,19 +59,19 @@ Also you can call this category method from `UIView(KLCPopup)` on your contentVi
 
 ### Customization
 
-The final horizontal position of your popup when shown:
+Final horizontal position of your popup when shown:
 
 	@property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout;
 
-The final vertical position of your popup when shown:
+Final vertical position of your popup when shown:
 	
 	@property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout;
 
-The animation used to show your popup:
+Animation used to show your popup:
 
 	@property (nonatomic, assign) KLCPopupShowType showType;
 	
-The animation used to dismiss your popup:
+Animation used to dismiss your popup:
 
 	@property (nonatomic, assign) KLCPopupDismissType dismissType;
 	
@@ -79,18 +79,18 @@ Masking prevents touches to the background from passing through to views below:
 	
 	@property (nonatomic, assign) KLCPopupMaskType maskType;
 
-The popup will automatically dismiss if the background is touched:
+Popup will automatically dismiss if the background is touched:
 	
 	@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
 	
-The popup will automatically dismiss if the contentView is touched:
+Popup will automatically dismiss if the contentView is touched:
 
 	@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
 
 
 ### Blocks
 
-You can use these blocks to synchronize other actions with popup events:
+Use these blocks to synchronize other actions with popup events:
 
 	@property (nonatomic, copy) void (^didFinishShowingCompletion)();
 
