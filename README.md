@@ -14,11 +14,11 @@ KLCPopup is a simple and flexible iOS class for presenting any custom view as a 
 
 ### Creating a Popup
 
-Create a popup for displaying a UIView using the default layouts, animations, and behaviors (similar to a UIAlertView)
+Create a popup for displaying a UIView using the default layouts, animations, and behaviors (similar to a UIAlertView):
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
 	
-Creates a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance.
+Create a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance:
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView
 					 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
@@ -37,7 +37,7 @@ Also **you must give your `contentView` a size** before showing it (by setting i
 	
 	- (void)show;
 	
-If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit duration.
+If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit duration:
 	
 	- (void)showWithDuration:(NSTimeInterval)duration;
 
@@ -45,15 +45,15 @@ If you want your popup to dismiss automatically (like a toast in Android) you ca
 		
 There are a few ways to dismiss a popup:
 
-If you have a reference to the popup instance, you can send this message to it. If `animated`, then it will use the animation specified in `dismissType`. Otherwise it will just disappear. 
+If you have a reference to the popup instance, you can send this message to it. If `animated`, then it will use the animation specified in `dismissType`. Otherwise it will just disappear: 
 
 	- (void)dismiss:(BOOL)animated;
 
-If you lost your reference to a popup or you want to make sure no popups are showing, this class method dismisses any and all popups in your app.
+If you lost your reference to a popup or you want to make sure no popups are showing, this class method dismisses any and all popups in your app:
 
 	+ (void)dismissAllPopups;
 
-Also you can call this category method from `UIView(KLCPopup)` on your contentView, or any of its subviews, to dismiss its parent popup.
+Also you can call this category method from `UIView(KLCPopup)` on your contentView, or any of its subviews, to dismiss its parent popup:
 	
 	- (void)dismissPresentingPopup; // UIView category
 
