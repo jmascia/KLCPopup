@@ -72,6 +72,19 @@ typedef NS_ENUM(NSInteger, CellType) {
 @property (nonatomic, strong) UITableView* tableView;
 @property (nonatomic, strong) UIPopoverController* popover;
 
+// Private
+- (void)updateFieldTableView:(UITableView*)tableView;
+- (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag;
+- (NSInteger)selectedRowForFieldWithTag:(NSInteger)tag;
+- (NSString*)nameForValue:(NSInteger)value inFieldWithTag:(NSInteger)tag;
+- (CellType)cellTypeForFieldWithTag:(NSInteger)tag;
+
+// Event handlers
+- (void)toggleValueDidChange:(id)sender;
+- (void)showButtonPressed:(id)sender;
+- (void)hideButtonPressed:(id)sender;
+- (void)fieldCancelButtonPressed:(id)sender;
+
 @end
 
 
