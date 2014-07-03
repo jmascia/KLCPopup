@@ -350,11 +350,11 @@ typedef NS_ENUM(NSInteger, CellType) {
   
   UIButton* hideButton = [UIButton buttonWithType:UIButtonTypeCustom];
   hideButton.translatesAutoresizingMaskIntoConstraints = NO;
-  hideButton.contentEdgeInsets = UIEdgeInsetsMake(8, 16, 8, 16);
+  hideButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
   hideButton.backgroundColor = [UIColor klcGreenColor];
   [hideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [hideButton setTitleColor:[[hideButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-  hideButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
+  hideButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
   [hideButton setTitle:@"Bye" forState:UIControlStateNormal];
   hideButton.layer.cornerRadius = 6.0;
   [hideButton addTarget:self action:@selector(hideButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -365,13 +365,13 @@ typedef NS_ENUM(NSInteger, CellType) {
   NSDictionary* views = NSDictionaryOfVariableBindings(contentView, hideButton, hideLabel);
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[hideLabel]-(10)-[hideButton]-(12)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(18)-[hideLabel]-(12)-[hideButton]-(18)-|"
                                            options:NSLayoutFormatAlignAllCenterX
                                            metrics:nil
                                              views:views]];
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[hideLabel]-(36)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(50)-[hideLabel]-(50)-|"
                                            options:0
                                            metrics:nil
                                              views:views]];
