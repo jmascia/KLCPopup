@@ -38,10 +38,12 @@ typedef NS_ENUM(NSInteger, FieldTag) {
   FieldTagTimedDismiss,
 };
 
+
 typedef NS_ENUM(NSInteger, CellType) {
   CellTypeNormal = 0,
   CellTypeSwitch,
 };
+
 
 @interface ViewController () {
   
@@ -93,6 +95,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 + (UIColor*)klcLightGreenColor;
 + (UIColor*)klcGreenColor;
 @end
+
 
 @interface UIView (KLCPopupExample)
 - (UITableViewCell*)parentCell;
@@ -711,11 +714,12 @@ typedef NS_ENUM(NSInteger, CellType) {
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
           
           // Present in a popover
-          [fieldTableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
-          
           UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:fieldController];
           popover.delegate = self;
           self.popover = popover;
+          
+          // Set KVO so we can adjust the popover's size to fit the table's content once it's populated.
+          [fieldTableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
           
           CGRect senderFrameInView = [self.tableView convertRect:[self.tableView rectForRowAtIndexPath:indexPath] toView:self.view];
           [popover presentPopoverFromRect:senderFrameInView inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
@@ -779,7 +783,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
   
-  // If this is a field table, make sure the selected row is scrolled into view
+  // If this is a field table, make sure the selected row is scrolled into view when it appears.
   if ((navigationController == self.presentedViewController) && [viewController.view isKindOfClass:[UITableView class]]) {
     
     UITableView* fieldTableView = (UITableView*)viewController.view;
@@ -796,13 +800,12 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
   
-  //
+  // Cleanup by removing KVO and reference to popover
   UIView* view = popoverController.contentViewController.view;
   if ([view isKindOfClass:[UITableView class]]) {
     [(UITableView*)view removeObserver:self forKeyPath:@"contentSize"];
   }
   
-  //
   self.popover = nil;
 }
 
@@ -811,7 +814,6 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
   
-  //
   if ([keyPath isEqualToString:@"contentSize"]) {
     
     if ([object isKindOfClass:[UITableView class]]) {
@@ -821,6 +823,7 @@ typedef NS_ENUM(NSInteger, CellType) {
         [self.popover setPopoverContentSize:tableView.contentSize animated:NO];
       }
       
+      // Make sure the selected row is scrolled into view when it appears
       NSInteger fieldTag = tableView.tag;
       NSInteger selectedRow = [self selectedRowForFieldWithTag:fieldTag];
       
