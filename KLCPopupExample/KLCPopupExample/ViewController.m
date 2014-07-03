@@ -378,14 +378,13 @@ typedef NS_ENUM(NSInteger, CellType) {
   
   // Show in popup
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
+                                  horizontalLayout:(KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
+                                    verticalLayout:(KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
                                           showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
                                           hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:FieldTagHideType]
-                                          maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]];
-  
-  popup.horizontalLayout = (KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout];
-  popup.verticalLayout = (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout];
-  popup.shouldHideOnBackgroundTouch = _shouldHideOnBackgroundTap;
-  popup.shouldHideOnContentTouch = _shouldHideOnContentTap;
+                                          maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
+                             hideOnBackgroundTouch:_shouldHideOnBackgroundTap
+                                hideOnContentTouch:_shouldHideOnContentTap];
   
   if (_shouldHideAfterDelay) {
     [popup showWithDuration:1.5];

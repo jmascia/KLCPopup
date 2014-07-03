@@ -82,9 +82,9 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.shouldHideOnBackgroundTouch = YES;
     self.shouldHideOnContentTouch = NO;
     
-    self.showType = KLCPopupShowTypeNone;
-    self.hideType = KLCPopupHideTypeNone;
-    self.maskType = KLCPopupMaskTypeNone;
+    self.showType = KLCPopupShowTypeShrinkIn;
+    self.hideType = KLCPopupHideTypeShrinkOut;
+    self.maskType = KLCPopupMaskTypeDimmed;
     self.horizontalLayout = KLCPopupHorizontalLayoutCenter;
     self.verticalLayout = KLCPopupVerticalLayoutCenter;
     
@@ -151,15 +151,31 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 #pragma mark - Class Public
 
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                         showType:(KLCPopupShowType)showType
-                         hideType:(KLCPopupHideType)hideType
-                         maskType:(KLCPopupMaskType)maskType
 {
   KLCPopup* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
+  return popup;
+}
+
+
++ (KLCPopup*)popupWithContentView:(UIView*)contentView
+                 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
+                   verticalLayout:(KLCPopupVerticalLayout)verticalLayout
+                         showType:(KLCPopupShowType)showType
+                         hideType:(KLCPopupHideType)hideType
+                         maskType:(KLCPopupMaskType)maskType
+            hideOnBackgroundTouch:(BOOL)shouldHideOnBackgroundTouch
+               hideOnContentTouch:(BOOL)shouldHideOnContentTouch
+{
+  KLCPopup* popup = [[[self class] alloc] init];
+  popup.contentView = contentView;
+  popup.horizontalLayout = horizontalLayout;
+  popup.verticalLayout = verticalLayout;
   popup.showType = showType;
   popup.hideType = hideType;
   popup.maskType = maskType;
+  popup.shouldHideOnBackgroundTouch = shouldHideOnBackgroundTouch;
+  popup.shouldHideOnContentTouch = shouldHideOnContentTouch;
   return popup;
 }
 

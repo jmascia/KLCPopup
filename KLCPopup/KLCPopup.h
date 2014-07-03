@@ -110,11 +110,18 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 // Block gets called after hide animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishHidingCompletion)();
 
-// Convenience method for creating a popup.
+// Convenience method for creating default popup.
++ (KLCPopup*)popupWithContentView:(UIView*)contentView;
+
+// Convenience method for creating fully customized popup.
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                        showType:(KLCPopupShowType)showType
-                        hideType:(KLCPopupHideType)hideType
-                        maskType:(KLCPopupMaskType)maskType;
+                 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
+                   verticalLayout:(KLCPopupVerticalLayout)verticalLayout
+                         showType:(KLCPopupShowType)showType
+                         hideType:(KLCPopupHideType)hideType
+                         maskType:(KLCPopupMaskType)maskType
+            hideOnBackgroundTouch:(BOOL)shouldHideOnBackgroundTouch
+               hideOnContentTouch:(BOOL)shouldHideOnContentTouch;
 
 // Hides all the popups in the app.
 + (void)hideAllPopups;
