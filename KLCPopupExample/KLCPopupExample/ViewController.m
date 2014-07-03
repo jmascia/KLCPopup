@@ -32,7 +32,7 @@ typedef NS_ENUM(NSInteger, FieldTag) {
   FieldTagVerticalLayout,
   FieldTagMaskType,
   FieldTagShowType,
-  FieldTagHideType,
+  FieldTagDismissType,
   FieldTagBackgroundDismiss,
   FieldTagContentDismiss,
   FieldTagTimedDismiss,
@@ -52,22 +52,22 @@ typedef NS_ENUM(NSInteger, CellType) {
   NSArray* _verticalLayouts;
   NSArray* _maskTypes;
   NSArray* _showTypes;
-  NSArray* _hideTypes;
+  NSArray* _dismissTypes;
   
   NSDictionary* _namesForHorizontalLayouts;
   NSDictionary* _namesForVerticalLayouts;
   NSDictionary* _namesForMaskTypes;
   NSDictionary* _namesForShowTypes;
-  NSDictionary* _namesForHideTypes;
+  NSDictionary* _namesForDismissTypes;
   
   NSInteger _selectedRowInHorizontalField;
   NSInteger _selectedRowInVerticalField;
   NSInteger _selectedRowInMaskField;
   NSInteger _selectedRowInShowField;
-  NSInteger _selectedRowInHideField;
-  BOOL _shouldHideOnBackgroundTouch;
-  BOOL _shouldHideOnContentTouch;
-  BOOL _shouldHideAfterDelay;
+  NSInteger _selectedRowInDismissField;
+  BOOL _shouldDismissOnBackgroundTouch;
+  BOOL _shouldDismissOnContentTouch;
+  BOOL _shouldDismissAfterDelay;
 }
 
 @property (nonatomic, strong) UITableView* tableView;
@@ -83,7 +83,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 // Event handlers
 - (void)toggleValueDidChange:(id)sender;
 - (void)showButtonPressed:(id)sender;
-- (void)hideButtonPressed:(id)sender;
+- (void)dismissButtonPressed:(id)sender;
 - (void)fieldCancelButtonPressed:(id)sender;
 
 @end
@@ -115,7 +115,7 @@ typedef NS_ENUM(NSInteger, CellType) {
                 @(FieldTagVerticalLayout),
                 @(FieldTagMaskType),
                 @(FieldTagShowType),
-                @(FieldTagHideType),
+                @(FieldTagDismissType),
                 @(FieldTagBackgroundDismiss),
                 @(FieldTagContentDismiss),
                 @(FieldTagTimedDismiss)];
@@ -123,11 +123,11 @@ typedef NS_ENUM(NSInteger, CellType) {
     _namesForFields = @{@(FieldTagHorizontalLayout) : @"Horizontal layout",
                         @(FieldTagVerticalLayout) : @"Vertical layout",
                         @(FieldTagMaskType) : @"Background mask",
-                        @(FieldTagShowType) : @"Show animation",
-                        @(FieldTagHideType) : @"Hide animation",
-                        @(FieldTagBackgroundDismiss) : @"Hide on background touch",
-                        @(FieldTagContentDismiss) : @"Hide on content touch",
-                        @(FieldTagTimedDismiss) : @"Hide after delay"};
+                        @(FieldTagShowType) : @"Show type",
+                        @(FieldTagDismissType) : @"Dismiss type",
+                        @(FieldTagBackgroundDismiss) : @"Dismiss on background touch",
+                        @(FieldTagContentDismiss) : @"Dismiss on content touch",
+                        @(FieldTagTimedDismiss) : @"Dismiss after delay"};
     
     // FIELD SUB-LISTS
     _horizontalLayouts = @[@(KLCPopupHorizontalLayoutLeft),
@@ -157,7 +157,7 @@ typedef NS_ENUM(NSInteger, CellType) {
     _maskTypes = @[@(KLCPopupMaskTypeNone),
                    @(KLCPopupMaskTypeClear),
                    @(KLCPopupMaskTypeDimmed)];
-  
+    
     _namesForMaskTypes = @{@(KLCPopupMaskTypeNone) : @"None",
                            @(KLCPopupMaskTypeClear) : @"Clear",
                            @(KLCPopupMaskTypeDimmed) : @"Dimmed"};
@@ -190,43 +190,43 @@ typedef NS_ENUM(NSInteger, CellType) {
                            @(KLCPopupShowTypeBounceInFromLeft) : @"Bounce from Left",
                            @(KLCPopupShowTypeBounceInFromRight) : @"Bounce from Right"};
     
-    _hideTypes = @[@(KLCPopupHideTypeNone),
-                   @(KLCPopupHideTypeFadeOut),
-                   @(KLCPopupHideTypeGrowOut),
-                   @(KLCPopupHideTypeShrinkOut),
-                   @(KLCPopupHideTypeSlideOutToTop),
-                   @(KLCPopupHideTypeSlideOutToBottom),
-                   @(KLCPopupHideTypeSlideOutToLeft),
-                   @(KLCPopupHideTypeSlideOutToRight),
-                   @(KLCPopupHideTypeBounceOut),
-                   @(KLCPopupHideTypeBounceOutToTop),
-                   @(KLCPopupHideTypeBounceOutToBottom),
-                   @(KLCPopupHideTypeBounceOutToLeft),
-                   @(KLCPopupHideTypeBounceOutToRight)];
+    _dismissTypes = @[@(KLCPopupDismissTypeNone),
+                      @(KLCPopupDismissTypeFadeOut),
+                      @(KLCPopupDismissTypeGrowOut),
+                      @(KLCPopupDismissTypeShrinkOut),
+                      @(KLCPopupDismissTypeSlideOutToTop),
+                      @(KLCPopupDismissTypeSlideOutToBottom),
+                      @(KLCPopupDismissTypeSlideOutToLeft),
+                      @(KLCPopupDismissTypeSlideOutToRight),
+                      @(KLCPopupDismissTypeBounceOut),
+                      @(KLCPopupDismissTypeBounceOutToTop),
+                      @(KLCPopupDismissTypeBounceOutToBottom),
+                      @(KLCPopupDismissTypeBounceOutToLeft),
+                      @(KLCPopupDismissTypeBounceOutToRight)];
     
-    _namesForHideTypes = @{@(KLCPopupHideTypeNone) : @"None",
-                           @(KLCPopupHideTypeFadeOut) : @"Fade out",
-                           @(KLCPopupHideTypeGrowOut) : @"Grow out",
-                           @(KLCPopupHideTypeShrinkOut) : @"Shrink out",
-                           @(KLCPopupHideTypeSlideOutToTop) : @"Slide to Top",
-                           @(KLCPopupHideTypeSlideOutToBottom) : @"Slide to Bottom",
-                           @(KLCPopupHideTypeSlideOutToLeft) : @"Slide to Left",
-                           @(KLCPopupHideTypeSlideOutToRight) : @"Slide to Right",
-                           @(KLCPopupHideTypeBounceOut) : @"Bounce out",
-                           @(KLCPopupHideTypeBounceOutToTop) : @"Bounce to Top",
-                           @(KLCPopupHideTypeBounceOutToBottom) : @"Bounce to Bottom",
-                           @(KLCPopupHideTypeBounceOutToLeft) : @"Bounce to Left",
-                           @(KLCPopupHideTypeBounceOutToRight) : @"Bounce to Right"};
-  
+    _namesForDismissTypes = @{@(KLCPopupDismissTypeNone) : @"None",
+                              @(KLCPopupDismissTypeFadeOut) : @"Fade out",
+                              @(KLCPopupDismissTypeGrowOut) : @"Grow out",
+                              @(KLCPopupDismissTypeShrinkOut) : @"Shrink out",
+                              @(KLCPopupDismissTypeSlideOutToTop) : @"Slide to Top",
+                              @(KLCPopupDismissTypeSlideOutToBottom) : @"Slide to Bottom",
+                              @(KLCPopupDismissTypeSlideOutToLeft) : @"Slide to Left",
+                              @(KLCPopupDismissTypeSlideOutToRight) : @"Slide to Right",
+                              @(KLCPopupDismissTypeBounceOut) : @"Bounce out",
+                              @(KLCPopupDismissTypeBounceOutToTop) : @"Bounce to Top",
+                              @(KLCPopupDismissTypeBounceOutToBottom) : @"Bounce to Bottom",
+                              @(KLCPopupDismissTypeBounceOutToLeft) : @"Bounce to Left",
+                              @(KLCPopupDismissTypeBounceOutToRight) : @"Bounce to Right"};
+    
     // DEFAULTS
     _selectedRowInHorizontalField = [_horizontalLayouts indexOfObject:@(KLCPopupHorizontalLayoutCenter)];
     _selectedRowInVerticalField = [_verticalLayouts indexOfObject:@(KLCPopupVerticalLayoutCenter)];
     _selectedRowInMaskField = [_maskTypes indexOfObject:@(KLCPopupMaskTypeDimmed)];
     _selectedRowInShowField = [_showTypes indexOfObject:@(KLCPopupShowTypeBounceInFromTop)];
-    _selectedRowInHideField = [_hideTypes indexOfObject:@(KLCPopupHideTypeBounceOutToBottom)];
-    _shouldHideOnBackgroundTouch = YES;
-    _shouldHideOnContentTouch = NO;
-    _shouldHideAfterDelay = NO;
+    _selectedRowInDismissField = [_dismissTypes indexOfObject:@(KLCPopupDismissTypeBounceOutToBottom)];
+    _shouldDismissOnBackgroundTouch = YES;
+    _shouldDismissOnContentTouch = NO;
+    _shouldDismissAfterDelay = NO;
   }
   return self;
 }
@@ -279,9 +279,9 @@ typedef NS_ENUM(NSInteger, CellType) {
   metrics = @{@"topMargin" : @(topMargin),
               @"bottomMargin" : @(bottomMargin)};
   [footerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(topMargin)-[showButton]-(bottomMargin)-|"
-                                                                    options:0
-                                                                    metrics:metrics
-                                                                      views:views]];
+                                                                     options:0
+                                                                     metrics:metrics
+                                                                       views:views]];
   
   [footerView addConstraint:[NSLayoutConstraint constraintWithItem:showButton
                                                          attribute:NSLayoutAttributeCenterX
@@ -302,7 +302,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 - (void)viewDidLoad
 {
   [super viewDidLoad];
- 
+  
   self.automaticallyAdjustsScrollViewInsets = YES;
   self.view.backgroundColor = [UIColor whiteColor];
 }
@@ -311,7 +311,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 #pragma mark - Event Handlers
 
 - (void)toggleValueDidChange:(id)sender {
- 
+  
   if ([sender isKindOfClass:[UISwitch class]]) {
     UISwitch* toggle = (UISwitch*)sender;
     
@@ -321,13 +321,13 @@ typedef NS_ENUM(NSInteger, CellType) {
       
       NSInteger fieldTag = [(NSNumber*)obj integerValue];
       if (fieldTag == FieldTagBackgroundDismiss) {
-        _shouldHideOnBackgroundTouch = toggle.on;
-     
+        _shouldDismissOnBackgroundTouch = toggle.on;
+        
       } else if (fieldTag == FieldTagContentDismiss) {
-        _shouldHideOnContentTouch = toggle.on;
-      
+        _shouldDismissOnContentTouch = toggle.on;
+        
       } else if (fieldTag == FieldTagTimedDismiss) {
-        _shouldHideAfterDelay = toggle.on;
+        _shouldDismissAfterDelay = toggle.on;
       }
     }
   }
@@ -342,37 +342,37 @@ typedef NS_ENUM(NSInteger, CellType) {
   contentView.backgroundColor = [UIColor klcLightGreenColor];
   contentView.layer.cornerRadius = 12.0;
   
-  UILabel* hideLabel = [[UILabel alloc] init];
-  hideLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  hideLabel.backgroundColor = [UIColor clearColor];
-  hideLabel.textColor = [UIColor whiteColor];
-  hideLabel.font = [UIFont boldSystemFontOfSize:72.0];
-  hideLabel.text = @"Hi.";
+  UILabel* dismissLabel = [[UILabel alloc] init];
+  dismissLabel.translatesAutoresizingMaskIntoConstraints = NO;
+  dismissLabel.backgroundColor = [UIColor clearColor];
+  dismissLabel.textColor = [UIColor whiteColor];
+  dismissLabel.font = [UIFont boldSystemFontOfSize:72.0];
+  dismissLabel.text = @"Hi.";
   
-  UIButton* hideButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  hideButton.translatesAutoresizingMaskIntoConstraints = NO;
-  hideButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
-  hideButton.backgroundColor = [UIColor klcGreenColor];
-  [hideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-  [hideButton setTitleColor:[[hideButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-  hideButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
-  [hideButton setTitle:@"Bye" forState:UIControlStateNormal];
-  hideButton.layer.cornerRadius = 6.0;
-  [hideButton addTarget:self action:@selector(hideButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
+  dismissButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
+  dismissButton.backgroundColor = [UIColor klcGreenColor];
+  [dismissButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+  [dismissButton setTitleColor:[[dismissButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
+  dismissButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  [dismissButton setTitle:@"Bye" forState:UIControlStateNormal];
+  dismissButton.layer.cornerRadius = 6.0;
+  [dismissButton addTarget:self action:@selector(dismissButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
-  [contentView addSubview:hideLabel];
-  [contentView addSubview:hideButton];
+  [contentView addSubview:dismissLabel];
+  [contentView addSubview:dismissButton];
   
-  NSDictionary* views = NSDictionaryOfVariableBindings(contentView, hideButton, hideLabel);
+  NSDictionary* views = NSDictionaryOfVariableBindings(contentView, dismissButton, dismissLabel);
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[hideLabel]-(10)-[hideButton]-(24)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[dismissLabel]-(10)-[dismissButton]-(24)-|"
                                            options:NSLayoutFormatAlignAllCenterX
                                            metrics:nil
                                              views:views]];
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[hideLabel]-(36)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[dismissLabel]-(36)-|"
                                            options:0
                                            metrics:nil
                                              views:views]];
@@ -382,12 +382,12 @@ typedef NS_ENUM(NSInteger, CellType) {
                                   horizontalLayout:(KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
                                     verticalLayout:(KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
                                           showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
-                                          hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:FieldTagHideType]
+                                       dismissType:(KLCPopupDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
-                             hideOnBackgroundTouch:_shouldHideOnBackgroundTouch
-                                hideOnContentTouch:_shouldHideOnContentTouch];
+                          dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
+                             dismissOnContentTouch:_shouldDismissOnContentTouch];
   
-  if (_shouldHideAfterDelay) {
+  if (_shouldDismissAfterDelay) {
     [popup showWithDuration:2.0];
   } else {
     [popup show];
@@ -395,9 +395,9 @@ typedef NS_ENUM(NSInteger, CellType) {
 }
 
 
-- (void)hideButtonPressed:(id)sender {
+- (void)dismissButtonPressed:(id)sender {
   if ([sender isKindOfClass:[UIView class]]) {
-    [(UIView*)sender hidePresentingPopup];
+    [(UIView*)sender dismissPresentingPopup];
   }
 }
 
@@ -433,7 +433,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 
 - (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag {
-
+  
   NSArray* listForField = nil;
   if (tag == FieldTagHorizontalLayout) {
     listForField = _horizontalLayouts;
@@ -447,8 +447,8 @@ typedef NS_ENUM(NSInteger, CellType) {
   } else if (tag == FieldTagShowType) {
     listForField = _showTypes;
     
-  } else if (tag == FieldTagHideType) {
-    listForField = _hideTypes;
+  } else if (tag == FieldTagDismissType) {
+    listForField = _dismissTypes;
   }
   
   // If row is out of bounds, try using first row.
@@ -480,8 +480,8 @@ typedef NS_ENUM(NSInteger, CellType) {
   } else if (tag == FieldTagShowType) {
     return _selectedRowInShowField;
     
-  } else if (tag == FieldTagHideType) {
-    return _selectedRowInHideField;
+  } else if (tag == FieldTagDismissType) {
+    return _selectedRowInDismissField;
   }
   return NSNotFound;
 }
@@ -498,12 +498,12 @@ typedef NS_ENUM(NSInteger, CellType) {
     
   } else if (tag == FieldTagMaskType) {
     namesForField = _namesForMaskTypes;
-  
+    
   } else if (tag == FieldTagShowType) {
     namesForField = _namesForShowTypes;
-  
-  } else if (tag == FieldTagHideType) {
-    namesForField = _namesForHideTypes;
+    
+  } else if (tag == FieldTagDismissType) {
+    namesForField = _namesForDismissTypes;
   }
   
   if (namesForField != nil) {
@@ -529,7 +529,7 @@ typedef NS_ENUM(NSInteger, CellType) {
     case FieldTagShowType:
       cellType = CellTypeNormal;
       break;
-    case FieldTagHideType:
+    case FieldTagDismissType:
       cellType = CellTypeNormal;
       break;
     case FieldTagBackgroundDismiss:
@@ -573,8 +573,8 @@ typedef NS_ENUM(NSInteger, CellType) {
     } else if (tableView.tag == FieldTagShowType) {
       return _showTypes.count;
       
-    } else if (tableView.tag == FieldTagHideType) {
-      return _hideTypes.count;
+    } else if (tableView.tag == FieldTagDismissType) {
+      return _dismissTypes.count;
     }
   }
   
@@ -590,7 +590,7 @@ typedef NS_ENUM(NSInteger, CellType) {
     id obj = [_fields objectAtIndex:indexPath.row];
     if ([obj isKindOfClass:[NSNumber class]]) {
       FieldTag fieldTag = [(NSNumber*)obj integerValue];
-
+      
       UITableViewCell* cell = nil;
       CellType cellType = [self cellTypeForFieldWithTag:fieldTag];
       
@@ -636,11 +636,11 @@ typedef NS_ENUM(NSInteger, CellType) {
         if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
           BOOL on = NO;
           if (fieldTag == FieldTagBackgroundDismiss) {
-            on = _shouldHideOnBackgroundTouch;
+            on = _shouldDismissOnBackgroundTouch;
           } else if (fieldTag == FieldTagContentDismiss) {
-            on = _shouldHideOnContentTouch;
+            on = _shouldDismissOnContentTouch;
           } else if (fieldTag == FieldTagTimedDismiss) {
-            on = _shouldHideAfterDelay;
+            on = _shouldDismissAfterDelay;
           }
           [(UISwitch*)cell.accessoryView setOn:on];
         }
@@ -652,7 +652,7 @@ typedef NS_ENUM(NSInteger, CellType) {
   
   // FIELD TABLES
   else {
-
+    
     UITableViewCell* cell = nil;
     
     Class cellClass = [UITableViewCell class];
@@ -697,7 +697,7 @@ typedef NS_ENUM(NSInteger, CellType) {
       NSInteger fieldTag = [(NSNumber*)obj integerValue];
       
       if ([self cellTypeForFieldWithTag:fieldTag] == CellTypeNormal) {
-
+        
         UIViewController* fieldController = [[UIViewController alloc] init];
         
         UITableView* fieldTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
@@ -723,13 +723,13 @@ typedef NS_ENUM(NSInteger, CellType) {
         
         // IPHONE
         else {
-
+          
           // Present in a modal
           UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
           fieldController.title = cell.textLabel.text;
           UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(fieldCancelButtonPressed:)];
           fieldController.navigationItem.rightBarButtonItem = cancelButton;
- 
+          
           UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:fieldController];
           navigationController.delegate = self;
           [self presentViewController:navigationController animated:YES completion:NULL];
@@ -754,8 +754,8 @@ typedef NS_ENUM(NSInteger, CellType) {
     } else if (tableView.tag == FieldTagShowType) {
       _selectedRowInShowField = indexPath.row;
       
-    } else if (tableView.tag == FieldTagHideType) {
-      _selectedRowInHideField = indexPath.row;
+    } else if (tableView.tag == FieldTagDismissType) {
+      _selectedRowInDismissField = indexPath.row;
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -813,7 +813,7 @@ typedef NS_ENUM(NSInteger, CellType) {
   
   //
   if ([keyPath isEqualToString:@"contentSize"]) {
-   
+    
     if ([object isKindOfClass:[UITableView class]]) {
       UITableView* tableView = (UITableView*)object;
       

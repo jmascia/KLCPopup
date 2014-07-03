@@ -39,21 +39,21 @@ typedef NS_ENUM(NSInteger, KLCPopupShowType) {
   KLCPopupShowTypeBounceInFromRight,
 };
 
-// KLCPopupHideType: Controls how the popup will be dismissed.
-typedef NS_ENUM(NSInteger, KLCPopupHideType) {
-	KLCPopupHideTypeNone = 0,
-	KLCPopupHideTypeFadeOut,
-  KLCPopupHideTypeGrowOut,
-  KLCPopupHideTypeShrinkOut,
-  KLCPopupHideTypeSlideOutToTop,
-  KLCPopupHideTypeSlideOutToBottom,
-  KLCPopupHideTypeSlideOutToLeft,
-  KLCPopupHideTypeSlideOutToRight,
-  KLCPopupHideTypeBounceOut,
-  KLCPopupHideTypeBounceOutToTop,
-  KLCPopupHideTypeBounceOutToBottom,
-  KLCPopupHideTypeBounceOutToLeft,
-  KLCPopupHideTypeBounceOutToRight,
+// KLCPopupDismissType: Controls how the popup will be dismissed.
+typedef NS_ENUM(NSInteger, KLCPopupDismissType) {
+	KLCPopupDismissTypeNone = 0,
+	KLCPopupDismissTypeFadeOut,
+  KLCPopupDismissTypeGrowOut,
+  KLCPopupDismissTypeShrinkOut,
+  KLCPopupDismissTypeSlideOutToTop,
+  KLCPopupDismissTypeSlideOutToBottom,
+  KLCPopupDismissTypeSlideOutToLeft,
+  KLCPopupDismissTypeSlideOutToRight,
+  KLCPopupDismissTypeBounceOut,
+  KLCPopupDismissTypeBounceOutToTop,
+  KLCPopupDismissTypeBounceOutToBottom,
+  KLCPopupDismissTypeBounceOutToLeft,
+  KLCPopupDismissTypeBounceOutToRight,
 };
 
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
@@ -89,28 +89,28 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 // - Must set desired size of contentView before or during willStartShowing.
 @property (nonatomic, strong) UIView* contentView;
 
-@property (nonatomic, assign) KLCPopupShowType showType; // default = none.
-@property (nonatomic, assign) KLCPopupHideType hideType; // default = none.
-@property (nonatomic, assign) KLCPopupMaskType maskType; // default = none.
+@property (nonatomic, assign) KLCPopupShowType showType; // default = shrink in.
+@property (nonatomic, assign) KLCPopupDismissType dismissType; // default = shrink out.
+@property (nonatomic, assign) KLCPopupMaskType maskType; // default = dimmed.
 @property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout; // default = center.
 @property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout; // default = center.
 
 // If YES, then popup will get dismissed when background is touched. default = YES.
-@property (nonatomic, assign) BOOL shouldHideOnBackgroundTouch;
+@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
 
 // If YES, then popup will get dismissed when content view is touched. default = NO.
-@property (nonatomic, assign) BOOL shouldHideOnContentTouch;
+@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
 
 // Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishShowingCompletion)();
 
-// Block gets called when hide animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
-@property (nonatomic, copy) void (^willStartHidingCompletion)();
+// Block gets called when dismiss animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
+@property (nonatomic, copy) void (^willStartDismissingCompletion)();
 
-// Block gets called after hide animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-@property (nonatomic, copy) void (^didFinishHidingCompletion)();
+// Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
+@property (nonatomic, copy) void (^didFinishDismissingCompletion)();
 
-// Convenience method for creating default popup.
+// Convenience method for creating default popup. Mimics UIAlertView behavior.
 + (KLCPopup*)popupWithContentView:(UIView*)contentView;
 
 // Convenience method for creating fully customized popup.
@@ -118,34 +118,34 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
                  horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
                    verticalLayout:(KLCPopupVerticalLayout)verticalLayout
                          showType:(KLCPopupShowType)showType
-                         hideType:(KLCPopupHideType)hideType
+                         dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
-            hideOnBackgroundTouch:(BOOL)shouldHideOnBackgroundTouch
-               hideOnContentTouch:(BOOL)shouldHideOnContentTouch;
+            dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+               dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
-// Hides all the popups in the app.
-+ (void)hideAllPopups;
+// Dismisses all the popups in the app. Use as a failsafe for cleaning up.
++ (void)dismissAllPopups;
 
 // Show popup. Uses showType for animation.
 - (void)show;
 
-// Show and then hide after duration. 0.0 or less will be considered infinity.
+// Show and then dismiss after duration. 0.0 or less will be considered infinity.
 - (void)showWithDuration:(NSTimeInterval)duration;
 
-// Hide popup. Uses hideType if animated is YES.
-- (void)hide:(BOOL)animated;
+// Dismiss popup. Uses dismissType if animated is YES.
+- (void)dismiss:(BOOL)animated;
 
 #pragma mark Subclassing
 @property (nonatomic, strong, readonly) UIView *backgroundView;
 @property (nonatomic, strong, readonly) UIView *containerView;
 @property (nonatomic, assign, readonly) BOOL isBeingShown;
 @property (nonatomic, assign, readonly) BOOL isShowing;
-@property (nonatomic, assign, readonly) BOOL isBeingHidden;
+@property (nonatomic, assign, readonly) BOOL isBeingDismissed;
 
 - (void)willStartShowing;
 - (void)didFinishShowing;
-- (void)willStartHiding;
-- (void)didFinishHiding;
+- (void)willStartDismissing;
+- (void)didFinishDismissing;
 
 @end
 
@@ -153,6 +153,6 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 #pragma mark - UIView Category
 @interface UIView(KLCPopup)
 - (void)forEachPopupDoBlock:(void (^)(KLCPopup* popup))block;
-- (void)hidePresentingPopup;
+- (void)dismissPresentingPopup;
 @end
 

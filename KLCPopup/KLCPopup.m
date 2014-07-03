@@ -35,14 +35,14 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
   // state flags
   BOOL _isBeingShown;
   BOOL _isShowing;
-  BOOL _isBeingHidden;
+  BOOL _isBeingDismissed;
 }
 
 - (void)updateForInterfaceOrientation;
 - (void)didChangeStatusBarOrientation:(NSNotification*)notification;
 
-// Used for calling hide:YES from selector because you can't pass primitives, thanks objc
-- (void)hide;
+// Used for calling dismiss:YES from selector because you can't pass primitives, thanks objc
+- (void)dismiss;
 
 @end
 
@@ -53,7 +53,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 @synthesize containerView = _containerView;
 @synthesize isBeingShown = _isBeingShown;
 @synthesize isShowing = _isShowing;
-@synthesize isBeingHidden = _isBeingHidden;
+@synthesize isBeingDismissed = _isBeingDismissed;
 
 
 - (void)dealloc {
@@ -79,18 +79,18 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.autoresizesSubviews = YES;
     
-    self.shouldHideOnBackgroundTouch = YES;
-    self.shouldHideOnContentTouch = NO;
+    self.shouldDismissOnBackgroundTouch = YES;
+    self.shouldDismissOnContentTouch = NO;
     
     self.showType = KLCPopupShowTypeShrinkIn;
-    self.hideType = KLCPopupHideTypeShrinkOut;
+    self.dismissType = KLCPopupDismissTypeShrinkOut;
     self.maskType = KLCPopupMaskTypeDimmed;
     self.horizontalLayout = KLCPopupHorizontalLayoutCenter;
     self.verticalLayout = KLCPopupVerticalLayoutCenter;
     
     _isBeingShown = NO;
     _isShowing = NO;
-    _isBeingHidden = NO;
+    _isBeingDismissed = NO;
     
     _backgroundView = [[UIView alloc] init];
     _backgroundView.backgroundColor = [UIColor clearColor];
@@ -123,9 +123,9 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
   UIView* hitView = [super hitTest:point withEvent:event];
   if (hitView == self) {
     
-    // Try to hide if backgroundTouch flag set.
-    if (_shouldHideOnBackgroundTouch) {
-      [self hide:YES];
+    // Try to dismiss if backgroundTouch flag set.
+    if (_shouldDismissOnBackgroundTouch) {
+      [self dismiss:YES];
     }
     
     // If no mask, then return nil so touch passes through to underlying views.
@@ -139,8 +139,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     
     // If view is within containerView and contentTouch flag set, then try to hide.
     if ([hitView isDescendantOfView:_containerView]) {
-      if (_shouldHideOnContentTouch) {
-        [self hide:YES];
+      if (_shouldDismissOnContentTouch) {
+        [self dismiss:YES];
       }
     }
     return hitView;
@@ -162,29 +162,29 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
                  horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
                    verticalLayout:(KLCPopupVerticalLayout)verticalLayout
                          showType:(KLCPopupShowType)showType
-                         hideType:(KLCPopupHideType)hideType
+                      dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
-            hideOnBackgroundTouch:(BOOL)shouldHideOnBackgroundTouch
-               hideOnContentTouch:(BOOL)shouldHideOnContentTouch
+         dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+            dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch
 {
   KLCPopup* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
   popup.horizontalLayout = horizontalLayout;
   popup.verticalLayout = verticalLayout;
   popup.showType = showType;
-  popup.hideType = hideType;
+  popup.dismissType = dismissType;
   popup.maskType = maskType;
-  popup.shouldHideOnBackgroundTouch = shouldHideOnBackgroundTouch;
-  popup.shouldHideOnContentTouch = shouldHideOnContentTouch;
+  popup.shouldDismissOnBackgroundTouch = shouldDismissOnBackgroundTouch;
+  popup.shouldDismissOnContentTouch = shouldDismissOnContentTouch;
   return popup;
 }
 
 
-+ (void)hideAllPopups {
++ (void)dismissAllPopups {
   NSArray* windows = [[UIApplication sharedApplication] windows];
   for (UIWindow* window in windows) {
     [window forEachPopupDoBlock:^(KLCPopup *popup) {
-      [popup hide:NO];
+      [popup dismiss:NO];
     }];
   }
 }
@@ -200,10 +200,10 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 - (void)showWithDuration:(NSTimeInterval)duration {
   
   // If popup can be shown
-  if (!_isBeingShown && !_isShowing && !_isBeingHidden) {
+  if (!_isBeingShown && !_isShowing && !_isBeingDismissed) {
     _isBeingShown = YES;
     _isShowing = NO;
-    _isBeingHidden = NO;
+    _isBeingDismissed = NO;
     
     [self willStartShowing];
     
@@ -257,7 +257,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       void (^completionBlock)(BOOL) = ^(BOOL finished) {
         _isBeingShown = NO;
         _isShowing = YES;
-        _isBeingHidden = NO;
+        _isBeingDismissed = NO;
         
         [self didFinishShowing];
         
@@ -267,7 +267,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
         
         // Set to hide after duration if greater than zero.
         if (duration > 0.0) {
-          [self performSelector:@selector(hide) withObject:nil afterDelay:duration];
+          [self performSelector:@selector(dismiss) withObject:nil afterDelay:duration];
         }
       };
       
@@ -606,20 +606,20 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-- (void)hide:(BOOL)animated {
+- (void)dismiss:(BOOL)animated {
   
-  if (_isShowing && !_isBeingHidden) {
+  if (_isShowing && !_isBeingDismissed) {
     _isBeingShown = NO;
     _isShowing = NO;
-    _isBeingHidden = YES;
+    _isBeingDismissed = YES;
     
-    // cancel previous hide requests (i.e. the hide after duration call).
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hide) object:nil];
+    // cancel previous dismiss requests (i.e. the dismiss after duration call).
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(dismiss) object:nil];
 
-    [self willStartHiding];
+    [self willStartDismissing];
     
-    if (self.willStartHidingCompletion != nil) {
-      self.willStartHidingCompletion();
+    if (self.willStartDismissingCompletion != nil) {
+      self.willStartDismissingCompletion();
     }
     
     dispatch_async( dispatch_get_main_queue(), ^{
@@ -647,12 +647,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
         
         _isBeingShown = NO;
         _isShowing = NO;
-        _isBeingHidden = NO;
+        _isBeingDismissed = NO;
         
-        [self didFinishHiding];
+        [self didFinishDismissing];
         
-        if (self.didFinishHidingCompletion != nil) {
-          self.didFinishHidingCompletion();
+        if (self.didFinishDismissingCompletion != nil) {
+          self.didFinishDismissingCompletion();
         }
       };
       
@@ -661,8 +661,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       
       // Animate content if needed
       if (animated) {
-        switch (_hideType) {
-          case KLCPopupHideTypeFadeOut: {
+        switch (_dismissType) {
+          case KLCPopupDismissTypeFadeOut: {
             [UIView animateWithDuration:0.15
                                   delay:0
                                 options:UIViewAnimationOptionCurveLinear
@@ -672,7 +672,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeGrowOut: {
+          case KLCPopupDismissTypeGrowOut: {
             [UIView animateWithDuration:0.15
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -683,7 +683,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeShrinkOut: {
+          case KLCPopupDismissTypeShrinkOut: {
             [UIView animateWithDuration:0.15
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -694,7 +694,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeSlideOutToTop: {
+          case KLCPopupDismissTypeSlideOutToTop: {
             [UIView animateWithDuration:0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -707,7 +707,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeSlideOutToBottom: {
+          case KLCPopupDismissTypeSlideOutToBottom: {
             [UIView animateWithDuration:0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -720,7 +720,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeSlideOutToLeft: {
+          case KLCPopupDismissTypeSlideOutToLeft: {
             [UIView animateWithDuration:0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -733,7 +733,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeSlideOutToRight: {
+          case KLCPopupDismissTypeSlideOutToRight: {
             [UIView animateWithDuration:0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
@@ -747,7 +747,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeBounceOut: {
+          case KLCPopupDismissTypeBounceOut: {
             [UIView animateWithDuration:bounce1Duration
                                   delay:0
                                 options:UIViewAnimationOptionCurveEaseOut
@@ -769,7 +769,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeBounceOutToTop: {
+          case KLCPopupDismissTypeBounceOutToTop: {
             [UIView animateWithDuration:bounce1Duration
                                   delay:0
                                 options:UIViewAnimationOptionCurveEaseOut
@@ -794,7 +794,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeBounceOutToBottom: {
+          case KLCPopupDismissTypeBounceOutToBottom: {
             [UIView animateWithDuration:bounce1Duration
                                   delay:0
                                 options:UIViewAnimationOptionCurveEaseOut
@@ -819,7 +819,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeBounceOutToLeft: {
+          case KLCPopupDismissTypeBounceOutToLeft: {
             [UIView animateWithDuration:bounce1Duration
                                   delay:0
                                 options:UIViewAnimationOptionCurveEaseOut
@@ -843,7 +843,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
             break;
           }
             
-          case KLCPopupHideTypeBounceOutToRight: {
+          case KLCPopupDismissTypeBounceOutToRight: {
             [UIView animateWithDuration:bounce1Duration
                                   delay:0
                                 options:UIViewAnimationOptionCurveEaseOut
@@ -886,8 +886,8 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 #pragma mark - Private
 
-- (void)hide {
-  [self hide:YES];
+- (void)dismiss {
+  [self dismiss:YES];
 }
 
 - (void)updateForInterfaceOrientation {
@@ -936,12 +936,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-- (void)willStartHiding {
+- (void)willStartDismissing {
   
 }
 
 
-- (void)didFinishHiding {
+- (void)didFinishDismissing {
   
 }
 
@@ -968,13 +968,13 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-- (void)hidePresentingPopup {
+- (void)dismissPresentingPopup {
   
-  // Iterate over superviews until you find a KLCPopup and hide it, then gtfo
+  // Iterate over superviews until you find a KLCPopup and dismiss it, then gtfo
   UIView* view = self;
   while (view != nil) {
     if ([view isKindOfClass:[KLCPopup class]]) {
-      [(KLCPopup*)view hide:YES];
+      [(KLCPopup*)view dismiss:YES];
       break;
     }
     view = [view superview];
