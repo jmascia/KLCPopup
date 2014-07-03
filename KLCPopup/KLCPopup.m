@@ -928,7 +928,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 
 
-#pragma mark - UIView Category
+#pragma mark - Categories
 
 @implementation UIView(KLCPopup)
 

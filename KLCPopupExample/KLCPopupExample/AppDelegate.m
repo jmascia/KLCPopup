@@ -31,8 +31,10 @@
 {
   // Create app window
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+
   ViewController* viewController = [[ViewController alloc] init];
-  [self.window setRootViewController:viewController];
+  UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+  [self.window setRootViewController:navigationController];
   [self.window makeKeyAndVisible];
   
   return YES;

@@ -25,15 +25,22 @@
 #import "ViewController.h"
 #import "KLCPopup.h"
 
-static NSInteger const kMaskFieldTag = 1001;
-static NSInteger const kShowFieldTag = 1002;
-static NSInteger const kHideFieldTag = 1003;
-static NSInteger const kHorizontalFieldTag = 1004;
-static NSInteger const kVerticalFieldTag = 1005;
 
-static NSInteger const kFieldTitleTag = 1101;
-static NSInteger const kFieldDetailTag = 1102;
+typedef NS_ENUM(NSInteger, FieldTag) {
+  FieldTagHorizontalLayout = 1001,
+  FieldTagVerticalLayout,
+  FieldTagMaskType,
+  FieldTagShowType,
+  FieldTagHideType,
+  FieldTagBackgroundDismiss,
+  FieldTagContentDismiss,
+  FieldTagTimedDismiss,
+};
 
+typedef NS_ENUM(NSInteger, CellType) {
+  CellTypeNormal = 0,
+  CellTypeSwitch,
+};
 
 @interface ViewController () {
   
@@ -42,14 +49,8 @@ static NSInteger const kFieldDetailTag = 1102;
   UIButton* _pickerButton;
   UIView* _pickerContainer;
   
-  UIButton* _horizontalButton;
-  UIButton* _verticalButton;
-  UIButton* _maskTypeButton;
-  UIButton* _showTypeButton;
-  UIButton* _hideTypeButton;
-  UISwitch* _backgroundSwitch;
-  UISwitch* _contentSwitch;
-  UISwitch* _delaySwitch;
+  NSArray* _fields;
+  NSDictionary* _namesForFields;
   
   NSArray* _horizontalLayouts;
   NSArray* _verticalLayouts;
@@ -57,42 +58,40 @@ static NSInteger const kFieldDetailTag = 1102;
   NSArray* _showTypes;
   NSArray* _hideTypes;
   
-  NSInteger _selectedRowInHorizontalField;
-  NSInteger _selectedRowInVerticalField;
-  NSInteger _selectedRowInMaskField;
-  NSInteger _selectedRowInShowField;
-  NSInteger _selectedRowInHideField;
-  
   NSDictionary* _namesForHorizontalLayouts;
   NSDictionary* _namesForVerticalLayouts;
   NSDictionary* _namesForMaskTypes;
   NSDictionary* _namesForShowTypes;
   NSDictionary* _namesForHideTypes;
+  
+  NSInteger _selectedRowInHorizontalField;
+  NSInteger _selectedRowInVerticalField;
+  NSInteger _selectedRowInMaskField;
+  NSInteger _selectedRowInShowField;
+  NSInteger _selectedRowInHideField;
+  BOOL _shouldHideOnBackgroundTap;
+  BOOL _shouldHideOnContentTap;
+  BOOL _shouldHideAfterDelay;
 }
 
+@property (nonatomic, strong) UITableView* tableView;
 @property (nonatomic, strong) UIPopoverController* popover;
-
-- (void)updateLabelsForState;
 
 @end
 
 
-@interface UIColor (KLCPopup)
+@interface UIColor (KLCPopupExample)
 + (UIColor*)klcLightGreenColor;
 + (UIColor*)klcGreenColor;
 @end
 
+@interface UIView (KLCPopupExample)
+- (UITableViewCell*)parentCell;
+@end
+
+
 
 @implementation ViewController
-
-- (void)dealloc {
-	[_horizontalButton removeObserver:self forKeyPath:@"highlighted"];
-  [_verticalButton removeObserver:self forKeyPath:@"highlighted"];
-	[_maskTypeButton removeObserver:self forKeyPath:@"highlighted"];
-	[_showTypeButton removeObserver:self forKeyPath:@"highlighted"];
-	[_hideTypeButton removeObserver:self forKeyPath:@"highlighted"];
-}
-
 
 #pragma mark - UIViewController
 
@@ -100,11 +99,39 @@ static NSInteger const kFieldDetailTag = 1102;
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     
+    self.title = @"KLCPopup Example";
+    
+    // MAIN LIST
+    _fields = @[@(FieldTagHorizontalLayout),
+                @(FieldTagVerticalLayout),
+                @(FieldTagMaskType),
+                @(FieldTagShowType),
+                @(FieldTagHideType),
+                @(FieldTagBackgroundDismiss),
+                @(FieldTagContentDismiss),
+                @(FieldTagTimedDismiss)];
+    
+    _namesForFields = @{@(FieldTagHorizontalLayout) : @"Horizontal layout",
+                        @(FieldTagVerticalLayout) : @"Vertical layout",
+                        @(FieldTagMaskType) : @"Background mask",
+                        @(FieldTagShowType) : @"Show animation",
+                        @(FieldTagHideType) : @"Hide animation",
+                        @(FieldTagBackgroundDismiss) : @"Hide on background tap",
+                        @(FieldTagContentDismiss) : @"Hide on content tap",
+                        @(FieldTagTimedDismiss) : @"Hide after delay"};
+    
+    // FIELD SUB-LISTS
     _horizontalLayouts = @[@(KLCPopupHorizontalLayoutLeft),
                            @(KLCPopupHorizontalLayoutLeftOfCenter),
                            @(KLCPopupHorizontalLayoutCenter),
                            @(KLCPopupHorizontalLayoutRightOfCenter),
                            @(KLCPopupHorizontalLayoutRight)];
+    
+    _namesForHorizontalLayouts = @{@(KLCPopupHorizontalLayoutLeft) : @"Left",
+                                   @(KLCPopupHorizontalLayoutLeftOfCenter) : @"Left of Center",
+                                   @(KLCPopupHorizontalLayoutCenter) : @"Center",
+                                   @(KLCPopupHorizontalLayoutRightOfCenter) : @"Right of Center",
+                                   @(KLCPopupHorizontalLayoutRight) : @"Right"};
     
     _verticalLayouts = @[@(KLCPopupVerticalLayoutTop),
                          @(KLCPopupVerticalLayoutAboveCenter),
@@ -112,9 +139,19 @@ static NSInteger const kFieldDetailTag = 1102;
                          @(KLCPopupVerticalLayoutBelowCenter),
                          @(KLCPopupVerticalLayoutBottom)];
     
+    _namesForVerticalLayouts = @{@(KLCPopupVerticalLayoutTop) : @"Top",
+                                 @(KLCPopupVerticalLayoutAboveCenter) : @"Above Center",
+                                 @(KLCPopupVerticalLayoutCenter) : @"Center",
+                                 @(KLCPopupVerticalLayoutBelowCenter) : @"Below Center",
+                                 @(KLCPopupVerticalLayoutBottom) : @"Bottom"};
+    
     _maskTypes = @[@(KLCPopupMaskTypeNone),
                    @(KLCPopupMaskTypeClear),
                    @(KLCPopupMaskTypeDimmed)];
+  
+    _namesForMaskTypes = @{@(KLCPopupMaskTypeNone) : @"None",
+                           @(KLCPopupMaskTypeClear) : @"Clear",
+                           @(KLCPopupMaskTypeDimmed) : @"Dimmed"};
     
     _showTypes = @[@(KLCPopupShowTypeNone),
                    @(KLCPopupShowTypeFadeIn),
@@ -130,37 +167,6 @@ static NSInteger const kFieldDetailTag = 1102;
                    @(KLCPopupShowTypeBounceInFromLeft),
                    @(KLCPopupShowTypeBounceInFromRight)];
     
-    _hideTypes = @[@(KLCPopupHideTypeNone),
-                   @(KLCPopupHideTypeFadeOut),
-                   @(KLCPopupHideTypeGrowOut),
-                   @(KLCPopupHideTypeShrinkOut),
-                   @(KLCPopupHideTypeSlideOutToTop),
-                   @(KLCPopupHideTypeSlideOutToBottom),
-                   @(KLCPopupHideTypeSlideOutToLeft),
-                   @(KLCPopupHideTypeSlideOutToRight),
-                   @(KLCPopupHideTypeBounceOut),
-                   @(KLCPopupHideTypeBounceOutToTop),
-                   @(KLCPopupHideTypeBounceOutToBottom),
-                   @(KLCPopupHideTypeBounceOutToLeft),
-                   @(KLCPopupHideTypeBounceOutToRight)];
-    
-    
-    _namesForHorizontalLayouts = @{@(KLCPopupHorizontalLayoutLeft) : @"Left",
-                                   @(KLCPopupHorizontalLayoutLeftOfCenter) : @"Left of Center",
-                                   @(KLCPopupHorizontalLayoutCenter) : @"Center",
-                                   @(KLCPopupHorizontalLayoutRightOfCenter) : @"Right of Center",
-                                   @(KLCPopupHorizontalLayoutRight) : @"Right"};
-    
-    _namesForVerticalLayouts = @{@(KLCPopupVerticalLayoutTop) : @"Top",
-                                 @(KLCPopupVerticalLayoutAboveCenter) : @"Above Center",
-                                 @(KLCPopupVerticalLayoutCenter) : @"Center",
-                                 @(KLCPopupVerticalLayoutBelowCenter) : @"Below Center",
-                                 @(KLCPopupVerticalLayoutBottom) : @"Bottom"};
-    
-    _namesForMaskTypes = @{@(KLCPopupMaskTypeNone) : @"None",
-                           @(KLCPopupMaskTypeClear) : @"Clear",
-                           @(KLCPopupMaskTypeDimmed) : @"Dimmed"};
-    
     _namesForShowTypes = @{@(KLCPopupShowTypeNone) : @"None",
                            @(KLCPopupShowTypeFadeIn) : @"Fade in",
                            @(KLCPopupShowTypeGrowIn) : @"Grow in",
@@ -174,6 +180,20 @@ static NSInteger const kFieldDetailTag = 1102;
                            @(KLCPopupShowTypeBounceInFromBottom) : @"Bounce from Bottom",
                            @(KLCPopupShowTypeBounceInFromLeft) : @"Bounce from Left",
                            @(KLCPopupShowTypeBounceInFromRight) : @"Bounce from Right"};
+    
+    _hideTypes = @[@(KLCPopupHideTypeNone),
+                   @(KLCPopupHideTypeFadeOut),
+                   @(KLCPopupHideTypeGrowOut),
+                   @(KLCPopupHideTypeShrinkOut),
+                   @(KLCPopupHideTypeSlideOutToTop),
+                   @(KLCPopupHideTypeSlideOutToBottom),
+                   @(KLCPopupHideTypeSlideOutToLeft),
+                   @(KLCPopupHideTypeSlideOutToRight),
+                   @(KLCPopupHideTypeBounceOut),
+                   @(KLCPopupHideTypeBounceOutToTop),
+                   @(KLCPopupHideTypeBounceOutToBottom),
+                   @(KLCPopupHideTypeBounceOutToLeft),
+                   @(KLCPopupHideTypeBounceOutToRight)];
     
     _namesForHideTypes = @{@(KLCPopupHideTypeNone) : @"None",
                            @(KLCPopupHideTypeFadeOut) : @"Fade out",
@@ -189,444 +209,84 @@ static NSInteger const kFieldDetailTag = 1102;
                            @(KLCPopupHideTypeBounceOutToLeft) : @"Bounce to Left",
                            @(KLCPopupHideTypeBounceOutToRight) : @"Bounce to Right"};
   
+    // DEFAULTS
     _selectedRowInHorizontalField = [_horizontalLayouts indexOfObject:@(KLCPopupHorizontalLayoutCenter)];
     _selectedRowInVerticalField = [_verticalLayouts indexOfObject:@(KLCPopupVerticalLayoutCenter)];
-    _selectedRowInMaskField = [_maskTypes indexOfObject:@(KLCPopupMaskTypeClear)];
+    _selectedRowInMaskField = [_maskTypes indexOfObject:@(KLCPopupMaskTypeDimmed)];
     _selectedRowInShowField = [_showTypes indexOfObject:@(KLCPopupShowTypeBounceInFromTop)];
     _selectedRowInHideField = [_hideTypes indexOfObject:@(KLCPopupHideTypeBounceOutToBottom)];
-
+    _shouldHideOnBackgroundTap = YES;
+    _shouldHideOnContentTap = NO;
+    _shouldHideAfterDelay = NO;
   }
   return self;
 }
 
+
 - (void)loadView {
   [super loadView];
   
-  UIColor* fieldTitleColor = [UIColor darkGrayColor];
-  UIFont* fieldTitleFont = [UIFont systemFontOfSize:15.0];
-  UIColor* fieldDetailColor = [UIColor darkGrayColor];
-  UIFont* fieldDetailFont = [UIFont boldSystemFontOfSize:15.0];
-  UIColor* fieldHighlightedColor = [UIColor lightGrayColor];
-  NSLineBreakMode fieldLineBreakMode = NSLineBreakByTruncatingMiddle;
+  // TABLEVIEW
+  UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+  tableView.translatesAutoresizingMaskIntoConstraints = NO;
+  tableView.delegate = self;
+  tableView.dataSource = self;
+  tableView.delaysContentTouches = NO;
+  self.tableView = tableView;
+  [self.view addSubview:tableView];
   
-  // SPACERS
-  UIView* spacer1 = [[UIView alloc] init];
-  spacer1.translatesAutoresizingMaskIntoConstraints = NO;
-  spacer1.backgroundColor = [UIColor clearColor];
+  NSDictionary* views = NSDictionaryOfVariableBindings(tableView);
+  NSDictionary* metrics = nil;
+  [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tableView]|"
+                                                                    options:0
+                                                                    metrics:metrics
+                                                                      views:views]];
   
-  UIView* spacer2 = [[UIView alloc] init];
-  spacer2.translatesAutoresizingMaskIntoConstraints = NO;
-  spacer2.backgroundColor = [UIColor clearColor];
+  [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tableView]|"
+                                                                    options:0
+                                                                    metrics:metrics
+                                                                      views:views]];
   
-  // HEADER
-  UILabel* header = [[UILabel alloc] init];
-  header.translatesAutoresizingMaskIntoConstraints = NO;
-  header.numberOfLines = 1;
-  header.backgroundColor = [UIColor clearColor];
-  header.textColor = [UIColor grayColor];
-  header.font = [UIFont boldSystemFontOfSize:28];
-  header.textAlignment = NSTextAlignmentCenter;
-  header.text = @"KLCPopup";
+  // FOOTER
+  UIView* footerView = [[UIView alloc] init];
   
-  // HORIZONTAL LAYOUT
-  UILabel* horizontalTitle = [[UILabel alloc] init];
-  horizontalTitle.translatesAutoresizingMaskIntoConstraints = NO;
-  horizontalTitle.numberOfLines = 1;
-  horizontalTitle.lineBreakMode = fieldLineBreakMode;
-  horizontalTitle.backgroundColor = [UIColor clearColor];
-  horizontalTitle.textColor = fieldTitleColor;
-  horizontalTitle.highlightedTextColor = fieldHighlightedColor;
-  horizontalTitle.font = fieldTitleFont;
-  horizontalTitle.tag = kFieldTitleTag;
-  horizontalTitle.userInteractionEnabled = NO;
-  horizontalTitle.text = @"Horizontal layout:";
-
-  UILabel* horizontalDetail = [[UILabel alloc] init];
-  horizontalDetail.translatesAutoresizingMaskIntoConstraints = NO;
-  horizontalDetail.numberOfLines = 1;
-  horizontalDetail.lineBreakMode = fieldLineBreakMode;
-  horizontalDetail.backgroundColor = [UIColor clearColor];
-  horizontalDetail.textColor = fieldDetailColor;
-  horizontalDetail.highlightedTextColor = fieldHighlightedColor;
-  horizontalDetail.font = fieldDetailFont;
-  horizontalDetail.userInteractionEnabled = NO;
-  horizontalDetail.tag = kFieldDetailTag;
-  
-  UIButton* horizontalButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  horizontalButton.translatesAutoresizingMaskIntoConstraints = NO;
-  horizontalButton.backgroundColor = [UIColor clearColor];
-  [horizontalButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [horizontalButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
-  _horizontalButton = horizontalButton;
-  
-  // VERTICAL LAYOUT
-  UILabel* verticalTitle = [[UILabel alloc] init];
-  verticalTitle.translatesAutoresizingMaskIntoConstraints = NO;
-  verticalTitle.numberOfLines = 1;
-  verticalTitle.lineBreakMode = fieldLineBreakMode;
-  verticalTitle.backgroundColor = [UIColor clearColor];
-  verticalTitle.textColor = fieldTitleColor;
-  verticalTitle.highlightedTextColor = fieldHighlightedColor;
-  verticalTitle.font = fieldTitleFont;
-  verticalTitle.tag = kFieldTitleTag;
-  verticalTitle.userInteractionEnabled = NO;
-  verticalTitle.text = @"Vertical layout:";
-
-  UILabel* verticalDetail = [[UILabel alloc] init];
-  verticalDetail.translatesAutoresizingMaskIntoConstraints = NO;
-  verticalDetail.numberOfLines = 1;
-  verticalDetail.lineBreakMode = fieldLineBreakMode;
-  verticalDetail.backgroundColor = [UIColor clearColor];
-  verticalDetail.textColor = fieldDetailColor;
-  verticalDetail.highlightedTextColor = fieldHighlightedColor;
-  verticalDetail.font = fieldDetailFont;
-  verticalDetail.tag = kFieldDetailTag;
-  verticalDetail.userInteractionEnabled = NO;
-  
-  UIButton* verticalButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  verticalButton.translatesAutoresizingMaskIntoConstraints = NO;
-  verticalButton.backgroundColor = [UIColor clearColor];
-  [verticalButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [verticalButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
-  _verticalButton = verticalButton;
-  
-  // MASK TYPE
-  UILabel* maskTypeTitle = [[UILabel alloc] init];
-  maskTypeTitle.translatesAutoresizingMaskIntoConstraints = NO;
-  maskTypeTitle.numberOfLines = 1;
-  maskTypeTitle.lineBreakMode = fieldLineBreakMode;
-  maskTypeTitle.backgroundColor = [UIColor clearColor];
-  maskTypeTitle.textColor = fieldTitleColor;
-  maskTypeTitle.highlightedTextColor = fieldHighlightedColor;
-  maskTypeTitle.font = fieldTitleFont;
-  maskTypeTitle.tag = kFieldTitleTag;
-  maskTypeTitle.text = @"Background mask:";
-  maskTypeTitle.userInteractionEnabled = NO;
-
-  UILabel* maskTypeDetail = [[UILabel alloc] init];
-  maskTypeDetail.translatesAutoresizingMaskIntoConstraints = NO;
-  maskTypeDetail.numberOfLines = 1;
-  maskTypeDetail.lineBreakMode = fieldLineBreakMode;
-  maskTypeDetail.backgroundColor = [UIColor clearColor];
-  maskTypeDetail.textColor = fieldDetailColor;
-  maskTypeDetail.highlightedTextColor = fieldHighlightedColor;
-  maskTypeDetail.font = fieldDetailFont;
-  maskTypeDetail.tag = kFieldDetailTag;
-  maskTypeDetail.userInteractionEnabled = NO;
-
-  UIButton* maskTypeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  maskTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
-  maskTypeButton.backgroundColor = [UIColor clearColor];
-  [maskTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [maskTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
-  _maskTypeButton = maskTypeButton;
-  
-  // SHOW TYPE
-  UILabel* showTypeTitle = [[UILabel alloc] init];
-  showTypeTitle.translatesAutoresizingMaskIntoConstraints = NO;
-  showTypeTitle.numberOfLines = 1;
-  showTypeTitle.lineBreakMode = fieldLineBreakMode;
-  showTypeTitle.backgroundColor = [UIColor clearColor];
-  showTypeTitle.textColor = fieldTitleColor;
-  showTypeTitle.highlightedTextColor = fieldHighlightedColor;
-  showTypeTitle.font = fieldTitleFont;
-  showTypeTitle.tag = kFieldTitleTag;
-  showTypeTitle.userInteractionEnabled = NO;
-  showTypeTitle.text = @"Show animation:";
-
-  UILabel* showTypeDetail = [[UILabel alloc] init];
-  showTypeDetail.translatesAutoresizingMaskIntoConstraints = NO;
-  showTypeDetail.numberOfLines = 1;
-  showTypeDetail.lineBreakMode = fieldLineBreakMode;
-  showTypeDetail.backgroundColor = [UIColor clearColor];
-  showTypeDetail.textColor = fieldDetailColor;
-  showTypeDetail.highlightedTextColor = fieldHighlightedColor;
-  showTypeDetail.font = fieldDetailFont;
-  showTypeDetail.tag = kFieldDetailTag;
-  showTypeDetail.userInteractionEnabled = NO;
-
-  UIButton* showTypeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  showTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
-  showTypeButton.backgroundColor = [UIColor clearColor];
-  [showTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [showTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
-  _showTypeButton = showTypeButton;
-  
-  // HIDE TYPE
-  UILabel* hideTypeTitle = [[UILabel alloc] init];
-  hideTypeTitle.translatesAutoresizingMaskIntoConstraints = NO;
-  hideTypeTitle.numberOfLines = 1;
-  hideTypeTitle.lineBreakMode = fieldLineBreakMode;
-  hideTypeTitle.backgroundColor = [UIColor clearColor];
-  hideTypeTitle.textColor = fieldTitleColor;
-  hideTypeTitle.highlightedTextColor = fieldHighlightedColor;
-  hideTypeTitle.font = fieldTitleFont;
-  hideTypeTitle.tag = kFieldTitleTag;
-  hideTypeTitle.userInteractionEnabled = NO;
-  hideTypeTitle.text = @"Hide animation:";
-
-  UILabel* hideTypeDetail = [[UILabel alloc] init];
-  hideTypeDetail.translatesAutoresizingMaskIntoConstraints = NO;
-  hideTypeDetail.numberOfLines = 1;
-  hideTypeDetail.lineBreakMode = fieldLineBreakMode;
-  hideTypeDetail.backgroundColor = [UIColor clearColor];
-  hideTypeDetail.textColor = fieldDetailColor;
-  hideTypeDetail.highlightedTextColor = fieldHighlightedColor;
-  hideTypeDetail.font = fieldDetailFont;
-  hideTypeDetail.tag = kFieldDetailTag;
-  hideTypeDetail.userInteractionEnabled = NO;
-  
-  UIButton* hideTypeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  hideTypeButton.translatesAutoresizingMaskIntoConstraints = NO;
-  hideTypeButton.backgroundColor = [UIColor clearColor];
-  [hideTypeButton addTarget:self action:@selector(fieldButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  [hideTypeButton addObserver:self forKeyPath:@"highlighted" options:0 context:nil];
-  _hideTypeButton = hideTypeButton;
-  
-  // BACKGROUND TAP
-  UILabel* backgroundLabel = [[UILabel alloc] init];
-  backgroundLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  backgroundLabel.numberOfLines = 1;
-  backgroundLabel.lineBreakMode = fieldLineBreakMode;
-  backgroundLabel.backgroundColor = [UIColor clearColor];
-  backgroundLabel.textColor = fieldTitleColor;
-  backgroundLabel.font = fieldTitleFont;
-  backgroundLabel.text = @"Hide on background tap:";
-  
-  UISwitch* backgroundSwitch = [[UISwitch alloc] init];
-  backgroundSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-  backgroundSwitch.on = YES;
-  _backgroundSwitch = backgroundSwitch;
-  
-  UIView* backgroundContainer = [[UIView alloc] init];
-  backgroundContainer.translatesAutoresizingMaskIntoConstraints = NO;
-  backgroundContainer.backgroundColor = [UIColor clearColor];
-  
-  // CONTENT TAP
-  UILabel* contentLabel = [[UILabel alloc] init];
-  contentLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  contentLabel.numberOfLines = 1;
-  contentLabel.lineBreakMode = fieldLineBreakMode;
-  contentLabel.backgroundColor = [UIColor clearColor];
-  contentLabel.textColor = fieldTitleColor;
-  contentLabel.font = fieldTitleFont;
-  contentLabel.text = @"Hide on content tap:";
-  
-  UISwitch* contentSwitch = [[UISwitch alloc] init];
-  contentSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-  _contentSwitch = contentSwitch;
-  
-  UIView* contentContainer = [[UIView alloc] init];
-  contentContainer.translatesAutoresizingMaskIntoConstraints = NO;
-  contentContainer.backgroundColor = [UIColor clearColor];
-  
-  // DELAY
-  UILabel* delayLabel = [[UILabel alloc] init];
-  delayLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  delayLabel.numberOfLines = 1;
-  delayLabel.lineBreakMode = fieldLineBreakMode;
-  delayLabel.backgroundColor = [UIColor clearColor];
-  delayLabel.textColor = fieldTitleColor;
-  delayLabel.font = fieldTitleFont;
-  delayLabel.text = @"Hide after delay:";
-  
-  UISwitch* delaySwitch = [[UISwitch alloc] init];
-  delaySwitch.translatesAutoresizingMaskIntoConstraints = NO;
-  _delaySwitch = delaySwitch;
-  
-  UIView* delayContainer = [[UIView alloc] init];
-  delayContainer.translatesAutoresizingMaskIntoConstraints = NO;
-  delayContainer.backgroundColor = [UIColor clearColor];
-  
-  // PRESENT
   UIButton* showButton = [UIButton buttonWithType:UIButtonTypeCustom];
   showButton.translatesAutoresizingMaskIntoConstraints = NO;
-  showButton.contentEdgeInsets = UIEdgeInsetsMake(9, 24, 9, 24);
-  [showButton setTitle:@"Show" forState:UIControlStateNormal];
+  showButton.contentEdgeInsets = UIEdgeInsetsMake(15, 30, 15, 30);
+  [showButton setTitle:@"Show it!" forState:UIControlStateNormal];
   showButton.backgroundColor = [UIColor lightGrayColor];
   [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [showButton setTitleColor:[[showButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
+  showButton.titleLabel.font = [UIFont boldSystemFontOfSize:18.0];
   [showButton.layer setCornerRadius:6.0];
   [showButton addTarget:self action:@selector(showButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
-  // View hierarchy
-  [self.view addSubview:spacer1];
-  [self.view addSubview:spacer2];
-  [self.view addSubview:header];
-  [horizontalButton addSubview:horizontalTitle];
-  [horizontalButton addSubview:horizontalDetail];
-  [self.view addSubview:horizontalButton];
-  [verticalButton addSubview:verticalTitle];
-  [verticalButton addSubview:verticalDetail];
-  [self.view addSubview:verticalButton];
-  [maskTypeButton addSubview:maskTypeTitle];
-  [maskTypeButton addSubview:maskTypeDetail];
-  [self.view addSubview:maskTypeButton];
-  [showTypeButton addSubview:showTypeTitle];
-  [showTypeButton addSubview:showTypeDetail];
-  [self.view addSubview:showTypeButton];
-  [hideTypeButton addSubview:hideTypeTitle];
-  [hideTypeButton addSubview:hideTypeDetail];
-  [self.view addSubview:hideTypeButton];
-  [backgroundContainer addSubview:backgroundLabel];
-  [backgroundContainer addSubview:backgroundSwitch];
-  [self.view addSubview:backgroundContainer];
-  [contentContainer addSubview:contentLabel];
-  [contentContainer addSubview:contentSwitch];
-  [self.view addSubview:contentContainer];
-  [delayContainer addSubview:delayLabel];
-  [delayContainer addSubview:delaySwitch];
-  [self.view addSubview:delayContainer];
-  [self.view addSubview:showButton];
+  [footerView addSubview:showButton];
   
-  // Set high level AutoLayout constraints
-  NSDictionary* views = NSDictionaryOfVariableBindings(spacer1,
-                                                       spacer2,
-                                                       header,
-                                                       horizontalButton,
-                                                       verticalButton,
-                                                       maskTypeButton,
-                                                       showTypeButton,
-                                                       hideTypeButton,
-                                                       backgroundContainer,
-                                                       contentContainer,
-                                                       delayContainer,
-                                                       showButton);
-  NSDictionary* metrics = @{@"minHSpacing" : @20.0,
-                            @"fieldVSpacing" : @10.0};
-
-  [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[spacer1][header]-(fieldVSpacing)-[horizontalButton]-(fieldVSpacing)-[verticalButton]-(fieldVSpacing)-[maskTypeButton]-(fieldVSpacing)-[showTypeButton]-(fieldVSpacing)-[hideTypeButton]-(fieldVSpacing)-[backgroundContainer]-(fieldVSpacing)-[contentContainer]-(fieldVSpacing)-[delayContainer]"
-                                           options:(NSLayoutFormatAlignAllLeft | NSLayoutFormatAlignAllRight)
-                                           metrics:metrics
-                                             views:views]];
+  CGFloat topMargin = 15.0;
+  CGFloat bottomMargin = 5.0;
   
-  [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:[delayContainer]-(20)-[showButton][spacer2(==spacer1)]|"
-                                           options:(NSLayoutFormatAlignAllCenterX)
-                                           metrics:metrics
-                                             views:views]];
+  views = NSDictionaryOfVariableBindings(showButton);
+  metrics = @{@"topMargin" : @(topMargin),
+              @"bottomMargin" : @(bottomMargin)};
+  [footerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(topMargin)-[showButton]-(bottomMargin)-|"
+                                                                    options:0
+                                                                    metrics:metrics
+                                                                      views:views]];
   
-  [self.view addConstraint:[NSLayoutConstraint constraintWithItem:backgroundContainer
-                                                        attribute:NSLayoutAttributeCenterX
-                                                        relatedBy:NSLayoutRelationEqual
-                                                           toItem:self.view
-                                                        attribute:NSLayoutAttributeCenterX
-                                                       multiplier:1.0
-                                                         constant:0.0]];
+  [footerView addConstraint:[NSLayoutConstraint constraintWithItem:showButton
+                                                         attribute:NSLayoutAttributeCenterX
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:showButton.superview
+                                                         attribute:NSLayoutAttributeCenterX
+                                                        multiplier:1.0
+                                                          constant:0.0]];
   
-  // AutoLayout horizontal-layout field
-  views = NSDictionaryOfVariableBindings(horizontalTitle, horizontalDetail);
-  [horizontalButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[horizontalTitle]-(>=minHSpacing)-[horizontalDetail]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [horizontalButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[horizontalTitle]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  
-  // AutoLayout vertical-layout field
-  views = NSDictionaryOfVariableBindings(verticalTitle, verticalDetail);
-  [verticalButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[verticalTitle]-(>=minHSpacing)-[verticalDetail]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [verticalButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[verticalTitle]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  // AutoLayout mask-type field
-  views = NSDictionaryOfVariableBindings(maskTypeTitle, maskTypeDetail);
-  [maskTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[maskTypeTitle]-(>=minHSpacing)-[maskTypeDetail]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [maskTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[maskTypeTitle]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  // AutoLayout show-type field
-  views = NSDictionaryOfVariableBindings(showTypeTitle, showTypeDetail);
-  [showTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[showTypeTitle]-(>=minHSpacing)-[showTypeDetail]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [showTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[showTypeTitle]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  // AutoLayout hide-type field
-  views = NSDictionaryOfVariableBindings(hideTypeTitle, hideTypeDetail);
-  [hideTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[hideTypeTitle]-(>=minHSpacing)-[hideTypeDetail]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [hideTypeButton addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[hideTypeTitle]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  // AutoLayout background tap field
-  views = NSDictionaryOfVariableBindings(backgroundLabel, backgroundSwitch);
-  [backgroundContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[backgroundLabel]-(>=minHSpacing)-[backgroundSwitch]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [backgroundContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[backgroundSwitch]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-  
-  // Auto layout content tap field
-  views = NSDictionaryOfVariableBindings(contentLabel, contentSwitch);
-  [contentContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[contentLabel]-(>=minHSpacing)-[contentSwitch]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [contentContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[contentSwitch]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
-
-  // Auto layout after-delay field
-  views = NSDictionaryOfVariableBindings(delayLabel, delaySwitch);
-  [delayContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[delayLabel]-(>=minHSpacing)-[delaySwitch]|"
-                                           options:NSLayoutFormatAlignAllCenterY
-                                           metrics:metrics
-                                             views:views]];
-  
-  [delayContainer addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[delaySwitch]|"
-                                           options:0
-                                           metrics:metrics
-                                             views:views]];
+  CGRect footerFrame = CGRectZero;
+  footerFrame.size = [showButton systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+  footerFrame.size.height += topMargin + bottomMargin;
+  footerView.frame = footerFrame;
+  self.tableView.tableFooterView = footerView;
   
   
   // PICKER
@@ -704,96 +364,37 @@ static NSInteger const kFieldDetailTag = 1102;
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  
+ 
+  self.automaticallyAdjustsScrollViewInsets = YES;
   self.view.backgroundColor = [UIColor whiteColor];
-}
-
-
-- (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
-  
-  // make sure labels reflect current state
-  [self updateLabelsForState];
 }
 
 
 #pragma mark - Event Handlers
 
-- (void)fieldButtonPressed:(id)sender {
-  
-  // Initialize picker for pressed field
-  NSInteger rowToSelect = 0;
-  NSInteger fieldTag = 0;
-  if (sender == _horizontalButton) {
-    fieldTag = kHorizontalFieldTag;
-    rowToSelect = _selectedRowInHorizontalField;
+- (void)toggleValueDidChange:(id)sender {
+ 
+  if ([sender isKindOfClass:[UISwitch class]]) {
+    UISwitch* toggle = (UISwitch*)sender;
     
-  } else if (sender == _verticalButton) {
-    fieldTag = kVerticalFieldTag;
-    rowToSelect = _selectedRowInVerticalField;
-    
-  } else if (sender == _maskTypeButton) {
-    fieldTag = kMaskFieldTag;
-    rowToSelect = _selectedRowInMaskField;
-    
-  } else if (sender == _showTypeButton) {
-    fieldTag = kShowFieldTag;
-    rowToSelect = _selectedRowInShowField;
-    
-  } else if (sender == _hideTypeButton) {
-    fieldTag = kHideFieldTag;
-    rowToSelect = _selectedRowInHideField;
-  }
-  
-  _pickerView.tag = fieldTag;
-  [_pickerView reloadAllComponents];
-  [_pickerView selectRow:rowToSelect inComponent:0 animated:NO];
-  
-  // Show field's title text
-  
-  if ([sender isKindOfClass:[UIView class]]) {
-    UIView* view = [(UIView*)sender viewWithTag:kFieldTitleTag];
-    if ([view isKindOfClass:[UILabel class]]) {
-      _pickerLabel.text = ((UILabel*)view).text;
+    NSIndexPath* indexPath = [self.tableView indexPathForCell:[toggle parentCell]];
+    id obj = [_fields objectAtIndex:indexPath.row];
+    if ([obj isKindOfClass:[NSNumber class]]) {
+      
+      NSInteger fieldTag = [(NSNumber*)obj integerValue];
+      if (fieldTag == FieldTagBackgroundDismiss) {
+        _shouldHideOnBackgroundTap = toggle.on;
+     
+      } else if (fieldTag == FieldTagContentDismiss) {
+        _shouldHideOnContentTap = toggle.on;
+      
+      } else if (fieldTag == FieldTagTimedDismiss) {
+        _shouldHideAfterDelay = toggle.on;
+      }
     }
   }
-  
-  
-  if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-    
-    UIViewController* controller = [[UIViewController alloc] init];
-    
-    UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 100, 200) style:UITableViewStylePlain];
-    tableView.delegate = self;
-    tableView.dataSource = self;
-    tableView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-    tableView.tag = fieldTag;
-    [tableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
-    controller.view = tableView;
-    
-    UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:controller];
-    popover.delegate = self;
-    self.popover = popover;
-    
-    UIView* senderView = (UIView*)sender;
-    CGRect senderFrameInView = [senderView convertRect:senderView.bounds toView:self.view];
-    [popover presentPopoverFromRect:senderFrameInView inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    
-  } else {
-    KLCPopup* popup = [KLCPopup popupWithContentView:_pickerContainer
-                                            showType:KLCPopupShowTypeSlideInFromBottom
-                                            hideType:KLCPopupHideTypeSlideOutToBottom
-                                            maskType:KLCPopupMaskTypeDimmed];
-    
-    popup.verticalLayout = KLCPopupVerticalLayoutBottom;
-    popup.shouldHideOnBackgroundTouch = YES;
-    popup.shouldHideOnContentTouch = NO;
-    popup.willStartHidingCompletion = ^{
-      [self updateLabelsForState];
-    };
-    [popup show];
-  }
 }
+
 
 - (void)showButtonPressed:(id)sender {
   
@@ -840,21 +441,22 @@ static NSInteger const kFieldDetailTag = 1102;
   
   // Show in popup
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
-                                          showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag]
-                                          hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag]
-                                          maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag]];
+                                          showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
+                                          hideType:(KLCPopupHideType)[self valueForRow:_selectedRowInHideField inFieldWithTag:FieldTagHideType]
+                                          maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]];
   
-  popup.horizontalLayout = (KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag];
-  popup.verticalLayout = (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag];
-  popup.shouldHideOnBackgroundTouch = _backgroundSwitch.on;
-  popup.shouldHideOnContentTouch = _contentSwitch.on;
+  popup.horizontalLayout = (KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout];
+  popup.verticalLayout = (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout];
+  popup.shouldHideOnBackgroundTouch = _shouldHideOnBackgroundTap;
+  popup.shouldHideOnContentTouch = _shouldHideOnContentTap;
   
-  if (_delaySwitch.on) {
-    [popup showWithDuration:2.0];
+  if (_shouldHideAfterDelay) {
+    [popup showWithDuration:1.5];
   } else {
     [popup show];
   }
 }
+
 
 - (void)hideButtonPressed:(id)sender {
   if ([sender isKindOfClass:[UIView class]]) {
@@ -862,231 +464,15 @@ static NSInteger const kFieldDetailTag = 1102;
   }
 }
 
+
 - (void)pickerDoneButtonPressed:(id)sender {
   [_pickerView hidePresentingPopup];
 }
 
+
 #pragma mark - Private
 
-- (void)updateLabelsForState {
-  [(UILabel*)[_horizontalButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:kHorizontalFieldTag] inFieldWithTag:kHorizontalFieldTag]];
-  [(UILabel*)[_verticalButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInVerticalField inFieldWithTag:kVerticalFieldTag] inFieldWithTag:kVerticalFieldTag]];
-  [(UILabel*)[_maskTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInMaskField inFieldWithTag:kMaskFieldTag] inFieldWithTag:kMaskFieldTag]];
-  [(UILabel*)[_showTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInShowField inFieldWithTag:kShowFieldTag] inFieldWithTag:kShowFieldTag]];
-  [(UILabel*)[_hideTypeButton viewWithTag:kFieldDetailTag] setText:[self nameForValue:[self valueForRow:_selectedRowInHideField inFieldWithTag:kHideFieldTag] inFieldWithTag:kHideFieldTag]];
-}
-
-
-- (NSInteger)valueForRow:(NSInteger)row inList:(NSArray*)list {
-  
-  // If row is out of bounds, try using first row.
-  if (row >= list.count) {
-    row = 0;
-  }
-  
-  if (row < list.count) {
-    id obj = [list objectAtIndex:row];
-    if ([obj isKindOfClass:[NSNumber class]]) {
-      return [(NSNumber*)obj integerValue];
-    }
-  }
-  
-  return 0;
-}
-
-
-- (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag {
-
-  NSArray* listForField = nil;
-  if (tag == kHorizontalFieldTag) {
-    listForField = _horizontalLayouts;
-    
-  } else if (tag == kVerticalFieldTag) {
-    listForField = _verticalLayouts;
-    
-  } else if (tag == kMaskFieldTag) {
-    listForField = _maskTypes;
-    
-  } else if (tag == kShowFieldTag) {
-    listForField = _showTypes;
-    
-  } else if (tag == kHideFieldTag) {
-    listForField = _hideTypes;
-  }
-  
-  // If row is out of bounds, try using first row.
-  if (row >= listForField.count) {
-    row = 0;
-  }
-  
-  if (row < listForField.count) {
-    id obj = [listForField objectAtIndex:row];
-    if ([obj isKindOfClass:[NSNumber class]]) {
-      return [(NSNumber*)obj integerValue];
-    }
-  }
-  
-  return 0;
-}
-
-- (NSInteger)selectedRowForFieldWithTag:(NSInteger)tag {
-  if (tag == kHorizontalFieldTag) {
-    return _selectedRowInHorizontalField;
-    
-  } else if (tag == kVerticalFieldTag) {
-    return _selectedRowInVerticalField;
-    
-  } else if (tag == kMaskFieldTag) {
-    return _selectedRowInMaskField;
-    
-  } else if (tag == kShowFieldTag) {
-    return _selectedRowInShowField;
-    
-  } else if (tag == kHideFieldTag) {
-    return _selectedRowInHideField;
-  }
-  return 0;
-}
-
-- (NSString*)nameForValue:(NSInteger)value inFieldWithTag:(NSInteger)tag {
-  
-  NSDictionary* namesForField = nil;
-  if (tag == kHorizontalFieldTag) {
-    namesForField = _namesForHorizontalLayouts;
-    
-  } else if (tag == kVerticalFieldTag) {
-    namesForField = _namesForVerticalLayouts;
-    
-  } else if (tag == kMaskFieldTag) {
-    namesForField = _namesForMaskTypes;
-  
-  } else if (tag == kShowFieldTag) {
-    namesForField = _namesForShowTypes;
-  
-  } else if (tag == kHideFieldTag) {
-    namesForField = _namesForHideTypes;
-  }
-  
-  if (namesForField != nil) {
-    return [namesForField objectForKey:@(value)];
-  }
-  return nil;
-}
-
-
-#pragma mark - <UIPickerViewDataSource>
-
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-  return 1;
-}
-
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-  
-  if (component == 0) {
-    
-    if (pickerView.tag == kHorizontalFieldTag) {
-      return _horizontalLayouts.count;
-      
-    } else if (pickerView.tag == kVerticalFieldTag) {
-      return _verticalLayouts.count;
-      
-    } else if (pickerView.tag == kMaskFieldTag) {
-      return _maskTypes.count;
-      
-    } else if (pickerView.tag == kShowFieldTag) {
-      return _showTypes.count;
-      
-    } else if (pickerView.tag == kHideFieldTag) {
-      return _hideTypes.count;
-    }
-  }
-  return 0;
-}
-
-
-#pragma mark - <UIPickerViewDelegate>
-
-- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-  
-  NSInteger fieldTag = pickerView.tag;
-  return [self nameForValue:[self valueForRow:row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
-}
-
-
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-  
-  if (pickerView.tag == kHorizontalFieldTag) {
-    _selectedRowInHorizontalField = row;
-    
-  } else if (pickerView.tag == kVerticalFieldTag) {
-    _selectedRowInVerticalField = row;
-    
-  } else if (pickerView.tag == kMaskFieldTag) {
-    _selectedRowInMaskField = row;
-    
-  } else if (pickerView.tag == kShowFieldTag) {
-    _selectedRowInShowField = row;
-    
-  } else if (pickerView.tag == kHideFieldTag) {
-    _selectedRowInHideField = row;
-  }
-}
-
-
-#pragma mark - <UITableViewDataSource>
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  
-  if (tableView.tag == kHorizontalFieldTag) {
-    return _horizontalLayouts.count;
-    
-  } else if (tableView.tag == kVerticalFieldTag) {
-    return _verticalLayouts.count;
-    
-  } else if (tableView.tag == kMaskFieldTag) {
-    return _maskTypes.count;
-    
-  } else if (tableView.tag == kShowFieldTag) {
-    return _showTypes.count;
-    
-  } else if (tableView.tag == kHideFieldTag) {
-    return _hideTypes.count;
-  }
-  
-  return 0;
-}
-
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
-  UITableViewCell* cell = nil;
-  
-  Class cellClass = [UITableViewCell class];
-  NSString* identifier = NSStringFromClass(cellClass);
-  
-  cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-  
-  if (nil == cell) {
-    UITableViewCellStyle style = UITableViewCellStyleDefault;
-    cell = [[cellClass alloc] initWithStyle:style reuseIdentifier:identifier];
-  }
-  
-  NSInteger fieldTag = tableView.tag;
-  
-  cell.textLabel.text = [self nameForValue:[self valueForRow:indexPath.row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
-  
-  if (indexPath.row == [self selectedRowForFieldWithTag:fieldTag]) {
-    cell.accessoryType = UITableViewCellAccessoryCheckmark;
-  } else {
-    cell.accessoryType = UITableViewCellAccessoryNone;
-  }
-
-  return cell;
-}
-
-
-- (void)updateTableView:(UITableView*)tableView {
+- (void)updateFieldTableView:(UITableView*)tableView {
   
   if (tableView != nil) {
     
@@ -1109,35 +495,404 @@ static NSInteger const kFieldDetailTag = 1102;
 }
 
 
+- (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag {
+
+  NSArray* listForField = nil;
+  if (tag == FieldTagHorizontalLayout) {
+    listForField = _horizontalLayouts;
+    
+  } else if (tag == FieldTagVerticalLayout) {
+    listForField = _verticalLayouts;
+    
+  } else if (tag == FieldTagMaskType) {
+    listForField = _maskTypes;
+    
+  } else if (tag == FieldTagShowType) {
+    listForField = _showTypes;
+    
+  } else if (tag == FieldTagHideType) {
+    listForField = _hideTypes;
+  }
+  
+  // If row is out of bounds, try using first row.
+  if (row >= listForField.count) {
+    row = 0;
+  }
+  
+  if (row < listForField.count) {
+    id obj = [listForField objectAtIndex:row];
+    if ([obj isKindOfClass:[NSNumber class]]) {
+      return [(NSNumber*)obj integerValue];
+    }
+  }
+  
+  return 0;
+}
+
+
+- (NSInteger)selectedRowForFieldWithTag:(NSInteger)tag {
+  if (tag == FieldTagHorizontalLayout) {
+    return _selectedRowInHorizontalField;
+    
+  } else if (tag == FieldTagVerticalLayout) {
+    return _selectedRowInVerticalField;
+    
+  } else if (tag == FieldTagMaskType) {
+    return _selectedRowInMaskField;
+    
+  } else if (tag == FieldTagShowType) {
+    return _selectedRowInShowField;
+    
+  } else if (tag == FieldTagHideType) {
+    return _selectedRowInHideField;
+  }
+  return NSNotFound;
+}
+
+
+- (NSString*)nameForValue:(NSInteger)value inFieldWithTag:(NSInteger)tag {
+  
+  NSDictionary* namesForField = nil;
+  if (tag == FieldTagHorizontalLayout) {
+    namesForField = _namesForHorizontalLayouts;
+    
+  } else if (tag == FieldTagVerticalLayout) {
+    namesForField = _namesForVerticalLayouts;
+    
+  } else if (tag == FieldTagMaskType) {
+    namesForField = _namesForMaskTypes;
+  
+  } else if (tag == FieldTagShowType) {
+    namesForField = _namesForShowTypes;
+  
+  } else if (tag == FieldTagHideType) {
+    namesForField = _namesForHideTypes;
+  }
+  
+  if (namesForField != nil) {
+    return [namesForField objectForKey:@(value)];
+  }
+  return nil;
+}
+
+
+- (CellType)cellTypeForFieldWithTag:(NSInteger)tag {
+  
+  CellType cellType;
+  switch (tag) {
+    case FieldTagHorizontalLayout:
+      cellType = CellTypeNormal;
+      break;
+    case FieldTagVerticalLayout:
+      cellType = CellTypeNormal;
+      break;
+    case FieldTagMaskType:
+      cellType = CellTypeNormal;
+      break;
+    case FieldTagShowType:
+      cellType = CellTypeNormal;
+      break;
+    case FieldTagHideType:
+      cellType = CellTypeNormal;
+      break;
+    case FieldTagBackgroundDismiss:
+      cellType = CellTypeSwitch;
+      break;
+    case FieldTagContentDismiss:
+      cellType = CellTypeSwitch;
+      break;
+    case FieldTagTimedDismiss:
+      cellType = CellTypeSwitch;
+      break;
+    default:
+      cellType = CellTypeNormal;
+      break;
+  }
+  return cellType;
+}
+
+
+#pragma mark - <UIPickerViewDataSource>
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+  return 1;
+}
+
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+  
+  if (component == 0) {
+    
+    if (pickerView.tag == FieldTagHorizontalLayout) {
+      return _horizontalLayouts.count;
+      
+    } else if (pickerView.tag == FieldTagVerticalLayout) {
+      return _verticalLayouts.count;
+      
+    } else if (pickerView.tag == FieldTagMaskType) {
+      return _maskTypes.count;
+      
+    } else if (pickerView.tag == FieldTagShowType) {
+      return _showTypes.count;
+      
+    } else if (pickerView.tag == FieldTagHideType) {
+      return _hideTypes.count;
+    }
+  }
+  return 0;
+}
+
+
+#pragma mark - <UIPickerViewDelegate>
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+  
+  NSInteger fieldTag = pickerView.tag;
+  return [self nameForValue:[self valueForRow:row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
+}
+
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+  
+  if (pickerView.tag == FieldTagHorizontalLayout) {
+    _selectedRowInHorizontalField = row;
+    
+  } else if (pickerView.tag == FieldTagVerticalLayout) {
+    _selectedRowInVerticalField = row;
+    
+  } else if (pickerView.tag == FieldTagMaskType) {
+    _selectedRowInMaskField = row;
+    
+  } else if (pickerView.tag == FieldTagShowType) {
+    _selectedRowInShowField = row;
+    
+  } else if (pickerView.tag == FieldTagHideType) {
+    _selectedRowInHideField = row;
+  }
+}
+
+
+#pragma mark - <UITableViewDataSource>
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+  
+  // MAIN TABLE
+  if (tableView == self.tableView) {
+    return _fields.count;
+  }
+  
+  // FIELD TABLES
+  else {
+    
+    if (tableView.tag == FieldTagHorizontalLayout) {
+      return _horizontalLayouts.count;
+      
+    } else if (tableView.tag == FieldTagVerticalLayout) {
+      return _verticalLayouts.count;
+      
+    } else if (tableView.tag == FieldTagMaskType) {
+      return _maskTypes.count;
+      
+    } else if (tableView.tag == FieldTagShowType) {
+      return _showTypes.count;
+      
+    } else if (tableView.tag == FieldTagHideType) {
+      return _hideTypes.count;
+    }
+  }
+  
+  return 0;
+}
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+  
+  // MAIN TABLE
+  if (tableView == self.tableView) {
+    
+    id obj = [_fields objectAtIndex:indexPath.row];
+    if ([obj isKindOfClass:[NSNumber class]]) {
+      FieldTag fieldTag = [(NSNumber*)obj integerValue];
+
+      UITableViewCell* cell = nil;
+      CellType cellType = [self cellTypeForFieldWithTag:fieldTag];
+      
+      NSString* identifier = @"";
+      if (cellType == CellTypeNormal) {
+        identifier = @"normal";
+      } else if (cellType == CellTypeSwitch) {
+        identifier = @"switch";
+      }
+      
+      cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+      
+      if (nil == cell) {
+        UITableViewCellStyle style = UITableViewCellStyleValue1;
+        cell = [[UITableViewCell alloc] initWithStyle:style reuseIdentifier:identifier];
+        UIEdgeInsets newSeparatorInset = cell.separatorInset;
+        newSeparatorInset.right = newSeparatorInset.left;
+        cell.separatorInset = newSeparatorInset;
+        
+        if (cellType == CellTypeNormal) {
+          cell.selectionStyle = UITableViewCellSelectionStyleGray;
+          
+        } else if (cellType == CellTypeSwitch) {
+          cell.selectionStyle = UITableViewCellSelectionStyleNone;
+          UISwitch* toggle = [[UISwitch alloc] init];
+          [toggle addTarget:self action:@selector(toggleValueDidChange:) forControlEvents:UIControlEventValueChanged];
+          cell.accessoryView = toggle;
+        }
+      }
+      
+      cell.textLabel.text = [_namesForFields objectForKey:@(fieldTag)];
+      
+      // populate Normal cell
+      if (cellType == CellTypeNormal) {
+        NSInteger selectedRowInField = [self selectedRowForFieldWithTag:fieldTag];
+        if (selectedRowInField != NSNotFound) {
+          cell.detailTextLabel.text = [self nameForValue:[self valueForRow:selectedRowInField inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
+        }
+      }
+      // populate Switch cell
+      else if (cellType == CellTypeSwitch) {
+        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+          BOOL on = NO;
+          if (fieldTag == FieldTagBackgroundDismiss) {
+            on = _shouldHideOnBackgroundTap;
+          } else if (fieldTag == FieldTagContentDismiss) {
+            on = _shouldHideOnContentTap;
+          } else if (fieldTag == FieldTagTimedDismiss) {
+            on = _shouldHideAfterDelay;
+          }
+          [(UISwitch*)cell.accessoryView setOn:on];
+        }
+      }
+      
+      return cell;
+    }
+  }
+  
+  // FIELD TABLES
+  else {
+
+    UITableViewCell* cell = nil;
+    
+    Class cellClass = [UITableViewCell class];
+    NSString* identifier = NSStringFromClass(cellClass);
+    
+    cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    
+    if (nil == cell) {
+      UITableViewCellStyle style = UITableViewCellStyleDefault;
+      cell = [[cellClass alloc] initWithStyle:style reuseIdentifier:identifier];
+      UIEdgeInsets newSeparatorInset = cell.separatorInset;
+      newSeparatorInset.right = newSeparatorInset.left;
+      cell.separatorInset = newSeparatorInset;
+    }
+    
+    NSInteger fieldTag = tableView.tag;
+    
+    cell.textLabel.text = [self nameForValue:[self valueForRow:indexPath.row inFieldWithTag:fieldTag] inFieldWithTag:fieldTag];
+    
+    if (indexPath.row == [self selectedRowForFieldWithTag:fieldTag]) {
+      cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+      cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    
+    return cell;
+  }
+  
+  return nil;
+}
 
 
 #pragma mark - <UITableViewDelegate>
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   
-  if (tableView.tag == kHorizontalFieldTag) {
-    _selectedRowInHorizontalField = indexPath.row;
+  // MAIN TABLE
+  if (tableView == self.tableView) {
     
-  } else if (tableView.tag == kVerticalFieldTag) {
-    _selectedRowInVerticalField = indexPath.row;
-    
-  } else if (tableView.tag == kMaskFieldTag) {
-    _selectedRowInMaskField = indexPath.row;
-    
-  } else if (tableView.tag == kShowFieldTag) {
-    _selectedRowInShowField = indexPath.row;
-    
-  } else if (tableView.tag == kHideFieldTag) {
-    _selectedRowInHideField = indexPath.row;
+    id obj = [_fields objectAtIndex:indexPath.row];
+    if ([obj isKindOfClass:[NSNumber class]]) {
+      NSInteger fieldTag = [(NSNumber*)obj integerValue];
+      
+      NSInteger rowToSelect = [self selectedRowForFieldWithTag:fieldTag];
+      if (rowToSelect != NSNotFound) {
+      
+        _pickerView.tag = fieldTag;
+        [_pickerView reloadAllComponents];
+        [_pickerView selectRow:rowToSelect inComponent:0 animated:NO];
+        
+        UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+        _pickerLabel.text = cell.textLabel.text;
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+          
+          UIViewController* controller = [[UIViewController alloc] init];
+          
+          UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 100, 200) style:UITableViewStylePlain];
+          tableView.delegate = self;
+          tableView.dataSource = self;
+          tableView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+          tableView.tag = fieldTag;
+          [tableView addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew context:nil];
+          controller.view = tableView;
+          
+          UIPopoverController* popover = [[UIPopoverController alloc] initWithContentViewController:controller];
+          popover.delegate = self;
+          self.popover = popover;
+          
+          CGRect senderFrameInView = [self.tableView convertRect:[self.tableView rectForRowAtIndexPath:indexPath] toView:self.view];
+          [popover presentPopoverFromRect:senderFrameInView inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+          
+        } else {
+          KLCPopup* popup = [KLCPopup popupWithContentView:_pickerContainer
+                                                  showType:KLCPopupShowTypeSlideInFromBottom
+                                                  hideType:KLCPopupHideTypeSlideOutToBottom
+                                                  maskType:KLCPopupMaskTypeDimmed];
+          
+          popup.verticalLayout = KLCPopupVerticalLayoutBottom;
+          popup.shouldHideOnBackgroundTouch = YES;
+          popup.shouldHideOnContentTouch = NO;
+          popup.willStartHidingCompletion = ^{
+            [self.tableView reloadData];
+          };
+          [popup show];
+        }
+      }
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
   }
   
-  [tableView deselectRowAtIndexPath:indexPath animated:YES];
-
-  [self updateTableView:tableView];
-  
-  [self updateLabelsForState];
-  
-  [self.popover dismissPopoverAnimated:YES];
+  // FIELD TABLES
+  else {
+    
+    if (tableView.tag == FieldTagHorizontalLayout) {
+      _selectedRowInHorizontalField = indexPath.row;
+      
+    } else if (tableView.tag == FieldTagVerticalLayout) {
+      _selectedRowInVerticalField = indexPath.row;
+      
+    } else if (tableView.tag == FieldTagMaskType) {
+      _selectedRowInMaskField = indexPath.row;
+      
+    } else if (tableView.tag == FieldTagShowType) {
+      _selectedRowInShowField = indexPath.row;
+      
+    } else if (tableView.tag == FieldTagHideType) {
+      _selectedRowInHideField = indexPath.row;
+    }
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    [self updateFieldTableView:tableView];
+    
+    [self.tableView reloadData];
+    
+    [self.popover dismissPopoverAnimated:YES];
+  }
 }
 
 
@@ -1161,20 +916,7 @@ static NSInteger const kFieldDetailTag = 1102;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
   
   //
-  if ([keyPath isEqualToString:@"highlighted"]) {
-    
-    if ([object isKindOfClass:[UIButton class]]) {
-      UIButton* button = (UIButton*)object;
-      for (UIView* subview in button.subviews) {
-        if ([subview isKindOfClass:[UILabel class]]) {
-          [(UILabel*)subview setHighlighted:button.highlighted];
-        }
-      }
-    }
-  }
-  
-  //
-  else if ([keyPath isEqualToString:@"contentSize"]) {
+  if ([keyPath isEqualToString:@"contentSize"]) {
    
     if ([object isKindOfClass:[UITableView class]]) {
       UITableView* tableView = (UITableView*)object;
@@ -1197,9 +939,9 @@ static NSInteger const kFieldDetailTag = 1102;
 @end
 
 
+#pragma mark - Categories
 
-
-@implementation UIColor (KLCPopup)
+@implementation UIColor (KLCPopupExample)
 
 + (UIColor*)klcLightGreenColor {
   return [UIColor colorWithRed:(184.0/255.0) green:(233.0/255.0) blue:(122.0/255.0) alpha:1.0];
@@ -1210,3 +952,25 @@ static NSInteger const kFieldDetailTag = 1102;
 }
 
 @end
+
+
+
+@implementation UIView (KLCPopupExample)
+
+- (UITableViewCell*)parentCell {
+  
+  // Iterate over superviews until you find a UITableViewCell
+  UIView* view = self;
+  while (view != nil) {
+    if ([view isKindOfClass:[UITableViewCell class]]) {
+      return (UITableViewCell*)view;
+    } else {
+      view = [view superview];
+    }
+  }
+  return nil;
+}
+
+@end
+
+
