@@ -389,7 +389,7 @@ typedef NS_ENUM(NSInteger, CellType) {
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
                           dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
                              dismissOnContentTouch:_shouldDismissOnContentTouch];
-  
+    
   if (_shouldDismissAfterDelay) {
     [popup showWithDuration:2.0];
   } else {

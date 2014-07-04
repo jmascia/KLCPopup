@@ -87,6 +87,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.maskType = KLCPopupMaskTypeDimmed;
     self.horizontalLayout = KLCPopupHorizontalLayoutCenter;
     self.verticalLayout = KLCPopupVerticalLayoutCenter;
+    self.dimmedMaskAlpha = 0.5;
     
     _isBeingShown = NO;
     _isShowing = NO;
@@ -232,7 +233,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       // Setup background view
       _backgroundView.alpha = 0.0;
       if (_maskType == KLCPopupMaskTypeDimmed) {
-        _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:0.5];
+        _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
       } else {
         _backgroundView.backgroundColor = [UIColor clearColor];
       }
@@ -883,12 +884,12 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 }
 
 
-
 #pragma mark - Private
 
 - (void)dismiss {
   [self dismiss:YES];
 }
+
 
 - (void)updateForInterfaceOrientation {
   

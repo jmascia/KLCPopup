@@ -89,11 +89,13 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 // - Must set desired size of contentView before or during willStartShowing.
 @property (nonatomic, strong) UIView* contentView;
 
+@property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout; // default = center.
+@property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout; // default = center.
 @property (nonatomic, assign) KLCPopupShowType showType; // default = shrink in.
 @property (nonatomic, assign) KLCPopupDismissType dismissType; // default = shrink out.
 @property (nonatomic, assign) KLCPopupMaskType maskType; // default = dimmed.
-@property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout; // default = center.
-@property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout; // default = center.
+
+@property (nonatomic, assign) CGFloat dimmedMaskAlpha; // default = 0.5
 
 // If YES, then popup will get dismissed when background is touched. default = YES.
 @property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
