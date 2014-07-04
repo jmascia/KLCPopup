@@ -20,7 +20,7 @@ Create a popup for displaying a UIView using the default layouts, animations, an
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
 	
-Create a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance:
+Or create a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance:
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView
 					 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
@@ -77,7 +77,7 @@ Animation used to dismiss your popup:
 
 	@property (nonatomic, assign) KLCPopupDismissType dismissType;
 	
-Masking prevents touches to the background from passing through to views below:
+Mask prevents touches to the background from passing through to views below:
 	
 	@property (nonatomic, assign) KLCPopupMaskType maskType;
 
@@ -125,4 +125,4 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` was made with ARC enabled by default.
 
 ##Credits
-KLCPopup was created by Jeff Mascia at Kullect, where we use it in our [Shout Photo Messenger](http://tryshout.com) app for iPhone. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
+KLCPopup was created by Jeff Mascia at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app for iPhone. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
