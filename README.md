@@ -88,6 +88,10 @@ Popup will automatically dismiss if the background is touched:
 Popup will automatically dismiss if the contentView is touched:
 
 	@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
+	
+Override alpha value for dimmed background mask:
+
+	@property (nonatomic, assign) CGFloat dimmedMaskAlpha;	
 
 
 ### Blocks
