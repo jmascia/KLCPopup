@@ -120,13 +120,13 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` supports **Portrait** and **Landscape** by default.
 
 ### Deployment
-`KLCPopup` supports **iOS 7**. It has not been tested on iOS 8 yet.
+`KLCPopup` requires **iOS 7**. It has not been tested on iOS 8 yet.
 
 ### Devices
-`KLCPopup` is compatible with both **iPhone** and **iPad**.
+`KLCPopup` supports **iPhone** and **iPad**.
 
 ### ARC
-`KLCPopup` was made with ARC enabled by default.
+`KLCPopup` requires ARC.
 
 ##Credits
-KLCPopup was created by Jeff Mascia at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app for iPhone. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
+KLCPopup was created by Jeff Mascia and the team at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
