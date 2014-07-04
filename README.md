@@ -125,4 +125,4 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` was made with ARC enabled by default.
 
 ##Credits
-KLCPopup was created by Jeff Mascia at Kullect, where we use it in our [Shout Photo Messenger](http://tryshout.com) app for iPhone. Some aspects of this class were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
+KLCPopup was created by Jeff Mascia at Kullect, where we use it in our [Shout Photo Messenger](http://tryshout.com) app for iPhone. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
