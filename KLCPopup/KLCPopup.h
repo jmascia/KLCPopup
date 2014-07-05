@@ -106,12 +106,23 @@ extern const KLCPopupLayout KLCPopupLayoutCustom;
 // - Must set desired size of contentView before or in willStartShowing.
 @property (nonatomic, strong) UIView* contentView;
 
-@property (nonatomic, assign) KLCPopupLayout layout; // default = center
-@property (nonatomic, assign) KLCPopupShowType showType; // default = shrink in.
-@property (nonatomic, assign) KLCPopupDismissType dismissType; // default = shrink out.
-@property (nonatomic, assign) KLCPopupMaskType maskType; // default = dimmed.
+// Final position of contentView defined by screen-relative presets. default = center
+@property (nonatomic, assign) KLCPopupLayout layout;
 
-@property (nonatomic, assign) CGFloat dimmedMaskAlpha; // default = 0.5
+// Final position of contentView defined by custom center coordinates. Only respected if layout = custom.
+@property (nonatomic, assign) CGPoint customLayoutCenter;
+
+// Animation transition for presenting contentView. default = shrink in
+@property (nonatomic, assign) KLCPopupShowType showType;
+
+// Animation transition for dismissing contentView. default = shrink out
+@property (nonatomic, assign) KLCPopupDismissType dismissType;
+
+// Mask prevents background touches from passing to underlying views. // default = dimmed.
+@property (nonatomic, assign) KLCPopupMaskType maskType;
+
+// Overrides alpha value for dimmed background mask. // default = 0.5
+@property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
 // If YES, then popup will get dismissed when background is touched. default = YES.
 @property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;

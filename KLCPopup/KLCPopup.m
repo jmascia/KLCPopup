@@ -300,6 +300,11 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
       CGRect finalContainerFrame = containerFrame;
       UIViewAutoresizing containerAutoresizingMask = UIViewAutoresizingNone;
       switch (_layout.horizontal) {
+        
+        case KLCPopupHorizontalLayoutCustom: {
+          finalContainerFrame.origin.x = (_customLayoutCenter.x - CGRectGetWidth(finalContainerFrame)/2.0);
+          break;
+        }
           
         case KLCPopupHorizontalLayoutLeft: {
           finalContainerFrame.origin.x = 0.0;
@@ -337,6 +342,11 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
       
       // Vertical
       switch (_layout.vertical) {
+          
+        case KLCPopupVerticalLayoutCustom: {
+          finalContainerFrame.origin.y = (_customLayoutCenter.y - CGRectGetHeight(finalContainerFrame)/2.0);
+          break;
+        }
           
         case KLCPopupVerticalLayoutTop: {
           finalContainerFrame.origin.y = 0;
@@ -887,6 +897,15 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
       
     });
   }
+}
+
+#pragma mark - Setters
+
+- (void)setCustomLayoutCenter:(CGPoint)customLayoutCenter {
+  _customLayoutCenter = customLayoutCenter;
+  
+  // Override layout to custom so these coordinates are respected.
+  _layout = KLCPopupLayoutCustom;
 }
 
 
