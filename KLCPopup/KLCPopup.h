@@ -56,9 +56,12 @@ typedef NS_ENUM(NSInteger, KLCPopupDismissType) {
   KLCPopupDismissTypeBounceOutToRight,
 };
 
+
+
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
 typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
-  KLCPopupHorizontalLayoutLeft = 0,
+  KLCPopupHorizontalLayoutCustom = 0,
+  KLCPopupHorizontalLayoutLeft,
   KLCPopupHorizontalLayoutLeftOfCenter,
   KLCPopupHorizontalLayoutCenter,
   KLCPopupHorizontalLayoutRightOfCenter,
@@ -67,7 +70,8 @@ typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
 
 // KLCPopupVerticalLayout: Controls where the popup will come to rest vertically.
 typedef NS_ENUM(NSInteger, KLCPopupVerticalLayout) {
-	KLCPopupVerticalLayoutTop = 0,
+  KLCPopupVerticalLayoutCustom = 0,
+	KLCPopupVerticalLayoutTop,
   KLCPopupVerticalLayoutAboveCenter,
   KLCPopupVerticalLayoutCenter,
   KLCPopupVerticalLayoutBelowCenter,
@@ -81,16 +85,28 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 	KLCPopupMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
 };
 
+// KLCPopupLayout structure and maker functions
+struct KLCPopupLayout {
+  KLCPopupHorizontalLayout horizontal;
+  KLCPopupVerticalLayout vertical;
+};
+typedef struct KLCPopupLayout KLCPopupLayout;
+
+extern KLCPopupLayout KLCPopupLayoutMake(KLCPopupHorizontalLayout horizontal, KLCPopupVerticalLayout vertical);
+
+extern const KLCPopupLayout KLCPopupLayoutCenter;
+extern const KLCPopupLayout KLCPopupLayoutCustom;
+
+
 
 @interface KLCPopup : UIView
 
 // This is the view that you want to appear in Popup.
-// - Must provide contentView before or during willStartShowing.
-// - Must set desired size of contentView before or during willStartShowing.
+// - Must provide contentView before or in willStartShowing.
+// - Must set desired size of contentView before or in willStartShowing.
 @property (nonatomic, strong) UIView* contentView;
 
-@property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout; // default = center.
-@property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout; // default = center.
+@property (nonatomic, assign) KLCPopupLayout layout; // default = center
 @property (nonatomic, assign) KLCPopupShowType showType; // default = shrink in.
 @property (nonatomic, assign) KLCPopupDismissType dismissType; // default = shrink out.
 @property (nonatomic, assign) KLCPopupMaskType maskType; // default = dimmed.
@@ -112,13 +128,12 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 // Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishDismissingCompletion)();
 
-// Convenience method for creating default popup (mimics UIAlertView).
+// Convenience method for creating popup with default values (mimics UIAlertView).
 + (KLCPopup*)popupWithContentView:(UIView*)contentView;
 
 // Convenience method for creating fully customized popup.
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
-                   verticalLayout:(KLCPopupVerticalLayout)verticalLayout
+                           layout:(KLCPopupLayout)layout
                          showType:(KLCPopupShowType)showType
                          dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType

@@ -26,6 +26,15 @@
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
+KLCPopupLayout KLCPopupLayoutMake(KLCPopupHorizontalLayout horizontal, KLCPopupVerticalLayout vertical)
+{
+  KLCPopupLayout layout; layout.horizontal = horizontal; layout.vertical = vertical; return layout;
+}
+
+const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KLCPopupVerticalLayoutCenter };
+const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KLCPopupVerticalLayoutCustom };
+
+
 
 @interface KLCPopup () {
   // views
@@ -85,8 +94,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.showType = KLCPopupShowTypeShrinkIn;
     self.dismissType = KLCPopupDismissTypeShrinkOut;
     self.maskType = KLCPopupMaskTypeDimmed;
-    self.horizontalLayout = KLCPopupHorizontalLayoutCenter;
-    self.verticalLayout = KLCPopupVerticalLayoutCenter;
+    self.layout = KLCPopupLayoutCenter;
     self.dimmedMaskAlpha = 0.5;
     
     _isBeingShown = NO;
@@ -160,8 +168,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
-                   verticalLayout:(KLCPopupVerticalLayout)verticalLayout
+                           layout:(KLCPopupLayout)layout
                          showType:(KLCPopupShowType)showType
                       dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
@@ -170,8 +177,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 {
   KLCPopup* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
-  popup.horizontalLayout = horizontalLayout;
-  popup.verticalLayout = verticalLayout;
+  popup.layout = layout;
   popup.showType = showType;
   popup.dismissType = dismissType;
   popup.maskType = maskType;
@@ -293,7 +299,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       // Determine final position and necessary autoresizingMask for container based on horizontal and vertical layouts.
       CGRect finalContainerFrame = containerFrame;
       UIViewAutoresizing containerAutoresizingMask = UIViewAutoresizingNone;
-      switch (_horizontalLayout) {
+      switch (_layout.horizontal) {
           
         case KLCPopupHorizontalLayoutLeft: {
           finalContainerFrame.origin.x = 0.0;
@@ -330,7 +336,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
       }
       
       // Vertical
-      switch (_verticalLayout) {
+      switch (_layout.vertical) {
           
         case KLCPopupVerticalLayoutTop: {
           finalContainerFrame.origin.y = 0;
