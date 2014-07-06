@@ -28,12 +28,19 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 KLCPopupLayout KLCPopupLayoutMake(KLCPopupHorizontalLayout horizontal, KLCPopupVerticalLayout vertical)
 {
-  KLCPopupLayout layout; layout.horizontal = horizontal; layout.vertical = vertical; return layout;
+  KLCPopupLayout layout;
+  layout.horizontal = horizontal;
+  layout.vertical = vertical;
+  return layout;
 }
 
 const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KLCPopupVerticalLayoutCenter };
-const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KLCPopupVerticalLayoutCustom };
 
+
+@interface NSValue (KLCPopupLayout)
++ (NSValue*)valueWithKLCPopupLayout:(KLCPopupLayout)layout;
+- (KLCPopupLayout)KLCPopupLayoutValue;
+@end
 
 
 @interface KLCPopup () {
@@ -94,7 +101,6 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
     self.showType = KLCPopupShowTypeShrinkIn;
     self.dismissType = KLCPopupDismissTypeShrinkOut;
     self.maskType = KLCPopupMaskTypeDimmed;
-    self.layout = KLCPopupLayoutCenter;
     self.dimmedMaskAlpha = 0.5;
     
     _isBeingShown = NO;
@@ -168,7 +174,6 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
 
 
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                           layout:(KLCPopupLayout)layout
                          showType:(KLCPopupShowType)showType
                       dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
@@ -177,7 +182,6 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
 {
   KLCPopup* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
-  popup.layout = layout;
   popup.showType = showType;
   popup.dismissType = dismissType;
   popup.maskType = maskType;
@@ -200,430 +204,38 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
 #pragma mark - Public
 
 - (void)show {
-  [self showWithDuration:0.0];
+  [self showWithLayout:KLCPopupLayoutCenter];
+}
+
+
+- (void)showWithLayout:(KLCPopupLayout)layout {
+  [self showWithLayout:layout duration:0.0];
 }
 
 
 - (void)showWithDuration:(NSTimeInterval)duration {
-  
-  // If popup can be shown
-  if (!_isBeingShown && !_isShowing && !_isBeingDismissed) {
-    _isBeingShown = YES;
-    _isShowing = NO;
-    _isBeingDismissed = NO;
-    
-    [self willStartShowing];
-    
-    dispatch_async( dispatch_get_main_queue(), ^{
-      
-      // Prepare by adding to the top window.
-      if(!self.superview){
-        NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
-        
-        for (UIWindow *window in frontToBackWindows) {
-          if (window.windowLevel == UIWindowLevelNormal) {
-            [window addSubview:self];
-            
-            break;
-          }
-        }
-      }
-      
-      // Before we calculate layout for containerView, make sure we are transformed for current orientation.
-      [self updateForInterfaceOrientation];
-      
-      // Make sure we're not hidden
-      self.hidden = NO;
-      self.alpha = 1.0;
-      
-      // Setup background view
-      _backgroundView.alpha = 0.0;
-      if (_maskType == KLCPopupMaskTypeDimmed) {
-        _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
-      } else {
-        _backgroundView.backgroundColor = [UIColor clearColor];
-      }
-      
-      // Animate background if needed
-      void (^backgroundAnimationBlock)(void) = ^(void) {
-        _backgroundView.alpha = 1.0;
-      };
-      
-      if (_showType != KLCPopupShowTypeNone) {
-        // Make fade happen faster than motion. Use linear for fades.
-        [UIView animateWithDuration:0.15
-                              delay:0
-                            options:UIViewAnimationOptionCurveLinear
-                         animations:backgroundAnimationBlock
-                         completion:NULL];
-      } else {
-        backgroundAnimationBlock();
-      }
-      
-      // Setup completion block
-      void (^completionBlock)(BOOL) = ^(BOOL finished) {
-        _isBeingShown = NO;
-        _isShowing = YES;
-        _isBeingDismissed = NO;
-        
-        [self didFinishShowing];
-        
-        if (self.didFinishShowingCompletion != nil) {
-          self.didFinishShowingCompletion();
-        }
-        
-        // Set to hide after duration if greater than zero.
-        if (duration > 0.0) {
-          [self performSelector:@selector(dismiss) withObject:nil afterDelay:duration];
-        }
-      };
-      
-      // Add contentView to container
-      if (self.contentView.superview != _containerView) {
-        [_containerView addSubview:self.contentView];
-      }
-      
-      // Re-layout (this is needed if the contentView is using autoLayout)
-      [self.contentView layoutIfNeeded];
-      
-      // Size container to match contentView
-      CGRect containerFrame = _containerView.frame;
-      containerFrame.size = self.contentView.frame.size;
-      _containerView.frame = containerFrame;
-      // Position contentView to fill it
-      CGRect contentViewFrame = self.contentView.frame;
-      contentViewFrame.origin = CGPointZero;
-      self.contentView.frame = contentViewFrame;
-      
-      
-      // Determine final position and necessary autoresizingMask for container based on horizontal and vertical layouts.
-      CGRect finalContainerFrame = containerFrame;
-      UIViewAutoresizing containerAutoresizingMask = UIViewAutoresizingNone;
-      switch (_layout.horizontal) {
-        
-        case KLCPopupHorizontalLayoutCustom: {
-          finalContainerFrame.origin.x = (_customLayoutCenter.x - CGRectGetWidth(finalContainerFrame)/2.0);
-          break;
-        }
-          
-        case KLCPopupHorizontalLayoutLeft: {
-          finalContainerFrame.origin.x = 0.0;
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleRightMargin;
-          break;
-        }
-          
-        case KLCPopupHorizontalLayoutLeftOfCenter: {
-          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)/3.0 - CGRectGetWidth(containerFrame)/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-          break;
-        }
-          
-        case KLCPopupHorizontalLayoutCenter: {
-          finalContainerFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame))/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-          break;
-        }
-          
-        case KLCPopupHorizontalLayoutRightOfCenter: {
-          finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)*2.0/3.0 - CGRectGetWidth(containerFrame)/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-          break;
-        }
-          
-        case KLCPopupHorizontalLayoutRight: {
-          finalContainerFrame.origin.x = CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin;
-          break;
-        }
-          
-        default:
-          break;
-      }
-      
-      // Vertical
-      switch (_layout.vertical) {
-          
-        case KLCPopupVerticalLayoutCustom: {
-          finalContainerFrame.origin.y = (_customLayoutCenter.y - CGRectGetHeight(finalContainerFrame)/2.0);
-          break;
-        }
-          
-        case KLCPopupVerticalLayoutTop: {
-          finalContainerFrame.origin.y = 0;
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleBottomMargin;
-          break;
-        }
+  [self showWithLayout:KLCPopupLayoutCenter duration:duration];
+}
 
-        case KLCPopupVerticalLayoutAboveCenter: {
-          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)/3.0 - CGRectGetHeight(containerFrame)/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-          break;
-        }
-          
-        case KLCPopupVerticalLayoutCenter: {
-          finalContainerFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame))/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-          break;
-        }
-          
-        case KLCPopupVerticalLayoutBelowCenter: {
-          finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)*2.0/3.0 - CGRectGetHeight(containerFrame)/2.0);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-          break;
-        }
-          
-        case KLCPopupVerticalLayoutBottom: {
-          finalContainerFrame.origin.y = CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame);
-          containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin;
-          break;
-        }
 
-        default:
-          break;
-      }
-      _containerView.autoresizingMask = containerAutoresizingMask;
-      
-      
-      // Animate content if needed
-      switch (_showType) {
-        case KLCPopupShowTypeFadeIn: {
-          
-          _containerView.alpha = 0.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          _containerView.frame = startFrame;
-          
-          [UIView animateWithDuration:0.15
-                                delay:0
-                              options:UIViewAnimationOptionCurveLinear
-                           animations:^{
-                             _containerView.alpha = 1.0;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeGrowIn: {
-          
-          _containerView.alpha = 0.0;
-          // set frame before transform here...
-          CGRect startFrame = finalContainerFrame;
-          _containerView.frame = startFrame;
-          _containerView.transform = CGAffineTransformMakeScale(0.85, 0.85);
-          
-          [UIView animateWithDuration:0.15
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.alpha = 1.0;
-                             // set transform before frame here...
-                             _containerView.transform = CGAffineTransformIdentity;
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          
-          break;
-        }
-          
-        case KLCPopupShowTypeShrinkIn: {
-          _containerView.alpha = 0.0;
-          // set frame before transform here...
-          CGRect startFrame = finalContainerFrame;
-          _containerView.frame = startFrame;
-          _containerView.transform = CGAffineTransformMakeScale(1.25, 1.25);
-          
-          [UIView animateWithDuration:0.15
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.alpha = 1.0;
-                             // set transform before frame here...
-                             _containerView.transform = CGAffineTransformIdentity;
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeSlideInFromTop: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
-          _containerView.frame = startFrame;
-          
-          [UIView animateWithDuration:0.30
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeSlideInFromBottom: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = CGRectGetHeight(self.bounds);
-          _containerView.frame = startFrame;
+- (void)showWithLayout:(KLCPopupLayout)layout duration:(NSTimeInterval)duration {
+  NSDictionary* parameters = @{@"layout" : [NSValue valueWithKLCPopupLayout:layout],
+                               @"duration" : @(duration)};
+  [self showWithParameters:parameters];
+}
 
-          [UIView animateWithDuration:0.30
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-        
-        case KLCPopupShowTypeSlideInFromLeft: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
-          _containerView.frame = startFrame;
-          
-          [UIView animateWithDuration:0.30
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeSlideInFromRight: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = CGRectGetWidth(self.bounds);
-          _containerView.frame = startFrame;
-        
-          [UIView animateWithDuration:0.30
-                                delay:0
-                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          
-          break;
-        }
-          
-        case KLCPopupShowTypeBounceIn: {
-          _containerView.alpha = 0.0;
-          // set frame before transform here...
-          CGRect startFrame = finalContainerFrame;
-          _containerView.frame = startFrame;
-          _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
 
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:15.0
-                              options:0
-                           animations:^{
-                             _containerView.alpha = 1.0;
-                             _containerView.transform = CGAffineTransformIdentity;
-                           }
-                           completion:completionBlock];
-          
-          break;
-        }
-          
-        case KLCPopupShowTypeBounceInFromTop: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
-          _containerView.frame = startFrame;
+- (void)showAtCenter:(CGPoint)center inView:(UIView*)view {
+  [self showAtCenter:center inView:view withDuration:0.0];
+}
 
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeBounceInFromBottom: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = CGRectGetHeight(self.bounds);
-          _containerView.frame = startFrame;
-          
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeBounceInFromLeft: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
-          _containerView.frame = startFrame;
 
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        case KLCPopupShowTypeBounceInFromRight: {
-          _containerView.alpha = 1.0;
-          _containerView.transform = CGAffineTransformIdentity;
-          CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = CGRectGetWidth(self.bounds);
-          _containerView.frame = startFrame;
-          
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
-          break;
-        }
-          
-        default: {
-          self.containerView.alpha = 1.0;
-          self.containerView.transform = CGAffineTransformIdentity;
-          self.containerView.frame = finalContainerFrame;
-  
-          completionBlock(YES);
-          
-          break;
-        }
-      }
-      
-    });
-  }
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view withDuration:(NSTimeInterval)duration {
+  NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+  [parameters setValue:[NSValue valueWithCGPoint:center] forKey:@"center"];
+  [parameters setValue:@(duration) forKey:@"duration"];
+  [parameters setValue:view forKey:@"view"];
+  [self showWithParameters:[NSDictionary dictionaryWithDictionary:parameters]];
 }
 
 
@@ -903,17 +515,462 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
   }
 }
 
-#pragma mark - Setters
-
-- (void)setCustomLayoutCenter:(CGPoint)customLayoutCenter {
-  _customLayoutCenter = customLayoutCenter;
-  
-  // Override layout to custom so these coordinates are respected.
-  _layout = KLCPopupLayoutCustom;
-}
-
 
 #pragma mark - Private
+
+- (void)showWithParameters:(NSDictionary*)parameters {
+  
+  // If popup can be shown
+  if (!_isBeingShown && !_isShowing && !_isBeingDismissed) {
+    _isBeingShown = YES;
+    _isShowing = NO;
+    _isBeingDismissed = NO;
+    
+    [self willStartShowing];
+    
+    dispatch_async( dispatch_get_main_queue(), ^{
+      
+      // Prepare by adding to the top window.
+      if(!self.superview){
+        NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
+        
+        for (UIWindow *window in frontToBackWindows) {
+          if (window.windowLevel == UIWindowLevelNormal) {
+            [window addSubview:self];
+            
+            break;
+          }
+        }
+      }
+      
+      // Before we calculate layout for containerView, make sure we are transformed for current orientation.
+      [self updateForInterfaceOrientation];
+      
+      // Make sure we're not hidden
+      self.hidden = NO;
+      self.alpha = 1.0;
+      
+      // Setup background view
+      _backgroundView.alpha = 0.0;
+      if (_maskType == KLCPopupMaskTypeDimmed) {
+        _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
+      } else {
+        _backgroundView.backgroundColor = [UIColor clearColor];
+      }
+      
+      // Animate background if needed
+      void (^backgroundAnimationBlock)(void) = ^(void) {
+        _backgroundView.alpha = 1.0;
+      };
+      
+      if (_showType != KLCPopupShowTypeNone) {
+        // Make fade happen faster than motion. Use linear for fades.
+        [UIView animateWithDuration:0.15
+                              delay:0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:backgroundAnimationBlock
+                         completion:NULL];
+      } else {
+        backgroundAnimationBlock();
+      }
+      
+      // Determine duration. Default to 0 if none provided.
+      NSTimeInterval duration;
+      NSNumber* durationNumber = [parameters valueForKey:@"duration"];
+      if (durationNumber != nil) {
+        duration = [durationNumber doubleValue];
+      } else {
+        duration = 0.0;
+      }
+      
+      // Setup completion block
+      void (^completionBlock)(BOOL) = ^(BOOL finished) {
+        _isBeingShown = NO;
+        _isShowing = YES;
+        _isBeingDismissed = NO;
+        
+        [self didFinishShowing];
+        
+        if (self.didFinishShowingCompletion != nil) {
+          self.didFinishShowingCompletion();
+        }
+        
+        // Set to hide after duration if greater than zero.
+        if (duration > 0.0) {
+          [self performSelector:@selector(dismiss) withObject:nil afterDelay:duration];
+        }
+      };
+      
+      // Add contentView to container
+      if (self.contentView.superview != _containerView) {
+        [_containerView addSubview:self.contentView];
+      }
+      
+      // Re-layout (this is needed if the contentView is using autoLayout)
+      [self.contentView layoutIfNeeded];
+      
+      // Size container to match contentView
+      CGRect containerFrame = _containerView.frame;
+      containerFrame.size = self.contentView.frame.size;
+      _containerView.frame = containerFrame;
+      // Position contentView to fill it
+      CGRect contentViewFrame = self.contentView.frame;
+      contentViewFrame.origin = CGPointZero;
+      self.contentView.frame = contentViewFrame;
+      
+      // Determine final position and necessary autoresizingMask for container.
+      CGRect finalContainerFrame = containerFrame;
+      UIViewAutoresizing containerAutoresizingMask = UIViewAutoresizingNone;
+      
+      // Use explicit center coordinates if provided.
+      NSValue* centerValue = [parameters valueForKey:@"center"];
+      if (centerValue != nil) {
+        
+        CGPoint centerInView = [centerValue CGPointValue];
+        CGPoint centerInSelf;
+        
+        // Convert coordinates from provided view to self. Otherwise use as-is.
+        UIView* fromView = [parameters valueForKey:@"view"];
+        if (fromView != nil) {
+          centerInSelf = [self convertPoint:centerInView fromView:fromView];
+        } else {
+          centerInSelf = centerInView;
+        }
+        
+        finalContainerFrame.origin.x = (centerInSelf.x - CGRectGetWidth(finalContainerFrame)/2.0);
+        finalContainerFrame.origin.y = (centerInSelf.y - CGRectGetHeight(finalContainerFrame)/2.0);
+        containerAutoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin;
+      }
+      
+      // Otherwise use relative layout. Default to center is none provided.
+      else {
+        
+        NSValue* layoutValue = [parameters valueForKey:@"layout"];
+        KLCPopupLayout layout;
+        if (layoutValue != nil) {
+          layout = [layoutValue KLCPopupLayoutValue];
+        } else {
+          layout = KLCPopupLayoutCenter;
+        }
+        
+        switch (layout.horizontal) {
+            
+          case KLCPopupHorizontalLayoutLeft: {
+            finalContainerFrame.origin.x = 0.0;
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleRightMargin;
+            break;
+          }
+            
+          case KLCPopupHorizontalLayoutLeftOfCenter: {
+            finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)/3.0 - CGRectGetWidth(containerFrame)/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+            break;
+          }
+            
+          case KLCPopupHorizontalLayoutCenter: {
+            finalContainerFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame))/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+            break;
+          }
+            
+          case KLCPopupHorizontalLayoutRightOfCenter: {
+            finalContainerFrame.origin.x = floorf(CGRectGetWidth(self.bounds)*2.0/3.0 - CGRectGetWidth(containerFrame)/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+            break;
+          }
+            
+          case KLCPopupHorizontalLayoutRight: {
+            finalContainerFrame.origin.x = CGRectGetWidth(self.bounds) - CGRectGetWidth(containerFrame);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleLeftMargin;
+            break;
+          }
+            
+          default:
+            break;
+        }
+        
+        // Vertical
+        switch (layout.vertical) {
+            
+          case KLCPopupVerticalLayoutTop: {
+            finalContainerFrame.origin.y = 0;
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleBottomMargin;
+            break;
+          }
+            
+          case KLCPopupVerticalLayoutAboveCenter: {
+            finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)/3.0 - CGRectGetHeight(containerFrame)/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+            break;
+          }
+            
+          case KLCPopupVerticalLayoutCenter: {
+            finalContainerFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame))/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+            break;
+          }
+            
+          case KLCPopupVerticalLayoutBelowCenter: {
+            finalContainerFrame.origin.y = floorf(CGRectGetHeight(self.bounds)*2.0/3.0 - CGRectGetHeight(containerFrame)/2.0);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+            break;
+          }
+            
+          case KLCPopupVerticalLayoutBottom: {
+            finalContainerFrame.origin.y = CGRectGetHeight(self.bounds) - CGRectGetHeight(containerFrame);
+            containerAutoresizingMask = containerAutoresizingMask | UIViewAutoresizingFlexibleTopMargin;
+            break;
+          }
+            
+          default:
+            break;
+        }
+      }
+      
+      _containerView.autoresizingMask = containerAutoresizingMask;
+      
+      // Animate content if needed
+      switch (_showType) {
+        case KLCPopupShowTypeFadeIn: {
+          
+          _containerView.alpha = 0.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.15
+                                delay:0
+                              options:UIViewAnimationOptionCurveLinear
+                           animations:^{
+                             _containerView.alpha = 1.0;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeGrowIn: {
+          
+          _containerView.alpha = 0.0;
+          // set frame before transform here...
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
+          _containerView.transform = CGAffineTransformMakeScale(0.85, 0.85);
+          
+          [UIView animateWithDuration:0.15
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.alpha = 1.0;
+                             // set transform before frame here...
+                             _containerView.transform = CGAffineTransformIdentity;
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          
+          break;
+        }
+          
+        case KLCPopupShowTypeShrinkIn: {
+          _containerView.alpha = 0.0;
+          // set frame before transform here...
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
+          _containerView.transform = CGAffineTransformMakeScale(1.25, 1.25);
+          
+          [UIView animateWithDuration:0.15
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.alpha = 1.0;
+                             // set transform before frame here...
+                             _containerView.transform = CGAffineTransformIdentity;
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeSlideInFromTop: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.30
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeSlideInFromBottom: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.y = CGRectGetHeight(self.bounds);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.30
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeSlideInFromLeft: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.30
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeSlideInFromRight: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.x = CGRectGetWidth(self.bounds);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.30
+                                delay:0
+                              options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          
+          break;
+        }
+          
+        case KLCPopupShowTypeBounceIn: {
+          _containerView.alpha = 0.0;
+          // set frame before transform here...
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
+          _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:15.0
+                              options:0
+                           animations:^{
+                             _containerView.alpha = 1.0;
+                             _containerView.transform = CGAffineTransformIdentity;
+                           }
+                           completion:completionBlock];
+          
+          break;
+        }
+          
+        case KLCPopupShowTypeBounceInFromTop: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:10.0
+                              options:0
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeBounceInFromBottom: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.y = CGRectGetHeight(self.bounds);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:10.0
+                              options:0
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeBounceInFromLeft: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:10.0
+                              options:0
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        case KLCPopupShowTypeBounceInFromRight: {
+          _containerView.alpha = 1.0;
+          _containerView.transform = CGAffineTransformIdentity;
+          CGRect startFrame = finalContainerFrame;
+          startFrame.origin.x = CGRectGetWidth(self.bounds);
+          _containerView.frame = startFrame;
+          
+          [UIView animateWithDuration:0.6
+                                delay:0.0
+               usingSpringWithDamping:0.8
+                initialSpringVelocity:10.0
+                              options:0
+                           animations:^{
+                             _containerView.frame = finalContainerFrame;
+                           }
+                           completion:completionBlock];
+          break;
+        }
+          
+        default: {
+          self.containerView.alpha = 1.0;
+          self.containerView.transform = CGAffineTransformIdentity;
+          self.containerView.frame = finalContainerFrame;
+          
+          completionBlock(YES);
+          
+          break;
+        }
+      }
+      
+    });
+  }
+}
+
 
 - (void)dismiss {
   [self dismiss:YES];
@@ -1011,5 +1068,25 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
   }
 }
 
+@end
+
+
+
+
+@implementation NSValue (KLCPopupLayout)
+
++ (NSValue *)valueWithKLCPopupLayout:(KLCPopupLayout)layout
+{
+  return [NSValue valueWithBytes:&layout objCType:@encode(KLCPopupLayout)];
+}
+
+- (KLCPopupLayout)KLCPopupLayoutValue
+{
+  KLCPopupLayout layout;
+  
+  [self getValue:&layout];
+  
+  return layout;
+}
 
 @end

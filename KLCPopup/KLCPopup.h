@@ -95,7 +95,6 @@ typedef struct KLCPopupLayout KLCPopupLayout;
 extern KLCPopupLayout KLCPopupLayoutMake(KLCPopupHorizontalLayout horizontal, KLCPopupVerticalLayout vertical);
 
 extern const KLCPopupLayout KLCPopupLayoutCenter;
-extern const KLCPopupLayout KLCPopupLayoutCustom;
 
 
 
@@ -106,22 +105,16 @@ extern const KLCPopupLayout KLCPopupLayoutCustom;
 // - Must set desired size of contentView before or in willStartShowing.
 @property (nonatomic, strong) UIView* contentView;
 
-// Final position of contentView defined by screen-relative presets. default = center
-@property (nonatomic, assign) KLCPopupLayout layout;
-
-// Final position of contentView defined by custom center coordinates. Only respected if layout = custom.
-@property (nonatomic, assign) CGPoint customLayoutCenter;
-
 // Animation transition for presenting contentView. default = shrink in
 @property (nonatomic, assign) KLCPopupShowType showType;
 
 // Animation transition for dismissing contentView. default = shrink out
 @property (nonatomic, assign) KLCPopupDismissType dismissType;
 
-// Mask prevents background touches from passing to underlying views. // default = dimmed.
+// Mask prevents background touches from passing to underlying views. default = dimmed.
 @property (nonatomic, assign) KLCPopupMaskType maskType;
 
-// Overrides alpha value for dimmed background mask. // default = 0.5
+// Overrides alpha value for dimmed background mask. default = 0.5
 @property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
 // If YES, then popup will get dismissed when background is touched. default = YES.
@@ -142,29 +135,38 @@ extern const KLCPopupLayout KLCPopupLayoutCustom;
 // Convenience method for creating popup with default values (mimics UIAlertView).
 + (KLCPopup*)popupWithContentView:(UIView*)contentView;
 
-// Convenience method for creating fully customized popup.
+// Convenience method for creating popup with custom values.
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                           layout:(KLCPopupLayout)layout
                          showType:(KLCPopupShowType)showType
-                         dismissType:(KLCPopupDismissType)dismissType
+                      dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
-            dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
-               dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
+         dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+            dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
-// TODO: make a convenience method with custom center?
-// TODO: README
-
-// Dismisses all the popups in the app. Use as a failsafe for cleaning up.
+// Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
 
-// Show popup. Uses showType for animation.
+// Show popup with center layout. Animation determined by showType.
 - (void)show;
+
+// Show with specified layout.
+- (void)showWithLayout:(KLCPopupLayout)layout;
 
 // Show and then dismiss after duration. 0.0 or less will be considered infinity.
 - (void)showWithDuration:(NSTimeInterval)duration;
 
+// Show with layout and dismiss after duration.
+- (void)showWithLayout:(KLCPopupLayout)layout duration:(NSTimeInterval)duration;
+
+// Show centered at point in view's coordinate system. If view is nil use screen base coordinates.
+- (void)showAtCenter:(CGPoint)center inView:(UIView*)view;
+
+// Show centered at point in view's coordinate system, then dismiss after duration.
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view withDuration:(NSTimeInterval)duration;
+
 // Dismiss popup. Uses dismissType if animated is YES.
 - (void)dismiss:(BOOL)animated;
+
 
 #pragma mark Subclassing
 @property (nonatomic, strong, readonly) UIView *backgroundView;

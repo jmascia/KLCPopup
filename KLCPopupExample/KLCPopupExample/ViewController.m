@@ -385,17 +385,16 @@ typedef NS_ENUM(NSInteger, CellType) {
                                              (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]);
   
   KLCPopup* popup = [KLCPopup popupWithContentView:contentView
-                                            layout:layout
                                           showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
                                        dismissType:(KLCPopupDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
                           dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
                              dismissOnContentTouch:_shouldDismissOnContentTouch];
-      
+  
   if (_shouldDismissAfterDelay) {
-    [popup showWithDuration:2.0];
+    [popup showWithLayout:layout duration:2.0];
   } else {
-    [popup show];
+    [popup showWithLayout:layout];
   }
 }
 
