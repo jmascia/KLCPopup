@@ -151,6 +151,9 @@ extern const KLCPopupLayout KLCPopupLayoutCustom;
             dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
                dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
+// TODO: make a convenience method with custom center?
+// TODO: README
+
 // Dismisses all the popups in the app. Use as a failsafe for cleaning up.
 + (void)dismissAllPopups;
 

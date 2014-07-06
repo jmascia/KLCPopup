@@ -390,7 +390,8 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           
           _containerView.alpha = 0.0;
           _containerView.transform = CGAffineTransformIdentity;
-          _containerView.frame = finalContainerFrame;
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
           
           [UIView animateWithDuration:0.15
                                 delay:0
@@ -406,7 +407,8 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           
           _containerView.alpha = 0.0;
           // set frame before transform here...
-          _containerView.frame = finalContainerFrame;
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.85, 0.85);
           
           [UIView animateWithDuration:0.15
@@ -426,7 +428,8 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
         case KLCPopupShowTypeShrinkIn: {
           _containerView.alpha = 0.0;
           // set frame before transform here...
-          _containerView.frame = finalContainerFrame;
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(1.25, 1.25);
           
           [UIView animateWithDuration:0.15
@@ -463,7 +466,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           _containerView.alpha = 1.0;
           _containerView.transform = CGAffineTransformIdentity;
           CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = CGRectGetHeight(self.frame);
+          startFrame.origin.y = CGRectGetHeight(self.bounds);
           _containerView.frame = startFrame;
 
           [UIView animateWithDuration:0.30
@@ -497,7 +500,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           _containerView.alpha = 1.0;
           _containerView.transform = CGAffineTransformIdentity;
           CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = CGRectGetWidth(self.frame);
+          startFrame.origin.x = CGRectGetWidth(self.bounds);
           _containerView.frame = startFrame;
         
           [UIView animateWithDuration:0.30
@@ -514,7 +517,8 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
         case KLCPopupShowTypeBounceIn: {
           _containerView.alpha = 0.0;
           // set frame before transform here...
-          _containerView.frame = finalContainerFrame;
+          CGRect startFrame = finalContainerFrame;
+          _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
 
           [UIView animateWithDuration:0.6
@@ -554,7 +558,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           _containerView.alpha = 1.0;
           _containerView.transform = CGAffineTransformIdentity;
           CGRect startFrame = finalContainerFrame;
-          startFrame.origin.y = CGRectGetHeight(self.frame);
+          startFrame.origin.y = CGRectGetHeight(self.bounds);
           _containerView.frame = startFrame;
           
           [UIView animateWithDuration:0.6
@@ -592,7 +596,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
           _containerView.alpha = 1.0;
           _containerView.transform = CGAffineTransformIdentity;
           CGRect startFrame = finalContainerFrame;
-          startFrame.origin.x = CGRectGetWidth(self.frame);
+          startFrame.origin.x = CGRectGetWidth(self.bounds);
           _containerView.frame = startFrame;
           
           [UIView animateWithDuration:0.6
@@ -730,7 +734,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
-                               finalFrame.origin.y = CGRectGetHeight(self.frame);
+                               finalFrame.origin.y = CGRectGetHeight(self.bounds);
                                _containerView.frame = finalFrame;
                              }
                              completion:completionBlock];
@@ -756,7 +760,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
                                CGRect finalFrame = _containerView.frame;
-                               finalFrame.origin.x = CGRectGetWidth(self.frame);
+                               finalFrame.origin.x = CGRectGetWidth(self.bounds);
                                _containerView.frame = finalFrame;
                              }
                              completion:completionBlock];
@@ -827,7 +831,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
                                                    options:UIViewAnimationOptionCurveEaseIn
                                                 animations:^(void){
                                                   CGRect finalFrame = _containerView.frame;
-                                                  finalFrame.origin.y = CGRectGetHeight(self.frame);
+                                                  finalFrame.origin.y = CGRectGetHeight(self.bounds);
                                                   _containerView.frame = finalFrame;
                                                 }
                                                 completion:completionBlock];
@@ -876,7 +880,7 @@ const KLCPopupLayout KLCPopupLayoutCustom = { KLCPopupHorizontalLayoutCustom, KL
                                                    options:UIViewAnimationOptionCurveEaseIn
                                                 animations:^(void){
                                                   CGRect finalFrame = _containerView.frame;
-                                                  finalFrame.origin.x = CGRectGetWidth(self.frame);
+                                                  finalFrame.origin.x = CGRectGetWidth(self.bounds);
                                                   _containerView.frame = finalFrame;
                                                 }
                                                 completion:completionBlock];
