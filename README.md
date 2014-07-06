@@ -16,15 +16,13 @@ KLCPopup is a simple and flexible iOS class for presenting any custom view as a 
 
 ### Creating a Popup
 
-Create a popup for displaying a UIView using the default layouts, animations, and behaviors (similar to a UIAlertView):
+Create a popup for displaying a UIView using default animations and behaviors (similar to a UIAlertView):
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
 	
-Or create a popup with custom layouts, animations, and behaviors. Customizations can also be accessed via properties on the popup instance:
+Or create a popup with custom animations and behaviors. Customizations can also be accessed via properties on the popup instance:
 
 	+ (KLCPopup*)popupWithContentView:(UIView*)contentView
-					 horizontalLayout:(KLCPopupHorizontalLayout)horizontalLayout
-					   verticalLayout:(KLCPopupVerticalLayout)verticalLayout
 							 showType:(KLCPopupShowType)showType
 						  dismissType:(KLCPopupDismissType)dismissType
 							 maskType:(KLCPopupMaskType)maskType
@@ -34,12 +32,27 @@ Or create a popup with custom layouts, animations, and behaviors. Customizations
 Note: You may pass `nil` for `contentView` when creating the popup, but **you must assign a `contentView` to the popup before showing it!**
 
 Also **you must give your `contentView` a size** before showing it (by setting its frame), or **it must size itself with AutoLayout**.
+
 					
 ### Showing a Popup
 	
+
+Show popup in middle of screen.
+	
 	- (void)show;
 	
-If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit duration:
+There are two ways to control where your popup is displayed:
+
+1. Relative layout presets (see `KLCPopup.h` for options).
+
+		- (void)showWithLayout:(KLCPopupLayout)layout;
+		
+
+2. Explicit center point relative to a view's coordinate system.
+
+		- (void)showAtCenter:(CGPoint)center inView:(UIView*)view;
+
+If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit `duration`:
 	
 	- (void)showWithDuration:(NSTimeInterval)duration;
 
@@ -61,13 +74,6 @@ Also you can call this category method from `UIView(KLCPopup)` on your contentVi
 
 ### Customization
 
-Final horizontal position of your popup when shown:
-
-	@property (nonatomic, assign) KLCPopupHorizontalLayout horizontalLayout;
-
-Final vertical position of your popup when shown:
-	
-	@property (nonatomic, assign) KLCPopupVerticalLayout verticalLayout;
 
 Animation used to show your popup:
 
