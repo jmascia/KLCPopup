@@ -137,6 +137,7 @@ Use these blocks to synchronize other actions with popup events:
 ### TODO
 - Add support for keyboard show/hide.
 - Add support for drag-to-dismiss.
+- Add 'blur' option for background mask
 
 ##Credits
 KLCPopup was created by Jeff Mascia and the team at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
