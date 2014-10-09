@@ -306,7 +306,9 @@ typedef NS_ENUM(NSInteger, CellType) {
 {
   [super viewDidLoad];
   
-  self.automaticallyAdjustsScrollViewInsets = YES;
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+        self.automaticallyAdjustsScrollViewInsets = YES;
+    }
   self.view.backgroundColor = [UIColor whiteColor];
 }
 
@@ -610,9 +612,11 @@ typedef NS_ENUM(NSInteger, CellType) {
       if (nil == cell) {
         UITableViewCellStyle style = UITableViewCellStyleValue1;
         cell = [[UITableViewCell alloc] initWithStyle:style reuseIdentifier:identifier];
-        UIEdgeInsets newSeparatorInset = cell.separatorInset;
-        newSeparatorInset.right = newSeparatorInset.left;
-        cell.separatorInset = newSeparatorInset;
+          if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+              UIEdgeInsets newSeparatorInset = cell.separatorInset;
+              newSeparatorInset.right = newSeparatorInset.left;
+              cell.separatorInset = newSeparatorInset;
+          }
         
         if (cellType == CellTypeNormal) {
           cell.selectionStyle = UITableViewCellSelectionStyleGray;

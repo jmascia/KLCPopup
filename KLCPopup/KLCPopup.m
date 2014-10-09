@@ -883,16 +883,26 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
           
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:15.0
-                              options:0
-                           animations:^{
-                             _containerView.alpha = 1.0;
-                             _containerView.transform = CGAffineTransformIdentity;
-                           }
-                           completion:completionBlock];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+                
+                [UIView animateWithDuration:0.6
+                                      delay:0.0
+                     usingSpringWithDamping:0.8
+                      initialSpringVelocity:15.0
+                                    options:0
+                                 animations:^{
+                                     _containerView.alpha = 1.0;
+                                     _containerView.transform = CGAffineTransformIdentity;
+                                 }
+                                 completion:completionBlock];
+            } else {
+                [UIView animateWithDuration:0.2 delay:0.0 options:0 animations:^{
+                    
+                    _containerView.alpha = 1.0;
+                    _containerView.transform = CGAffineTransformIdentity;
+                    
+                } completion:completionBlock];
+            }
           
           break;
         }
@@ -904,15 +914,23 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+                [UIView animateWithDuration:0.6
+                                      delay:0.0
+                     usingSpringWithDamping:0.8
+                      initialSpringVelocity:10.0
+                                    options:0
+                                 animations:^{
+                                     _containerView.frame = finalContainerFrame;
+                                 }
+                                 completion:completionBlock];
+            } else {
+                [UIView animateWithDuration:0.2 delay:0.0 options:0 animations:^{
+                    
+                    _containerView.frame = finalContainerFrame;
+                    
+                } completion:completionBlock];
+            }
           break;
         }
           
@@ -923,15 +941,23 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = CGRectGetHeight(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+                [UIView animateWithDuration:0.6
+                                      delay:0.0
+                     usingSpringWithDamping:0.8
+                      initialSpringVelocity:10.0
+                                    options:0
+                                 animations:^{
+                                     _containerView.frame = finalContainerFrame;
+                                 }
+                                 completion:completionBlock];
+            } else {
+                [UIView animateWithDuration:0.2 delay:0.0 options:0 animations:^{
+                    
+                    _containerView.frame = finalContainerFrame;
+                    
+                } completion:completionBlock];
+            }
           break;
         }
           
@@ -942,15 +968,23 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+                [UIView animateWithDuration:0.6
+                                      delay:0.0
+                     usingSpringWithDamping:0.8
+                      initialSpringVelocity:10.0
+                                    options:0
+                                 animations:^{
+                                     _containerView.frame = finalContainerFrame;
+                                 }
+                                 completion:completionBlock];
+            } else {
+                [UIView animateWithDuration:0.2 delay:0.0 options:0 animations:^{
+                    
+                    _containerView.frame = finalContainerFrame;
+                    
+                } completion:completionBlock];
+            }
           break;
         }
           
@@ -961,15 +995,23 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = CGRectGetWidth(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
-                                delay:0.0
-               usingSpringWithDamping:0.8
-                initialSpringVelocity:10.0
-                              options:0
-                           animations:^{
-                             _containerView.frame = finalContainerFrame;
-                           }
-                           completion:completionBlock];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+                [UIView animateWithDuration:0.6
+                                      delay:0.0
+                     usingSpringWithDamping:0.8
+                      initialSpringVelocity:10.0
+                                    options:0
+                                 animations:^{
+                                     _containerView.frame = finalContainerFrame;
+                                 }
+                                 completion:completionBlock];
+            } else {
+                [UIView animateWithDuration:0.2 delay:0.0 options:0 animations:^{
+                    
+                    _containerView.frame = finalContainerFrame;
+                    
+                } completion:completionBlock];
+            }
           break;
         }
           
