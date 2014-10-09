@@ -126,7 +126,7 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` supports **Portrait** and **Landscape** by default.
 
 ### Deployment
-`KLCPopup` requires **iOS 7**. It has not been tested on iOS 8 yet.
+`KLCPopup` requires **iOS 7**.
 
 ### Devices
 `KLCPopup` supports **iPhone** and **iPad**.
