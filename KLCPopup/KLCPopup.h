@@ -145,6 +145,7 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 
 // Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
++ (void)dismissAllPopups:(BOOL)animated;
 
 // Show popup with center layout. Animation determined by showType.
 - (void)show;
