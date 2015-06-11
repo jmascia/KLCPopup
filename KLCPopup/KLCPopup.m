@@ -53,6 +53,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   BOOL _isShowing;
   BOOL _isBeingDismissed;
 }
+// Boris
+@property UIVisualEffectView *_blurEffectView;
 
 - (void)updateForInterfaceOrientation;
 - (void)didChangeStatusBarOrientation:(NSNotification*)notification;
@@ -136,7 +138,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
   
   UIView* hitView = [super hitTest:point withEvent:event];
-  if (hitView == self) {
+  if (hitView == self || [NSStringFromClass([hitView class]) isEqualToString:@"_UIVisualEffectContentView"]) {
     
     // Try to dismiss if backgroundTouch flag set.
     if (_shouldDismissOnBackgroundTouch) {
@@ -552,28 +554,50 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       
       // Setup background view
       _backgroundView.alpha = 0.0;
-      if (_maskType == KLCPopupMaskTypeDimmed) {
-        _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
-      } else {
-        _backgroundView.backgroundColor = [UIColor clearColor];
-      }
-      
-      // Animate background if needed
-      void (^backgroundAnimationBlock)(void) = ^(void) {
-        _backgroundView.alpha = 1.0;
-      };
-      
-      if (_showType != KLCPopupShowTypeNone) {
-        // Make fade happen faster than motion. Use linear for fades.
-        [UIView animateWithDuration:0.15
-                              delay:0
-                            options:UIViewAnimationOptionCurveLinear
-                         animations:backgroundAnimationBlock
-                         completion:NULL];
-      } else {
-        backgroundAnimationBlock();
-      }
-      
+        void (^backgroundAnimationBlock)(void) = ^(void) {
+            _backgroundView.alpha = 1.0;
+        };
+        
+        switch (_maskType) {
+            case KLCPopupMaskTypeDimmed:
+            {
+                _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
+                backgroundAnimationBlock();
+
+            }
+                break;
+            case KLCPopupMaskTypeNone:
+            {
+                [UIView animateWithDuration:0.15
+                                      delay:0
+                                    options:UIViewAnimationOptionCurveLinear
+                                 animations:backgroundAnimationBlock
+                                 completion:NULL];
+
+            }
+                break;
+            case KLCPopupMaskTypeClear:
+            {
+                _backgroundView.backgroundColor = [UIColor clearColor];
+            }
+                break;
+            case KLCPopupMaskTypeBlured:
+            {
+                UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+                UIVisualEffectView *visualBlur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+                visualBlur.frame = _backgroundView.frame;
+                [visualBlur.contentView addSubview:_backgroundView];
+                [self insertSubview:visualBlur belowSubview:_containerView];
+                //_backgroundView = visualBlur;
+                //[self addSubview:visualBlur];
+            }
+                break;
+            default:
+                backgroundAnimationBlock();
+                break;
+        }
+        
+        
       // Determine duration. Default to 0 if none provided.
       NSTimeInterval duration;
       NSNumber* durationNumber = [parameters valueForKey:@"duration"];
