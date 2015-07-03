@@ -133,10 +133,10 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 @property (nonatomic, copy) void (^didFinishDismissingCompletion)();
 
 // Convenience method for creating popup with default values (mimics UIAlertView).
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
++ (instancetype)popupWithContentView:(UIView*)contentView;
 
 // Convenience method for creating popup with custom values.
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView*)contentView
                          showType:(KLCPopupShowType)showType
                       dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
