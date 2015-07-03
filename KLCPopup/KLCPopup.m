@@ -165,7 +165,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 #pragma mark - Class Public
 
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView*)contentView
 {
   KLCPopup* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
@@ -173,7 +173,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 }
 
 
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView*)contentView
                          showType:(KLCPopupShowType)showType
                       dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
