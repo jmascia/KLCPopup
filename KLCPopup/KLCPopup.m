@@ -529,18 +529,21 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     [self willStartShowing];
     
     dispatch_async( dispatch_get_main_queue(), ^{
-      
-      // Prepare by adding to the top window.
-      if(!self.superview){
-        NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
-        
-        for (UIWindow *window in frontToBackWindows) {
-          if (window.windowLevel == UIWindowLevelNormal) {
-            [window addSubview:self];
-            
-            break;
-          }
+      UIView* destView;
+      if(!self.superview) {
+        destView = [parameters valueForKey:@"view"];
+        if (destView == nil) {
+            // Prepare by adding to the top window.
+            NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
+
+            for (UIWindow *window in frontToBackWindows)
+              if (window.windowLevel == UIWindowLevelNormal) {
+                  destView = window;
+                  break;
+              }
         }
+        [destView addSubview:self];
+        [destView bringSubviewToFront:self];
       }
       
       // Before we calculate layout for containerView, make sure we are transformed for current orientation.
@@ -647,9 +650,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
         CGPoint centerInSelf;
         
         // Convert coordinates from provided view to self. Otherwise use as-is.
-        UIView* fromView = [parameters valueForKey:@"view"];
-        if (fromView != nil) {
-          centerInSelf = [self convertPoint:centerInView fromView:fromView];
+        if (destView != nil) {
+          centerInSelf = [self convertPoint:centerInView fromView:destView];
         } else {
           centerInSelf = centerInView;
         }
