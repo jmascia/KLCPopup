@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
 // This is the view that you want to appear in Popup.
 // - Must provide contentView before or in willStartShowing.
 // - Must set desired size of contentView before or in willStartShowing.
-@property (null_unspecified, nonatomic, strong) UIView* contentView;
+@property (nonatomic, strong) UIView* contentView;
 
 // Animation transition for presenting contentView. default = shrink in
 @property (nonatomic, assign) KLCPopupShowType showType;
@@ -122,6 +122,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 // If YES, then popup will get dismissed when content view is touched. default = NO.
 @property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
+
+// If YES, then popup will move up or down when keyboard is on or off screen. default = NO.
+@property (nonatomic, assign) BOOL shouldHandleKeyboard;
 
 // Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 @property (nonatomic, copy) void (^didFinishShowingCompletion)();

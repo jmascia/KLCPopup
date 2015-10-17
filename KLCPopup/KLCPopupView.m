@@ -1039,7 +1039,10 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 #pragma mark - Subclassing
 
 - (void)willStartShowing {
-  
+    if (_shouldHandleKeyboard) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
+    }
 }
 
 
@@ -1054,13 +1057,40 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 
 - (void)didFinishDismissing {
-  
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+#pragma mark - Keyboard notification handlers
+
+- (void)keyboardWillShowNotification:(NSNotification *)notification {
+    [self moveContainerViewForKeyboard:notification up:YES];
+}
+
+- (void)keyboardWillHideNotification:(NSNotification *)notification {
+    [self moveContainerViewForKeyboard:notification up:NO];
+}
+
+- (void)moveContainerViewForKeyboard:(NSNotification *)notification up:(BOOL)up {
+    NSDictionary *userInfo = [notification userInfo];
+    NSTimeInterval animationDuration = [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    UIViewAnimationCurve animationCurve = [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    CGRect keyboardEndFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    
+    _containerView.center = CGPointMake(_containerView.superview.frame.size.width/2, _containerView.superview.frame.size.height/2);
+    CGRect frame = _containerView.frame;
+    if (up) {
+        frame.origin.y -= keyboardEndFrame.size.height/2;
+    }
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:animationCurve];
+    _containerView.frame = frame;
+    [UIView commitAnimations];
 }
 
 @end
-
-
-
 
 #pragma mark - Categories
 
