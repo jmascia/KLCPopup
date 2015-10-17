@@ -138,10 +138,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) void (^didFinishDismissingCompletion)();
 
 // Convenience method for creating popup with default values (mimics UIAlertView).
-+ (instancetype)popupWithContentView:(UIView *)contentView;
++ (instancetype)popupViewWithContentView:(UIView *)contentView;
 
 // Convenience method for creating popup with custom values.
-+ (instancetype)popupWithContentView:(UIView *)contentView
++ (instancetype)popupViewWithContentView:(UIView *)contentView
                             showType:(KLCPopupShowType)showType
                          dismissType:(KLCPopupDismissType)dismissType
                             maskType:(KLCPopupMaskType)maskType
