@@ -142,11 +142,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Convenience method for creating popup with custom values.
 + (instancetype)popupViewWithContentView:(UIView *)contentView
-                            showType:(KLCPopupShowType)showType
-                         dismissType:(KLCPopupDismissType)dismissType
-                            maskType:(KLCPopupMaskType)maskType
-            dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
-               dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
+                                showType:(KLCPopupShowType)showType
+                             dismissType:(KLCPopupDismissType)dismissType
+                                maskType:(KLCPopupMaskType)maskType
+                dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+                   dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
 // Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
