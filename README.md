@@ -7,22 +7,51 @@ KLCPopup is a simple and flexible iOS class for presenting any custom view as a 
 
 ##Installation
 
-- Drag the `KLCPopup/KLCPopup` folder into your project.
-- `#import "KLCPopup.h"` where appropriate. 
+###CocoaPods
+You can install KLCPopup easily with Cocoapods
+
+```
+pod 'KLCPopupView'
+```
+
+###CocoaPods
+You can install KLCPopup easily with Carthage too
+
+```
+github 'jmascia/KLCPopup'
+```
 
 ##Usage
 
-(see sample Xcode project in `/KLCPopupExample`)
+To import the frameworkm you can either:
+
+####In Swift,
+
+```
+import KLCPopupView
+```
+
+####In Objective-C,
+
+```
+@import KLCPopupView;
+```
+
+or
+
+``` 
+#import <KLCPopupView/KLCPopup.h>
+```
 
 ### Creating a Popup
 
 Create a popup for displaying a UIView using default animations and behaviors (similar to a UIAlertView):
 
-	+ (KLCPopup*)popupWithContentView:(UIView*)contentView;
+	+ (instancetype)popupWithContentView:(UIView*)contentView;
 	
 Or create a popup with custom animations and behaviors. Customizations can also be accessed via properties on the popup instance:
 
-	+ (KLCPopup*)popupWithContentView:(UIView*)contentView
+	+ (instancetype)popupWithContentView:(UIView*)contentView
 							 showType:(KLCPopupShowType)showType
 						  dismissType:(KLCPopupDismissType)dismissType
 							 maskType:(KLCPopupMaskType)maskType
@@ -126,7 +155,7 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` supports **Portrait** and **Landscape** by default.
 
 ### Deployment
-`KLCPopup` requires **iOS 7**.
+`KLCPopup` requires **iOS 8**.
 
 ### Devices
 `KLCPopup` supports **iPhone** and **iPad**.

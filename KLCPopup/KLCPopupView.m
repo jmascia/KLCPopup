@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 
-#import "KLCPopup.h"
+#import "KLCPopupView.h"
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
@@ -43,7 +43,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 @end
 
 
-@interface KLCPopup () {
+@interface KLCPopupView () {
   // views
   UIView* _backgroundView;
   UIView* _containerView;
@@ -63,7 +63,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 @end
 
 
-@implementation KLCPopup
+@implementation KLCPopupView
 
 @synthesize backgroundView = _backgroundView;
 @synthesize containerView = _containerView;
@@ -165,22 +165,22 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 #pragma mark - Class Public
 
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView*)contentView
 {
-  KLCPopup* popup = [[[self class] alloc] init];
+  KLCPopupView* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
   return popup;
 }
 
 
-+ (KLCPopup*)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView*)contentView
                          showType:(KLCPopupShowType)showType
                       dismissType:(KLCPopupDismissType)dismissType
                          maskType:(KLCPopupMaskType)maskType
          dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
             dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch
 {
-  KLCPopup* popup = [[[self class] alloc] init];
+  KLCPopupView* popup = [[[self class] alloc] init];
   popup.contentView = contentView;
   popup.showType = showType;
   popup.dismissType = dismissType;
@@ -194,7 +194,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 + (void)dismissAllPopups {
   NSArray* windows = [[UIApplication sharedApplication] windows];
   for (UIWindow* window in windows) {
-    [window forEachPopupDoBlock:^(KLCPopup *popup) {
+    [window forEachPopupDoBlock:^(KLCPopupView *popup) {
       [popup dismiss:NO];
     }];
   }
@@ -531,16 +531,21 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     dispatch_async( dispatch_get_main_queue(), ^{
       
       // Prepare by adding to the top window.
-      if(!self.superview){
-        NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
-        
-        for (UIWindow *window in frontToBackWindows) {
-          if (window.windowLevel == UIWindowLevelNormal) {
-            [window addSubview:self];
-            
-            break;
-          }
-        }
+        UIView* destView;
+        if(!self.superview) {
+            destView = [parameters valueForKey:@"view"];
+            if (destView == nil) {
+                // Prepare by adding to the top window.
+                NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
+                
+                for (UIWindow *window in frontToBackWindows)
+                    if (window.windowLevel == UIWindowLevelNormal) {
+                        destView = window;
+                        break;
+                    }
+            }
+            [destView addSubview:self];
+            [destView bringSubviewToFront:self];
       }
       
       // Before we calculate layout for containerView, make sure we are transformed for current orientation.
@@ -646,10 +651,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
         CGPoint centerInView = [centerValue CGPointValue];
         CGPoint centerInSelf;
         
-        // Convert coordinates from provided view to self. Otherwise use as-is.
-        UIView* fromView = [parameters valueForKey:@"view"];
-        if (fromView != nil) {
-          centerInSelf = [self convertPoint:centerInView fromView:fromView];
+        if (destView != nil) {
+          centerInSelf = [self convertPoint:centerInView fromView:destView];
         } else {
           centerInSelf = centerInView;
         }
@@ -1064,12 +1067,12 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 @implementation UIView(KLCPopup)
 
 
-- (void)forEachPopupDoBlock:(void (^)(KLCPopup* popup))block {
+- (void)forEachPopupDoBlock:(void (^)(KLCPopupView* popup))block {
   for (UIView *subview in self.subviews)
   {
-    if ([subview isKindOfClass:[KLCPopup class]])
+    if ([subview isKindOfClass:[KLCPopupView class]])
     {
-      block((KLCPopup *)subview);
+      block((KLCPopupView *)subview);
     } else {
       [subview forEachPopupDoBlock:block];
     }
@@ -1082,8 +1085,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   // Iterate over superviews until you find a KLCPopup and dismiss it, then gtfo
   UIView* view = self;
   while (view != nil) {
-    if ([view isKindOfClass:[KLCPopup class]]) {
-      [(KLCPopup*)view dismiss:YES];
+    if ([view isKindOfClass:[KLCPopupView class]]) {
+      [(KLCPopupView*)view dismiss:YES];
       break;
     }
     view = [view superview];

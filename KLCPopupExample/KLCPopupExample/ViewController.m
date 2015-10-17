@@ -23,7 +23,7 @@
 // THE SOFTWARE.
 
 #import "ViewController.h"
-#import "KLCPopup.h"
+#import <KLCPopup/KLCPopupView.h>
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -384,7 +384,7 @@ typedef NS_ENUM(NSInteger, CellType) {
   KLCPopupLayout layout = KLCPopupLayoutMake((KLCPopupHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout],
                                              (KLCPopupVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]);
   
-  KLCPopup* popup = [KLCPopup popupWithContentView:contentView
+  KLCPopupView* popup = [KLCPopupView popupWithContentView:contentView
                                           showType:(KLCPopupShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
                                        dismissType:(KLCPopupDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]

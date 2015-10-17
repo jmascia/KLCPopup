@@ -21,7 +21,9 @@
 		1FA76AD6195893080075A8E4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA76AB5195893080075A8E4 /* UIKit.framework */; };
 		1FA76ADE195893080075A8E4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1FA76ADC195893080075A8E4 /* InfoPlist.strings */; };
 		1FA76AE0195893080075A8E4 /* KLCPopupExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FA76ADF195893080075A8E4 /* KLCPopupExampleTests.m */; };
-		1FA76AF01958A2130075A8E4 /* KLCPopup.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FA76AEF1958A2130075A8E4 /* KLCPopup.m */; };
+		6D09A5581BD2040F0069F2FF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D09A5571BD2040F0069F2FF /* LaunchScreen.xib */; settings = {ASSET_TAGS = (); }; };
+		6D09A5601BD2085E0069F2FF /* KLCPopup.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D09A55F1BD208470069F2FF /* KLCPopup.framework */; };
+		6D09A5611BD2085E0069F2FF /* KLCPopup.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D09A55F1BD208470069F2FF /* KLCPopup.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +34,35 @@
 			remoteGlobalIDString = 1FA76AAD195893080075A8E4;
 			remoteInfo = KLCPopupExample;
 		};
+		6D09A55E1BD208470069F2FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6D09A55A1BD208470069F2FF /* KLCPopup.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6D09A5261BD1FF980069F2FF;
+			remoteInfo = KLCPopup;
+		};
+		6D09A5621BD2085E0069F2FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6D09A55A1BD208470069F2FF /* KLCPopup.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6D09A5251BD1FF980069F2FF;
+			remoteInfo = KLCPopup;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6D09A5541BD2035B0069F2FF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6D09A5611BD2085E0069F2FF /* KLCPopup.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1F7E1B051965CF7D00D576D8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -54,8 +84,8 @@
 		1FA76ADB195893080075A8E4 /* KLCPopupExampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "KLCPopupExampleTests-Info.plist"; sourceTree = "<group>"; };
 		1FA76ADD195893080075A8E4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1FA76ADF195893080075A8E4 /* KLCPopupExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KLCPopupExampleTests.m; sourceTree = "<group>"; };
-		1FA76AEE1958A2130075A8E4 /* KLCPopup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KLCPopup.h; sourceTree = "<group>"; };
-		1FA76AEF1958A2130075A8E4 /* KLCPopup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KLCPopup.m; sourceTree = "<group>"; };
+		6D09A5571BD2040F0069F2FF /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		6D09A55A1BD208470069F2FF /* KLCPopup.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = KLCPopup.xcodeproj; path = ../KLCPopup.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +94,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F7E1B061965CF7D00D576D8 /* QuartzCore.framework in Frameworks */,
+				6D09A5601BD2085E0069F2FF /* KLCPopup.framework in Frameworks */,
 				1FA76AB4195893080075A8E4 /* CoreGraphics.framework in Frameworks */,
 				1FA76AB6195893080075A8E4 /* UIKit.framework in Frameworks */,
 				1FA76AB2195893080075A8E4 /* Foundation.framework in Frameworks */,
@@ -86,9 +117,9 @@
 		1FA76AA5195893080075A8E4 = {
 			isa = PBXGroup;
 			children = (
+				6D09A55A1BD208470069F2FF /* KLCPopup.xcodeproj */,
 				1FA76AB7195893080075A8E4 /* KLCPopupExample */,
 				1FA76AD9195893080075A8E4 /* KLCPopupExampleTests */,
-				1FA76AED1958A2130075A8E4 /* KLCPopup */,
 				1FA76AB0195893080075A8E4 /* Frameworks */,
 				1FA76AAF195893080075A8E4 /* Products */,
 			);
@@ -124,6 +155,7 @@
 				1FA76ACA195893080075A8E4 /* ViewController.m */,
 				1FA76ACC195893080075A8E4 /* Images.xcassets */,
 				1FA76AB8195893080075A8E4 /* Supporting Files */,
+				6D09A5571BD2040F0069F2FF /* LaunchScreen.xib */,
 			);
 			path = KLCPopupExample;
 			sourceTree = "<group>";
@@ -157,14 +189,12 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		1FA76AED1958A2130075A8E4 /* KLCPopup */ = {
+		6D09A55B1BD208470069F2FF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1FA76AEE1958A2130075A8E4 /* KLCPopup.h */,
-				1FA76AEF1958A2130075A8E4 /* KLCPopup.m */,
+				6D09A55F1BD208470069F2FF /* KLCPopup.framework */,
 			);
-			name = KLCPopup;
-			path = ../KLCPopup;
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,10 +207,12 @@
 				1FA76AAA195893080075A8E4 /* Sources */,
 				1FA76AAB195893080075A8E4 /* Frameworks */,
 				1FA76AAC195893080075A8E4 /* Resources */,
+				6D09A5541BD2035B0069F2FF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				6D09A5631BD2085E0069F2FF /* PBXTargetDependency */,
 			);
 			name = KLCPopupExample;
 			productName = KLCPopupExample;
@@ -212,7 +244,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = KLC;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Kullect;
 				TargetAttributes = {
 					1FA76AD1195893080075A8E4 = {
@@ -231,6 +263,12 @@
 			mainGroup = 1FA76AA5195893080075A8E4;
 			productRefGroup = 1FA76AAF195893080075A8E4 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 6D09A55B1BD208470069F2FF /* Products */;
+					ProjectRef = 6D09A55A1BD208470069F2FF /* KLCPopup.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1FA76AAD195893080075A8E4 /* KLCPopupExample */,
@@ -239,12 +277,23 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		6D09A55F1BD208470069F2FF /* KLCPopup.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = KLCPopup.framework;
+			remoteRef = 6D09A55E1BD208470069F2FF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
 		1FA76AAC195893080075A8E4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				1FA76ACD195893080075A8E4 /* Images.xcassets in Resources */,
+				6D09A5581BD2040F0069F2FF /* LaunchScreen.xib in Resources */,
 				1FA76ABC195893080075A8E4 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -267,7 +316,6 @@
 				1FA76ACB195893080075A8E4 /* ViewController.m in Sources */,
 				1FA76ABE195893080075A8E4 /* main.m in Sources */,
 				1FA76AC2195893080075A8E4 /* AppDelegate.m in Sources */,
-				1FA76AF01958A2130075A8E4 /* KLCPopup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,6 +334,11 @@
 			isa = PBXTargetDependency;
 			target = 1FA76AAD195893080075A8E4 /* KLCPopupExample */;
 			targetProxy = 1FA76AD7195893080075A8E4 /* PBXContainerItemProxy */;
+		};
+		6D09A5631BD2085E0069F2FF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = KLCPopup;
+			targetProxy = 6D09A5621BD2085E0069F2FF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -327,6 +380,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -341,7 +395,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -374,7 +428,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -389,7 +443,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KLCPopupExample/KLCPopupExample-Prefix.pch";
 				INFOPLIST_FILE = "KLCPopupExample/KLCPopupExample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kullect.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -403,7 +459,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KLCPopupExample/KLCPopupExample-Prefix.pch";
 				INFOPLIST_FILE = "KLCPopupExample/KLCPopupExample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kullect.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -425,6 +483,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "KLCPopupExampleTests/KLCPopupExampleTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kullect.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -443,6 +502,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KLCPopupExample/KLCPopupExample-Prefix.pch";
 				INFOPLIST_FILE = "KLCPopupExampleTests/KLCPopupExampleTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kullect.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
