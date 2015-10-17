@@ -11,7 +11,7 @@ KLCPopup is a simple and flexible iOS class for presenting any custom view as a 
 You can install KLCPopup easily with Cocoapods
 
 ```
-pod 'KLCPopupView'
+pod 'KLCPopup'
 ```
 
 ###CocoaPods
@@ -28,19 +28,19 @@ To import the frameworkm you can either:
 ####In Swift,
 
 ```
-import KLCPopupView
+import KLCPopup
 ```
 
 ####In Objective-C,
 
 ```
-@import KLCPopupView;
+@import KLCPopup;
 ```
 
 or
 
-``` 
-#import <KLCPopupView/KLCPopup.h>
+```
+#import <KLCPopup/KLCPopupView.h>
 ```
 
 ### Creating a Popup
@@ -48,7 +48,7 @@ or
 Create a popup for displaying a UIView using default animations and behaviors (similar to a UIAlertView):
 
 	+ (instancetype)popupWithContentView:(UIView*)contentView;
-	
+
 Or create a popup with custom animations and behaviors. Customizations can also be accessed via properties on the popup instance:
 
 	+ (instancetype)popupWithContentView:(UIView*)contentView
@@ -58,38 +58,38 @@ Or create a popup with custom animations and behaviors. Customizations can also 
 			 dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
 				dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
-Note: You may pass `nil` for `contentView` when creating the popup, but **you must assign a `contentView` to the popup before showing it!**
+Note: You may not pass `nil` to `contentView`
 
 Also **you must give your `contentView` a size** before showing it (by setting its frame), or **it must size itself with AutoLayout**.
 
-					
+
 ### Showing a Popup
-	
+
 
 Show popup in middle of screen.
-	
+
 	- (void)show;
-	
+
 There are two ways to control where your popup is displayed:
 
-1. Relative layout presets (see `KLCPopup.h` for options).
+1. Relative layout presets (see `KLCPopupView.h` for options).
 
 		- (void)showWithLayout:(KLCPopupLayout)layout;
-		
+
 
 2. Explicit center point relative to a view's coordinate system.
 
 		- (void)showAtCenter:(CGPoint)center inView:(UIView*)view;
 
 If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit `duration`:
-	
+
 	- (void)showWithDuration:(NSTimeInterval)duration;
 
 ### Dismissing a Popup
-		
+
 There are a few ways to dismiss a popup:
 
-If you have a reference to the popup instance, you can send this message to it. If `animated`, then it will use the animation specified in `dismissType`. Otherwise it will just disappear: 
+If you have a reference to the popup instance, you can send this message to it. If `animated`, then it will use the animation specified in `dismissType`. Otherwise it will just disappear:
 
 	- (void)dismiss:(BOOL)animated;
 
@@ -97,8 +97,8 @@ If you lost your reference to a popup or you want to make sure no popups are sho
 
 	+ (void)dismissAllPopups;
 
-Also you can call this category method from `UIView(KLCPopup)` on your contentView, or any of its subviews, to dismiss its parent popup:
-	
+Also you can call this category method from `UIView(KLCPopupView)` on your contentView, or any of its subviews, to dismiss its parent popup:
+
 	- (void)dismissPresentingPopup; // UIView category
 
 ### Customization
@@ -107,26 +107,26 @@ Also you can call this category method from `UIView(KLCPopup)` on your contentVi
 Animation used to show your popup:
 
 	@property (nonatomic, assign) KLCPopupShowType showType;
-	
+
 Animation used to dismiss your popup:
 
 	@property (nonatomic, assign) KLCPopupDismissType dismissType;
-	
+
 Mask prevents touches to the background from passing through to views below:
-	
+
 	@property (nonatomic, assign) KLCPopupMaskType maskType;
 
 Popup will automatically dismiss if the background is touched:
-	
+
 	@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
-	
+
 Popup will automatically dismiss if the contentView is touched:
 
 	@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
-	
+
 Override alpha value for dimmed background mask:
 
-	@property (nonatomic, assign) CGFloat dimmedMaskAlpha;	
+	@property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
 
 ### Blocks
@@ -145,8 +145,8 @@ Use these blocks to synchronize other actions with popup events:
 	UIView* contentView = [[UIView alloc] init];
 	contentView.backgroundColor = [UIColor orangeColor];
 	contentView.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
-		
-	KLCPopup* popup = [KLCPopup popupWithContentView:contentView];
+
+	KLCPopupView* popup = [KLCPopupView popupWithContentView:contentView];
 	[popup show];
 
 ## Notes
