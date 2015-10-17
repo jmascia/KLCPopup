@@ -159,11 +159,15 @@ typedef NS_ENUM(NSInteger, CellType) {
     
     _maskTypes = @[@(KLCPopupMaskTypeNone),
                    @(KLCPopupMaskTypeClear),
-                   @(KLCPopupMaskTypeDimmed)];
+                   @(KLCPopupMaskTypeDimmed),
+                   @(KLCPopupMaskTypeLightBlur),
+                   @(KLCPopupMaskTypeDarkBlur)];
     
     _namesForMaskTypes = @{@(KLCPopupMaskTypeNone) : @"None",
                            @(KLCPopupMaskTypeClear) : @"Clear",
-                           @(KLCPopupMaskTypeDimmed) : @"Dimmed"};
+                           @(KLCPopupMaskTypeDimmed) : @"Dimmed",
+                           @(KLCPopupMaskTypeLightBlur): @"Light blur",
+                           @(KLCPopupMaskTypeDarkBlur): @"Dark blur"};
     
     _showTypes = @[@(KLCPopupShowTypeNone),
                    @(KLCPopupShowTypeFadeIn),

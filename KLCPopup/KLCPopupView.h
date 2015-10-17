@@ -85,6 +85,8 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
     KLCPopupMaskTypeNone = 0, // Allow interaction with underlying views.
     KLCPopupMaskTypeClear, // Don't allow interaction with underlying views.
     KLCPopupMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
+    KLCPopupMaskTypeLightBlur, // Don't allow interaction with underlying views, blurs background.
+    KLCPopupMaskTypeDarkBlur,// Don't allow interaction with underlying views, blurs background.
 };
 
 // KLCPopupLayout structure and maker functions
