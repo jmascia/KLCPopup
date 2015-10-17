@@ -59,7 +59,6 @@ typedef NS_ENUM(NSInteger, KLCPopupDismissType) {
 };
 
 
-
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
 typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
     KLCPopupHorizontalLayoutCustom = 0,
@@ -100,48 +99,49 @@ extern KLCPopupLayout KLCPopupLayoutMake(KLCPopupHorizontalLayout horizontal, KL
 extern const KLCPopupLayout KLCPopupLayoutCenter;
 
 NS_ASSUME_NONNULL_BEGIN
+
 @interface KLCPopupView : UIView
 
 // This is the view that you want to appear in Popup.
 // - Must provide contentView before or in willStartShowing.
 // - Must set desired size of contentView before or in willStartShowing.
-@property (nonatomic, strong) UIView* contentView;
+@property(nonatomic, strong) UIView *contentView;
 
 // Animation transition for presenting contentView. default = shrink in
-@property (nonatomic, assign) KLCPopupShowType showType;
+@property(nonatomic, assign) KLCPopupShowType showType;
 
 // Animation transition for dismissing contentView. default = shrink out
-@property (nonatomic, assign) KLCPopupDismissType dismissType;
+@property(nonatomic, assign) KLCPopupDismissType dismissType;
 
 // Mask prevents background touches from passing to underlying views. default = dimmed.
-@property (nonatomic, assign) KLCPopupMaskType maskType;
+@property(nonatomic, assign) KLCPopupMaskType maskType;
 
 // Overrides alpha value for dimmed background mask. default = 0.5
-@property (nonatomic, assign) CGFloat dimmedMaskAlpha;
+@property(nonatomic, assign) CGFloat dimmedMaskAlpha;
 
 // If YES, then popup will get dismissed when background is touched. default = YES.
-@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
+@property(nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
 
 // If YES, then popup will get dismissed when content view is touched. default = NO.
-@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
+@property(nonatomic, assign) BOOL shouldDismissOnContentTouch;
 
 // If YES, then popup will move up or down when keyboard is on or off screen. default = NO.
-@property (nonatomic, assign) BOOL shouldHandleKeyboard;
+@property(nonatomic, assign) BOOL shouldHandleKeyboard;
 
 // Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-@property (nonatomic, copy) void (^didFinishShowingCompletion)();
+@property(nonatomic, copy) void (^didFinishShowingCompletion)();
 
 // Block gets called when dismiss animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
-@property (nonatomic, copy) void (^willStartDismissingCompletion)();
+@property(nonatomic, copy) void (^willStartDismissingCompletion)();
 
 // Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-@property (nonatomic, copy) void (^didFinishDismissingCompletion)();
+@property(nonatomic, copy) void (^didFinishDismissingCompletion)();
 
 // Convenience method for creating popup with default values (mimics UIAlertView).
-+ (instancetype)popupWithContentView:(UIView*)contentView;
++ (instancetype)popupWithContentView:(UIView *)contentView;
 
 // Convenience method for creating popup with custom values.
-+ (instancetype)popupWithContentView:(UIView*)contentView
++ (instancetype)popupWithContentView:(UIView *)contentView
                             showType:(KLCPopupShowType)showType
                          dismissType:(KLCPopupDismissType)dismissType
                             maskType:(KLCPopupMaskType)maskType
@@ -164,7 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showWithLayout:(KLCPopupLayout)layout duration:(NSTimeInterval)duration;
 
 // Show centered at point in view's coordinate system. If view is nil use screen base coordinates.
-- (void)showAtCenter:(CGPoint)center inView:(UIView*)view;
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view;
 
 // Show centered at point in view's coordinate system, then dismiss after duration.
 - (void)showAtCenter:(CGPoint)center inView:(UIView *)view withDuration:(NSTimeInterval)duration;
@@ -174,23 +174,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 #pragma mark Subclassing
-@property (nonatomic, strong, readonly) UIView *backgroundView;
-@property (nonatomic, strong, readonly) UIView *containerView;
-@property (nonatomic, assign, readonly) BOOL isBeingShown;
-@property (nonatomic, assign, readonly) BOOL isShowing;
-@property (nonatomic, assign, readonly) BOOL isBeingDismissed;
+
+@property(nonatomic, strong, readonly) UIView *backgroundView;
+@property(nonatomic, strong, readonly) UIView *containerView;
+@property(nonatomic, assign, readonly) BOOL isBeingShown;
+@property(nonatomic, assign, readonly) BOOL isShowing;
+@property(nonatomic, assign, readonly) BOOL isBeingDismissed;
 
 - (void)willStartShowing;
+
 - (void)didFinishShowing;
+
 - (void)willStartDismissing;
+
 - (void)didFinishDismissing;
 
 @end
 
 
 #pragma mark - UIView Category
-@interface UIView(KLCPopupView)
-- (void)forEachPopupDoBlock:(void (^)(KLCPopupView* popup))block;
+
+@interface UIView (KLCPopupView)
+- (void)forEachPopupDoBlock:(void (^)(KLCPopupView *popup))block;
+
 - (void)dismissPresentingPopup;
 @end
+
 NS_ASSUME_NONNULL_END
