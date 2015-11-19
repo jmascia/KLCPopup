@@ -193,13 +193,18 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 
 + (void)dismissAllPopups {
-  NSArray* windows = [[UIApplication sharedApplication] windows];
-  for (UIWindow* window in windows) {
-    [window forEachPopupDoBlock:^(KLCPopup *popup) {
-      [popup dismiss:NO];
-    }];
-  }
+    [KLCPopup dismissAllPopups:NO];
 }
+
++ (void)dismissAllPopups:(BOOL)animated {
+    NSArray* windows = [[UIApplication sharedApplication] windows];
+    for (UIWindow* window in windows) {
+        [window forEachPopupDoBlock:^(KLCPopup *popup) {
+            [popup dismiss:animated];
+        }];
+    }
+}
+
 
 
 #pragma mark - Public
