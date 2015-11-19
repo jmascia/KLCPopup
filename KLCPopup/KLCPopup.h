@@ -83,6 +83,8 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 	KLCPopupMaskTypeNone = 0, // Allow interaction with underlying views.
 	KLCPopupMaskTypeClear, // Don't allow interaction with underlying views.
 	KLCPopupMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
+  KLCPopupMaskTypeLightBlur, // Don't allow interaction with underlying views, light blur background.
+  KLCPopupMaskTypeDarkBlur, // Don't allow interaction with underlying views, dark blur background.
 };
 
 // KLCPopupLayout structure and maker functions
@@ -145,6 +147,7 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 
 // Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
++ (void)dismissAllPopups:(BOOL)animated;
 
 // Show popup with center layout. Animation determined by showType.
 - (void)show;

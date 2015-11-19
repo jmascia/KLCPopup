@@ -23,6 +23,7 @@
 
 
 #import "KLCPopup.h"
+#import "UIImage+ImageEffects.h"
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
@@ -45,7 +46,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 @interface KLCPopup () {
   // views
-  UIView* _backgroundView;
+  UIImageView* _backgroundView;
   UIView* _containerView;
   
   // state flags
@@ -107,7 +108,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     _isShowing = NO;
     _isBeingDismissed = NO;
     
-    _backgroundView = [[UIView alloc] init];
+    _backgroundView = [[UIImageView alloc] init];
     _backgroundView.backgroundColor = [UIColor clearColor];
     _backgroundView.userInteractionEnabled = NO;
     _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -192,13 +193,18 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 
 + (void)dismissAllPopups {
-  NSArray* windows = [[UIApplication sharedApplication] windows];
-  for (UIWindow* window in windows) {
-    [window forEachPopupDoBlock:^(KLCPopup *popup) {
-      [popup dismiss:NO];
-    }];
-  }
+    [KLCPopup dismissAllPopups:NO];
 }
+
++ (void)dismissAllPopups:(BOOL)animated {
+    NSArray* windows = [[UIApplication sharedApplication] windows];
+    for (UIWindow* window in windows) {
+        [window forEachPopupDoBlock:^(KLCPopup *popup) {
+            [popup dismiss:animated];
+        }];
+    }
+}
+
 
 
 #pragma mark - Public
@@ -554,6 +560,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       _backgroundView.alpha = 0.0;
       if (_maskType == KLCPopupMaskTypeDimmed) {
         _backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
+      }else if(_maskType == KLCPopupMaskTypeLightBlur || _maskType ==  KLCPopupMaskTypeDarkBlur){
+        _backgroundView.image = [self blurredImageFromScreenWithMaskType:_maskType];
       } else {
         _backgroundView.backgroundColor = [UIColor clearColor];
       }
@@ -986,6 +994,22 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       
     });
   }
+}
+
+
+- (UIImage*)blurredImageFromScreenWithMaskType:(KLCPopupMaskType)maskType {
+
+  UIWindow *window = [[[UIApplication sharedApplication] delegate] window];
+  CGSize size = window.frame.size;
+  
+  UIGraphicsBeginImageContext(size);
+  [window drawViewHierarchyInRect:(CGRect){CGPointZero, size.width, size.height} afterScreenUpdates:YES];
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  image = (maskType == KLCPopupMaskTypeLightBlur) ? [image applyLightEffect] : [image applyDarkEffect];
+
+  return image;
 }
 
 
