@@ -21,9 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+@import UIKit;
 
 // KLCPopupShowType: Controls how the popup will be presented.
-typedef NS_ENUM(NSInteger, KLCPopupShowType) {
+typedef NS_OPTIONS(NSUInteger, KLCPopupShowType) {
 	KLCPopupShowTypeNone = 0,
 	KLCPopupShowTypeFadeIn,
   KLCPopupShowTypeGrowIn,
@@ -59,7 +60,7 @@ typedef NS_ENUM(NSInteger, KLCPopupDismissType) {
 
 
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
-typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
+typedef NS_OPTIONS(NSUInteger, KLCPopupHorizontalLayout) {
   KLCPopupHorizontalLayoutCustom = 0,
   KLCPopupHorizontalLayoutLeft,
   KLCPopupHorizontalLayoutLeftOfCenter,
@@ -69,7 +70,7 @@ typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
 };
 
 // KLCPopupVerticalLayout: Controls where the popup will come to rest vertically.
-typedef NS_ENUM(NSInteger, KLCPopupVerticalLayout) {
+typedef NS_OPTIONS(NSUInteger, KLCPopupVerticalLayout) {
   KLCPopupVerticalLayoutCustom = 0,
 	KLCPopupVerticalLayoutTop,
   KLCPopupVerticalLayoutAboveCenter,
@@ -79,7 +80,7 @@ typedef NS_ENUM(NSInteger, KLCPopupVerticalLayout) {
 };
 
 // KLCPopupMaskType
-typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
+typedef NS_OPTIONS(NSUInteger, KLCPopupMaskType) {
 	KLCPopupMaskTypeNone = 0, // Allow interaction with underlying views.
 	KLCPopupMaskTypeClear, // Don't allow interaction with underlying views.
 	KLCPopupMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
