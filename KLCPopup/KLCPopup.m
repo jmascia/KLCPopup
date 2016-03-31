@@ -52,6 +52,9 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   BOOL _isBeingShown;
   BOOL _isShowing;
   BOOL _isBeingDismissed;
+  
+  // keyboard rectangle
+  CGRect _keyboardRect;
 }
 
 - (void)updateForInterfaceOrientation;
@@ -126,6 +129,16 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
                                              selector:@selector(didChangeStatusBarOrientation:)
                                                  name:UIApplicationDidChangeStatusBarFrameNotification
                                                object:nil];
+      
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidShow:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+      
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidHide:)
+                                                 name:UIKeyboardDidHideNotification
+                                               object:nil];
   }
   return self;
 }
@@ -135,6 +148,10 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
   
+  if (CGRectContainsPoint(_keyboardRect, point)) {
+    return nil;
+  }
+    
   UIView* hitView = [super hitTest:point withEvent:event];
   if (hitView == self) {
     
@@ -1030,6 +1047,17 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)didChangeStatusBarOrientation:(NSNotification*)notification {
   [self updateForInterfaceOrientation];
+}
+
+- (void)keyboardDidShow:(NSNotification *)notif {
+    CGRect keyboardRect;
+    
+    [[[notif userInfo] valueForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardRect];
+    _keyboardRect = [self convertRect:keyboardRect fromView:nil];
+}
+
+- (void)keyboardDidHide:(NSNotification *)notif {
+    _keyboardRect = CGRectZero;
 }
 
 
