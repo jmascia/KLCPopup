@@ -120,12 +120,15 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     
     [self addSubview:_backgroundView];
     [self addSubview:_containerView];
-    
+
+#if !TARGET_OS_TV
     // register for notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didChangeStatusBarOrientation:)
                                                  name:UIApplicationDidChangeStatusBarFrameNotification
                                                object:nil];
+#endif
+
   }
   return self;
 }
