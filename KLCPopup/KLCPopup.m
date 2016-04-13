@@ -120,12 +120,15 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     
     [self addSubview:_backgroundView];
     [self addSubview:_containerView];
-    
+
+#if !TARGET_OS_TV
     // register for notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didChangeStatusBarOrientation:)
                                                  name:UIApplicationDidChangeStatusBarFrameNotification
                                                object:nil];
+#endif
+
   }
   return self;
 }
@@ -996,6 +999,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)updateForInterfaceOrientation {
   
+#if !TARGET_OS_TV
   // We must manually fix orientation prior to iOS 8
   if (([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending)) {
 
@@ -1023,6 +1027,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   }
 
   self.frame = self.window.bounds;
+#endif
+
 }
 
 
