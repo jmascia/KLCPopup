@@ -999,6 +999,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)updateForInterfaceOrientation {
   
+#if !TARGET_OS_TV
   // We must manually fix orientation prior to iOS 8
   if (([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending)) {
 
@@ -1026,6 +1027,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   }
 
   self.frame = self.window.bounds;
+#endif
+
 }
 
 
