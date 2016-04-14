@@ -1,0 +1,14 @@
+PODS:
+  - PopupKit (2.0)
+
+DEPENDENCIES:
+  - PopupKit (from `../`)
+
+EXTERNAL SOURCES:
+  PopupKit:
+    :path: ../
+
+SPEC CHECKSUMS:
+  PopupKit: 222c308790c364377bbbc424053755939f65d963
+
+COCOAPODS: 0.39.0
