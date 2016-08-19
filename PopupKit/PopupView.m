@@ -33,7 +33,7 @@ PopupViewLayout PopupViewLayoutMake(PopupViewHorizontalLayout horizontal, PopupV
     return layout;
 }
 
-const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, PopupViewVerticalLayoutCenter};
+static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, PopupViewVerticalLayoutCenter};
 
 
 @interface NSValue (PopupViewLayout)
@@ -83,12 +83,12 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
 }
 
 
-- (id)init {
-    return [self initWithFrame:[[UIScreen mainScreen] bounds]];
+- (instancetype)init {
+    return [self initWithFrame:[UIScreen mainScreen].bounds];
 }
 
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
 
@@ -179,8 +179,8 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
                                 showType:(PopupViewShowType)showType
                              dismissType:(PopupViewDismissType)dismissType
                                 maskType:(PopupViewMaskType)maskType
-                dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
-                   dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch {
+          shouldDismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+             shouldDismissOnContentTouch:(BOOL)shouldDismissOnContentTouch {
     PopupView *popup = [[[self class] alloc] init];
     popup.contentView = contentView;
     popup.showType = showType;
@@ -193,7 +193,7 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
 
 
 + (void)dismissAllPopups {
-    NSArray *windows = [[UIApplication sharedApplication] windows];
+    NSArray *windows = [UIApplication sharedApplication].windows;
     for (UIWindow *window in windows) {
         [window forEachPopupDoBlock:^(PopupView *popup) {
             [popup dismiss:NO];
@@ -537,7 +537,7 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
                 destView = [parameters valueForKey:@"view"];
                 if (destView == nil) {
                     // Prepare by adding to the top window.
-                    NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
+                    NSEnumerator *frontToBackWindows = [[UIApplication sharedApplication].windows reverseObjectEnumerator];
 
                     for (UIWindow *window in frontToBackWindows)
                         if (window.windowLevel == UIWindowLevelNormal) {
@@ -613,7 +613,7 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
             NSTimeInterval duration;
             NSNumber *durationNumber = [parameters valueForKey:@"duration"];
             if (durationNumber != nil) {
-                duration = [durationNumber doubleValue];
+                duration = durationNumber.doubleValue;
             } else {
                 duration = 0.0;
             }
@@ -1030,9 +1030,9 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
 - (void)updateForInterfaceOrientation {
 
     // We must manually fix orientation prior to iOS 8
-    if (([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending)) {
+    if (([[UIDevice currentDevice].systemVersion compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending)) {
 
-        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
         CGFloat angle;
 
         switch (orientation) {
@@ -1102,7 +1102,7 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
 }
 
 - (void)moveContainerViewForKeyboard:(NSNotification *)notification up:(BOOL)up {
-    NSDictionary *userInfo = [notification userInfo];
+    NSDictionary *userInfo = notification.userInfo;
     NSTimeInterval animationDuration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
     UIViewAnimationCurve animationCurve = (UIViewAnimationCurve) [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
     CGRect keyboardEndFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
@@ -1147,7 +1147,7 @@ const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutCenter, 
             [(PopupView *) view dismiss:YES];
             break;
         }
-        view = [view superview];
+        view = view.superview;
     }
 }
 

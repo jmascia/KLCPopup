@@ -24,6 +24,10 @@
 @import Foundation;
 @import UIKit;
 
+@class PopupView;
+
+NS_ASSUME_NONNULL_BEGIN
+
 // PopupViewShowType: Controls how the popup will be presented.
 typedef NS_ENUM(NSInteger, PopupViewShowType) {
     PopupViewShowTypeNone = 0,
@@ -39,7 +43,7 @@ typedef NS_ENUM(NSInteger, PopupViewShowType) {
     PopupViewShowTypeBounceInFromBottom,
     PopupViewShowTypeBounceInFromLeft,
     PopupViewShowTypeBounceInFromRight,
-};
+} NS_SWIFT_NAME(PopupView.ShowType);
 
 // PopupViewDismissType: Controls how the popup will be dismissed.
 typedef NS_ENUM(NSInteger, PopupViewDismissType) {
@@ -56,7 +60,7 @@ typedef NS_ENUM(NSInteger, PopupViewDismissType) {
     PopupViewDismissTypeBounceOutToBottom,
     PopupViewDismissTypeBounceOutToLeft,
     PopupViewDismissTypeBounceOutToRight,
-};
+} NS_SWIFT_NAME(PopupView.DismissType);
 
 
 // PopupViewHorizontalLayout: Controls where the popup will come to rest horizontally.
@@ -67,7 +71,7 @@ typedef NS_ENUM(NSInteger, PopupViewHorizontalLayout) {
     PopupViewHorizontalLayoutCenter,
     PopupViewHorizontalLayoutRightOfCenter,
     PopupViewHorizontalLayoutRight,
-};
+} NS_SWIFT_NAME(PopupView.HorizontalLayout);
 
 // PopupViewVerticalLayout: Controls where the popup will come to rest vertically.
 typedef NS_ENUM(NSInteger, PopupViewVerticalLayout) {
@@ -77,7 +81,7 @@ typedef NS_ENUM(NSInteger, PopupViewVerticalLayout) {
     PopupViewVerticalLayoutCenter,
     PopupViewVerticalLayoutBelowCenter,
     PopupViewVerticalLayoutBottom,
-};
+} NS_SWIFT_NAME(PopupView.VerticalLayout);
 
 // PopupViewMaskType
 typedef NS_ENUM(NSInteger, PopupViewMaskType) {
@@ -86,19 +90,17 @@ typedef NS_ENUM(NSInteger, PopupViewMaskType) {
     PopupViewMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.
     PopupViewMaskTypeLightBlur, // Don't allow interaction with underlying views, blurs background.
     PopupViewMaskTypeDarkBlur,// Don't allow interaction with underlying views, blurs background.
-};
+} NS_SWIFT_NAME(PopupView.MaskType);
 
 // PopupViewLayout structure and maker functions
 typedef struct {
     PopupViewHorizontalLayout horizontal;
     PopupViewVerticalLayout vertical;
-} PopupViewLayout;
+} PopupViewLayout NS_SWIFT_NAME(PopupView.Layout);
 
-extern PopupViewLayout PopupViewLayoutMake(PopupViewHorizontalLayout horizontal, PopupViewVerticalLayout vertical);
+PopupViewLayout PopupViewLayoutMake(PopupViewHorizontalLayout horizontal, PopupViewVerticalLayout vertical) CF_SWIFT_UNAVAILABLE("Use 'PopupView.Layout.init(::)' instead");
 
-extern const PopupViewLayout PopupViewLayoutCenter;
-
-NS_ASSUME_NONNULL_BEGIN
+static const PopupViewLayout PopupViewLayoutCenter;
 
 @interface PopupView : UIView
 
@@ -145,8 +147,8 @@ NS_ASSUME_NONNULL_BEGIN
                                 showType:(PopupViewShowType)showType
                              dismissType:(PopupViewDismissType)dismissType
                                 maskType:(PopupViewMaskType)maskType
-                dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
-                   dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
+          shouldDismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+             shouldDismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
 // Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
@@ -158,19 +160,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showWithLayout:(PopupViewLayout)layout;
 
 // Show and then dismiss after duration. 0.0 or less will be considered infinity.
-- (void)showWithDuration:(NSTimeInterval)duration;
+- (void)showWithDuration:(NSTimeInterval)duration NS_SWIFT_NAME(PopupView.show(with:));
 
 // Show with layout and dismiss after duration.
 - (void)showWithLayout:(PopupViewLayout)layout duration:(NSTimeInterval)duration;
 
 // Show centered at point in view's coordinate system. If view is nil use screen base coordinates.
-- (void)showAtCenter:(CGPoint)center inView:(UIView *)view;
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view NS_SWIFT_NAME(PopupView.show(at:in:));
 
 // Show centered at point in view's coordinate system, then dismiss after duration.
-- (void)showAtCenter:(CGPoint)center inView:(UIView *)view withDuration:(NSTimeInterval)duration;
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view withDuration:(NSTimeInterval)duration NS_SWIFT_NAME(PopupView.show(at:in:with:));
 
 // Dismiss popup. Uses dismissType if animated is YES.
-- (void)dismiss:(BOOL)animated;
+- (void)dismiss:(BOOL)animated NS_SWIFT_NAME(PopupView.dismiss(animated:));;
 
 
 #pragma mark Subclassing
@@ -191,11 +193,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
 #pragma mark - UIView Category
 
 @interface UIView (PopupView)
-- (void)forEachPopupDoBlock:(void (^)(PopupView *popup))block;
+- (void)forEachPopupDoBlock:(void (^)(PopupView *popup))block NS_SWIFT_NAME(UIView.forEachPopup(handle:));
 
 - (void)dismissPresentingPopup;
 @end

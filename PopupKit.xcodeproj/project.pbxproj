@@ -110,6 +110,8 @@
 				TargetAttributes = {
 					6D09A5251BD1FF980069F2FF = {
 						CreatedOnToolsVersion = 7.0.1;
+						DevelopmentTeam = DQAU73Z92C;
+						DevelopmentTeamName = "Ryne Cheow (Personal Team)";
 					};
 				};
 			};

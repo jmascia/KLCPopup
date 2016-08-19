@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "PopupKit"
-  s.version      = "2.0"
+  s.version      = "2.1"
   s.summary      = "PopupKit is a simple and flexible iOS class for presenting any custom view as a popup, forked from KLCPopup."
   s.homepage     = "https://github.com/rynecheow/PopupKit"
   s.author       = {"Jeff Mascia" => "http://jeffmascia.com", "Ryne Cheow" => "http://rynecheow.com"}
