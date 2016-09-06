@@ -218,6 +218,12 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
     [self showWithLayout:PopupViewLayoutCenter duration:duration];
 }
 
+- (void)showWithLayout:(PopupViewLayout)layout
+                inView:(UIView*) view {
+    NSDictionary *parameters = @{@"layout" : [NSValue valueWithPopupViewLayout:layout],
+                                 @"view": view};
+    [self showWithParameters:parameters];
+}
 
 - (void)showWithLayout:(PopupViewLayout)layout duration:(NSTimeInterval)duration {
     NSDictionary *parameters = @{@"layout" : [NSValue valueWithPopupViewLayout:layout],

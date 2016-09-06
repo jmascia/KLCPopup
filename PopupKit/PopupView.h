@@ -159,6 +159,10 @@ static const PopupViewLayout PopupViewLayoutCenter;
 // Show with specified layout.
 - (void)showWithLayout:(PopupViewLayout)layout;
 
+// Show with specified layout in specific view.
+- (void)showWithLayout:(PopupViewLayout)layout
+                inView:(UIView*) view;
+
 // Show and then dismiss after duration. 0.0 or less will be considered infinity.
 - (void)showWithDuration:(NSTimeInterval)duration NS_SWIFT_NAME(PopupView.show(with:));
 
