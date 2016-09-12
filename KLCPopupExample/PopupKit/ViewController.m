@@ -388,12 +388,11 @@ typedef NS_ENUM(NSInteger, CellType) {
   PopupViewLayout layout = PopupViewLayoutMake((PopupViewHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout],
                                              (PopupViewVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]);
   
-  PopupView* popup = [PopupView popupViewWithContentView:contentView
-                                          showType:(PopupViewShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
-                                       dismissType:(PopupViewDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
-                                          maskType:(PopupViewMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
-                          dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
-                             dismissOnContentTouch:_shouldDismissOnContentTouch];
+    PopupView* popup = [PopupView popupViewWithContentView:contentView
+                                                  showType:(PopupViewShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
+                                               dismissType:(PopupViewDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
+                                                  maskType:(PopupViewMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
+                            shouldDismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch shouldDismissOnContentTouch:_shouldDismissOnContentTouch];
   
   if (_shouldDismissAfterDelay) {
     [popup showWithLayout:layout duration:2.0];
