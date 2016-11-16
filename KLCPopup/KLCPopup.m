@@ -534,7 +534,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       if(!self.superview){
         NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
         
-        for (UIWindow *window in frontToBackWindows) {
+        for (UIWindow *window in frontToBackWindows && !window.hidden) {
           if (window.windowLevel == UIWindowLevelNormal) {
             [window addSubview:self];
             
