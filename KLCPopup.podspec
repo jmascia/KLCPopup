@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KLCPopup"
-  s.version      = "1.1"
+  s.version      = "1.1.1"
   s.summary      = "KLCPopup is a simple and flexible iOS class for presenting any custom view as a popup"
   s.homepage     = "https://github.com/jmascia/KLCPopup"
   s.author       = {"Jeff Mascia" => "http://jeffmascia.com"}
@@ -8,7 +8,9 @@ Pod::Spec.new do |s|
   s.source       = {:git => 'https://github.com/jmascia/KLCPopup.git', :tag => s.version.to_s}
   s.frameworks   = 'UIKit'
   s.requires_arc = true
-  s.platform     = :ios, '7.0'
+  s.platforms = { :ios => "7.0", :tvos => "9.0" }
+  s.ios.deployment_target = '7.0'
+  s.tvos.deployment_target = '9.0'
   s.license      = {
     :type => 'MIT',
     :file => 'LICENSE'
