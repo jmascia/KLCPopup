@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 // KLCPopupShowType: Controls how the popup will be presented.
 typedef NS_ENUM(NSInteger, KLCPopupShowType) {
