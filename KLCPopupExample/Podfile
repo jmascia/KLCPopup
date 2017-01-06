@@ -1,3 +1,0 @@
-use_frameworks!
-
-pod 'PopupKit', :path => "../"

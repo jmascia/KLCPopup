@@ -257,7 +257,7 @@
 				INFOPLIST_FILE = PopupKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kullect.KLCPopupView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rynecheow.PopupKit;
 				PRODUCT_NAME = PopupKit;
 				SKIP_INSTALL = YES;
 			};
@@ -274,7 +274,7 @@
 				INFOPLIST_FILE = PopupKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kullect.KLCPopupView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rynecheow.PopupKit;
 				PRODUCT_NAME = PopupKit;
 				SKIP_INSTALL = YES;
 			};

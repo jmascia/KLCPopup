@@ -1,0 +1,16 @@
+PODS:
+  - PopupKit (3.1.0)
+
+DEPENDENCIES:
+  - PopupKit (from `../`)
+
+EXTERNAL SOURCES:
+  PopupKit:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  PopupKit: 5ca15cfc723c26239666c591f1dd77009f90129c
+
+PODFILE CHECKSUM: 59962dea2d11cbc2be85b8509f429537673ec423
+
+COCOAPODS: 1.1.1

@@ -29,7 +29,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // PopupViewShowType: Controls how the popup will be presented.
-typedef NS_ENUM(NSInteger, PopupViewShowType) {
+typedef NS_OPTIONS(NSInteger, PopupViewShowType) {
     PopupViewShowTypeNone = 0,
     PopupViewShowTypeFadeIn,
     PopupViewShowTypeGrowIn,
@@ -46,7 +46,7 @@ typedef NS_ENUM(NSInteger, PopupViewShowType) {
 } NS_SWIFT_NAME(PopupView.ShowType);
 
 // PopupViewDismissType: Controls how the popup will be dismissed.
-typedef NS_ENUM(NSInteger, PopupViewDismissType) {
+typedef NS_OPTIONS(NSInteger, PopupViewDismissType) {
     PopupViewDismissTypeNone = 0,
     PopupViewDismissTypeFadeOut,
     PopupViewDismissTypeGrowOut,
@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, PopupViewDismissType) {
 
 
 // PopupViewHorizontalLayout: Controls where the popup will come to rest horizontally.
-typedef NS_ENUM(NSInteger, PopupViewHorizontalLayout) {
+typedef NS_OPTIONS(NSInteger, PopupViewHorizontalLayout) {
     PopupViewHorizontalLayoutCustom = 0,
     PopupViewHorizontalLayoutLeft,
     PopupViewHorizontalLayoutLeftOfCenter,
@@ -74,7 +74,7 @@ typedef NS_ENUM(NSInteger, PopupViewHorizontalLayout) {
 } NS_SWIFT_NAME(PopupView.HorizontalLayout);
 
 // PopupViewVerticalLayout: Controls where the popup will come to rest vertically.
-typedef NS_ENUM(NSInteger, PopupViewVerticalLayout) {
+typedef NS_OPTIONS(NSInteger, PopupViewVerticalLayout) {
     PopupViewVerticalLayoutCustom = 0,
     PopupViewVerticalLayoutTop,
     PopupViewVerticalLayoutAboveCenter,
@@ -84,7 +84,7 @@ typedef NS_ENUM(NSInteger, PopupViewVerticalLayout) {
 } NS_SWIFT_NAME(PopupView.VerticalLayout);
 
 // PopupViewMaskType
-typedef NS_ENUM(NSInteger, PopupViewMaskType) {
+typedef NS_OPTIONS(NSInteger, PopupViewMaskType) {
     PopupViewMaskTypeNone = 0, // Allow interaction with underlying views.
     PopupViewMaskTypeClear, // Don't allow interaction with underlying views.
     PopupViewMaskTypeDimmed, // Don't allow interaction with underlying views, dim background.

@@ -52,6 +52,7 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
     BOOL _isBeingShown;
     BOOL _isShowing;
     BOOL _isBeingDismissed;
+    CGRect _keyboardRect;
 }
 
 @property UIVisualEffectView *_blurEffectView;
@@ -123,11 +124,22 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
 
         [self addSubview:_backgroundView];
         [self addSubview:_containerView];
-
+#if !TARGET_OS_TV
         // register for notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(didChangeStatusBarOrientation:)
                                                      name:UIApplicationDidChangeStatusBarFrameNotification
+                                                   object:nil];
+#endif
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(keyboardDidShow:)
+                                                     name:UIKeyboardDidShowNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(keyboardDidHide:)
+                                                     name:UIKeyboardDidHideNotification
                                                    object:nil];
     }
     return self;
@@ -137,6 +149,10 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
 #pragma mark - UIView
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+
+    if (CGRectContainsPoint(_keyboardRect, point)) {
+        return nil;
+    }
 
     UIView *hitView = [super hitTest:point withEvent:event];
     if (hitView == self || [NSStringFromClass([hitView class]) isEqualToString:@"_UIVisualEffectContentView"]) {
@@ -1034,34 +1050,30 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
 
 
 - (void)updateForInterfaceOrientation {
+#if !TARGET_OS_TV
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    CGFloat angle;
 
-    // We must manually fix orientation prior to iOS 8
-    if (([[UIDevice currentDevice].systemVersion compare:@"8.0" options:NSNumericSearch] == NSOrderedAscending)) {
+    switch (orientation) {
+        case UIInterfaceOrientationPortraitUpsideDown:
+        angle = M_PI;
+        break;
+        case UIInterfaceOrientationLandscapeLeft:
+        angle = -M_PI / 2.0f;;
 
-        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-        CGFloat angle;
+        break;
+        case UIInterfaceOrientationLandscapeRight:
+        angle = M_PI / 2.0f;
 
-        switch (orientation) {
-            case UIInterfaceOrientationPortraitUpsideDown:
-                angle = M_PI;
-                break;
-            case UIInterfaceOrientationLandscapeLeft:
-                angle = -M_PI / 2.0f;;
-
-                break;
-            case UIInterfaceOrientationLandscapeRight:
-                angle = M_PI / 2.0f;
-
-                break;
-            default: // as UIInterfaceOrientationPortrait
-                angle = 0.0;
-                break;
-        }
-
-        self.transform = CGAffineTransformMakeRotation(angle);
+        break;
+        default: // as UIInterfaceOrientationPortrait
+        angle = 0.0;
+        break;
     }
 
+    self.transform = CGAffineTransformMakeRotation(angle);
     self.frame = self.window.bounds;
+#endif
 }
 
 
@@ -1071,6 +1083,16 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
     [self updateForInterfaceOrientation];
 }
 
+- (void)keyboardDidShow:(NSNotification *)notification {
+    CGRect keyboardRect;
+
+    [[[notification userInfo] valueForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardRect];
+    _keyboardRect = [self convertRect:keyboardRect fromView:nil];
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification {
+    _keyboardRect = CGRectZero;
+}
 
 #pragma mark - Subclassing
 
