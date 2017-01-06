@@ -1,0 +1,9 @@
+use_frameworks!
+
+target 'PopupKitExample' do
+  pod 'PopupKit', :path => "../"
+end
+
+target 'PopupKit_tvOS_Example' do
+    pod 'PopupKit', :path => "../"
+end
