@@ -18,7 +18,6 @@
   ],
   "requires_arc": true,
   "platforms": {
-    "{:ios=>\"9.0\", :tvos=>\"9.0\"}": null,
     "ios": "9.0",
     "tvos": "9.0"
   },

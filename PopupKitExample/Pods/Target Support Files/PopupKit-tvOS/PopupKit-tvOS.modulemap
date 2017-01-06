@@ -1,5 +1,5 @@
 framework module PopupKit {
-  umbrella header "PopupKit-umbrella.h"
+  umbrella header "PopupKit-tvOS-umbrella.h"
 
   export *
   module * { export * }

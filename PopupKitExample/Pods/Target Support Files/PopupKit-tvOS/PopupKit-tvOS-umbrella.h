@@ -10,7 +10,8 @@
 #endif
 #endif
 
+#import "PopupView.h"
 
-FOUNDATION_EXPORT double Pods_PopupKitExampleVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_PopupKitExampleVersionString[];
+FOUNDATION_EXPORT double PopupKitVersionNumber;
+FOUNDATION_EXPORT const unsigned char PopupKitVersionString[];
 

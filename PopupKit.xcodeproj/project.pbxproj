@@ -10,8 +10,6 @@
 		6D09A52A1BD1FF980069F2FF /* PopupKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5291BD1FF980069F2FF /* PopupKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D09A5481BD2002C0069F2FF /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5461BD2002C0069F2FF /* PopupView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D09A5491BD2002C0069F2FF /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D09A5471BD2002C0069F2FF /* PopupView.m */; };
-		6D09A5671BD209780069F2FF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D09A5661BD209780069F2FF /* Foundation.framework */; };
-		6D09A5691BD2097C0069F2FF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D09A5681BD2097C0069F2FF /* UIKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,8 +27,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D09A5691BD2097C0069F2FF /* UIKit.framework in Frameworks */,
-				6D09A5671BD209780069F2FF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

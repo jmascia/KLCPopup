@@ -130,7 +130,7 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
                                                  selector:@selector(didChangeStatusBarOrientation:)
                                                      name:UIApplicationDidChangeStatusBarFrameNotification
                                                    object:nil];
-#endif
+
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(keyboardDidShow:)
@@ -141,10 +141,10 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
                                                  selector:@selector(keyboardDidHide:)
                                                      name:UIKeyboardDidHideNotification
                                                    object:nil];
+#endif
     }
     return self;
 }
-
 
 #pragma mark - UIView
 
@@ -1083,24 +1083,28 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
     [self updateForInterfaceOrientation];
 }
 
+#if !TARGET_OS_TV
 - (void)keyboardDidShow:(NSNotification *)notification {
     CGRect keyboardRect;
-
     [[[notification userInfo] valueForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardRect];
     _keyboardRect = [self convertRect:keyboardRect fromView:nil];
+
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification {
     _keyboardRect = CGRectZero;
 }
+#endif
 
 #pragma mark - Subclassing
 
 - (void)willStartShowing {
+#if !TARGET_OS_TV
     if (_shouldHandleKeyboard) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
     }
+#endif
 }
 
 
@@ -1115,12 +1119,15 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
 
 
 - (void)didFinishDismissing {
+#if !TARGET_OS_TV
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+#endif
 }
 
 #pragma mark - Keyboard notification handlers
 
+#if !TARGET_OS_TV
 - (void)keyboardWillShowNotification:(NSNotification *)notification {
     [self moveContainerViewForKeyboard:notification up:YES];
 }
@@ -1147,7 +1154,7 @@ static const PopupViewLayout PopupViewLayoutCenter = {PopupViewHorizontalLayoutC
     _containerView.frame = frame;
     [UIView commitAnimations];
 }
-
+#endif
 @end
 
 #pragma mark - Categories
