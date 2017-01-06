@@ -15,7 +15,7 @@ pod 'PopupKit'
 ```
 
 ###CocoaPods
-You can install KLCPopup easily with Carthage too
+You can install PopupKit easily with Carthage too
 
 ```
 github 'rynecheow/PopupKit'
@@ -47,12 +47,12 @@ or
 
 Create a popup for displaying a UIView using default animations and behaviors (similar to a UIAlertView):
 ```objc
-	+ (instancetype)popupWithContentView:(UIView*)contentView;
++ (instancetype)popupWithContentView:(UIView*)contentView;
 ```
 
 or similarly in Swift:
 ```swift
-	convenience init(contentView: UIView)
+convenience init(contentView: UIView)
 ```
 
 Or create a popup with custom animations and behaviors. Customizations can also be accessed via properties on the popup instance:
@@ -67,12 +67,7 @@ Or create a popup with custom animations and behaviors. Customizations can also 
 
 or similarly in Swift:
 ```swift
-  	convenience init(contentView: UIView,
-	  							      showType: PopupView.ShowType,
-	  						  	 dismissType: PopupView.DismissType,
-  							  			maskType: PopupView.MaskType,
-  shouldDismissOnBackgroundTouch: Bool,
-	   shouldDismissOnContentTouch: Bool)
+convenience init(contentView: UIView, showType: PopupView.ShowType, dismissType: PopupView.DismissType, maskType: PopupView.MaskType, shouldDismissOnBackgroundTouch: Bool, shouldDismissOnContentTouch: Bool)
 ```
 
 Also **you must give your `contentView` a size** before showing it (by setting its frame), or **it must size itself with AutoLayout**.
@@ -83,44 +78,46 @@ Also **you must give your `contentView` a size** before showing it (by setting i
 
 Show popup in middle of screen.
 ```objc
-	- (void)show;
+- (void)show;
 ```
 
 or similarly in Swift:
 ```swift
-  	func show()
+func show()
 ```
 
 There are two ways to control where your popup is displayed:
 
 1. Relative layout presets (see `PopupView.h` for options).
-		```objc
-		- (void)showWithLayout:(PopupViewLayout)layout;
-		```
-		or similarly in Swift:
-		```swift
-		  	func show(with layout: PopupView.Layout)
-		```
+
+```objc
+- (void)showWithLayout:(PopupViewLayout)layout;
+```
+
+or similarly in Swift:
+```swift
+func show(with layout: PopupView.Layout)
+```
 
 2. Explicit center point relative to a view's coordinate system.
-		```objc
-		- (void)showAtCenter:(CGPoint)center inView:(UIView *)view;
-		```
+```objc
+- (void)showAtCenter:(CGPoint)center inView:(UIView *)view;
+```
 
-		or similarly in Swift:
-		```swift
-		  	func show(at center: CGPoint, in view: UIView)
-		```
+or similarly in Swift:
+```swift
+func show(at center: CGPoint, in view: UIView)
+```
 
 
 If you want your popup to dismiss automatically (like a toast in Android) you can set an explicit `duration`:
 ```objc
-	- (void)showWithDuration:(NSTimeInterval)duration;
+- (void)showWithDuration:(NSTimeInterval)duration;
 ```
-	or similarly in Swift:
-	```swift
-		  func show(with duration: TimeInterval)
-	```
+or similarly in Swift:
+```swift
+func show(with duration: TimeInterval)
+```
 
 ### Dismissing a Popup
 
@@ -128,77 +125,88 @@ There are a few ways to dismiss a popup:
 
 If you have a reference to the popup instance, you can send this message to it. If `animated`, then it will use the animation specified in `dismissType`. Otherwise it will just disappear:
 ```objc
-	- (void)dismiss:(BOOL)animated;
+- (void)dismiss:(BOOL)animated;
 ```
 
 or similarly in Swift:
 ```swift
-		func dismiss(animated: Bool)
+func dismiss(animated: Bool)
 ```
 
 If you lost your reference to a popup or you want to make sure no popups are showing, this class method dismisses any and all popups in your app:
+
 ```objc
-	+ (void)dismissAllPopups;
-	```
-	or similarly in Swift:
-	```swift
-			class func dismissAllPopups()
-	```
-Also you can call this category method from `UIView(KLCPopupView)` on your contentView, or any of its subviews, to dismiss its parent popup:
++ (void)dismissAllPopups;
+```
+
+or similarly in Swift:
+```swift
+class func dismissAllPopups()
+```
+
+Also you can call this category method from `UIView(PopupView)` on your contentView, or any of its subviews, to dismiss its parent popup:
 ```objc
-	- (void)dismissPresentingPopup; // UIView category
-	```
-	or similarly in Swift:
-	```swift
-		 func dismissPresentingPopup()
-	```
+- (void)dismissPresentingPopup; // UIView category
+```
+
+or similarly in Swift:
+```swift
+func dismissPresentingPopup()
+```
+
 ### Customization
 
 
 Animation used to show your popup:
-
-	@property (nonatomic, assign) KLCPopupShowType showType;
+```objc
+@property (nonatomic, assign) PopupViewShowType showType;
+```
 
 Animation used to dismiss your popup:
-
-	@property (nonatomic, assign) KLCPopupDismissType dismissType;
+```objc
+@property (nonatomic, assign) PopupViewDismissType dismissType;
+```
 
 Mask prevents touches to the background from passing through to views below:
-
-	@property (nonatomic, assign) KLCPopupMaskType maskType;
+```objc
+@property (nonatomic, assign) PopupViewMaskType maskType;
+```
 
 Popup will automatically dismiss if the background is touched:
-
-	@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
+```objc
+@property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
+```
 
 Popup will automatically dismiss if the contentView is touched:
-
-	@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
+```objc
+@property (nonatomic, assign) BOOL shouldDismissOnContentTouch;
+```
 
 Override alpha value for dimmed background mask:
-
-	@property (nonatomic, assign) CGFloat dimmedMaskAlpha;
-
+```objc
+@property (nonatomic, assign) CGFloat dimmedMaskAlpha;
+```
 
 ### Blocks
 
 Use these blocks to synchronize other actions with popup events:
+```objc
+@property (nonatomic, copy) void (^didFinishShowingCompletion)();
 
-	@property (nonatomic, copy) void (^didFinishShowingCompletion)();
+@property (nonatomic, copy) void (^willStartDismissingCompletion)();
 
-	@property (nonatomic, copy) void (^willStartDismissingCompletion)();
-
-	@property (nonatomic, copy) void (^didFinishDismissingCompletion)();
-
+@property (nonatomic, copy) void (^didFinishDismissingCompletion)();
+```
 
 ### Example
+```objc
+UIView* contentView = [[UIView alloc] init];
+contentView.backgroundColor = [UIColor orangeColor];
+contentView.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
 
-	UIView* contentView = [[UIView alloc] init];
-	contentView.backgroundColor = [UIColor orangeColor];
-	contentView.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
-
-	KLCPopupView* popup = [KLCPopupView popupWithContentView:contentView];
-	[popup show];
+PopupView* popup = [PopupView popupWithContentView:contentView];
+[popup show];
+```
 
 ## Notes
 
@@ -210,4 +218,5 @@ Use these blocks to synchronize other actions with popup events:
 - Add support for drag-to-dismiss.
 
 ##Credits
-KLCPopup was created by Jeff Mascia and the team at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD).
+KLCPopup was created by Jeff Mascia and the team at Kullect, where it's used in the [Shout Photo Messenger](http://tryshout.com) app. Aspects of KLCPopup were inspired by Sam Vermette's [SVProgressHUD](https://github.com/samvermette/SVProgressHUD). PopupKit is a modernised version of
+KLCPopup ported by Ryne Cheow.
