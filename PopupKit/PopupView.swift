@@ -163,6 +163,8 @@ open class PopupView: UIView {
     private var isBeingDismissed = false
     private var keyboardRect = CGRect.zero
 
+    private var task: DispatchWorkItem?
+
 //    //MARK: - Closure
 //    /// Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
 //    public var didFinishShowingCompletion: (() -> ())?
@@ -224,7 +226,7 @@ open class PopupView: UIView {
     }
 
     deinit {
-        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        task?.cancel()
         // stop listening to notifications
         NotificationCenter.default.removeObserver(self)
     }
@@ -308,7 +310,7 @@ open class PopupView: UIView {
         show(with: parameters)
     }
 
-    public func dismiss(animated: Bool) {
+    public func dismiss(animated: Bool = true) {
 
         guard isShowing && !isBeingDismissed else {
             return
@@ -318,7 +320,7 @@ open class PopupView: UIView {
         isShowing = false
         isBeingDismissed = true
 
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(PopupView.dismissWithAnimation), object: nil)
+        task?.cancel()
 
         delegate?.willStartDismissing(popUpView: self)
 
@@ -362,11 +364,6 @@ open class PopupView: UIView {
 
         }
 
-    }
-
-    //MARK: - Private Methods
-    internal func dismissWithAnimation() {
-        dismiss(animated: true)
     }
     
     private func show(with parameters: [String: Any]) {
@@ -444,7 +441,10 @@ open class PopupView: UIView {
 
             // Setup completion block
             let completionBlock: (Bool) -> () = {
-                finished in
+                [weak self] finished in
+                guard let `self` = self else {
+                    return
+                }
                 self.isBeingShown = false
                 self.isShowing = true
                 self.isBeingDismissed = false
@@ -453,7 +453,12 @@ open class PopupView: UIView {
 
                 // Set to hide after duration if greater than zero.
                 if duration > 0.0 {
-                    self.perform(#selector(PopupView.dismissWithAnimation), with: nil, afterDelay: duration)
+                    self.task = DispatchWorkItem { [weak self] in self?.dismiss() }
+                    guard let task = self.task else {
+                        return
+                    }
+                    // execute task in 2 seconds
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration, execute: task)
                 }
             }
 
