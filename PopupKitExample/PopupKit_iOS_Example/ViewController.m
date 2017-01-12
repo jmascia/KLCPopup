@@ -403,12 +403,12 @@ typedef NS_ENUM(NSInteger, CellType) {
     if (_shouldDismissAfterDelay) {
         [popup showWithHorizontalLayout:(PopupViewHorizontalLayout) [self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
                          verticalLayout:(PopupViewVerticalLayout) [self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
-                                     in:nil
+                                 inView:nil
                                duration:2.0];
     } else {
         [popup showWithHorizontalLayout:(PopupViewHorizontalLayout) [self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
                          verticalLayout:(PopupViewVerticalLayout) [self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
-                                     in:nil
+                                 inView:nil
                                duration:0.0];
     }
 }

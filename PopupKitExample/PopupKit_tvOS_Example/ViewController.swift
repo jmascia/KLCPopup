@@ -17,7 +17,7 @@ class ViewController: UIViewController {
         view.backgroundColor = .red
         let popupView = PopupView(contentView: view)
         // Do any additional setup after loading the view, typically from a nib.
-        popupView.show(with: 2.0)
+        popupView.show(duration: 2.0)
     }
 
     override func didReceiveMemoryWarning() {

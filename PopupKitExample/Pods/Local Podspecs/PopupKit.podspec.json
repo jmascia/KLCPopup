@@ -7,7 +7,7 @@
     "Jeff Mascia": "http://jeffmascia.com",
     "Ryne Cheow": "http://rynecheow.com"
   },
-  "source_files": "PopupKit/PopupView.swift",
+  "source_files": "PopupKit/*.swift",
   "source": {
     "git": "https://github.com/rynecheow/PopupKit.git",
     "tag": "3.1.1"
