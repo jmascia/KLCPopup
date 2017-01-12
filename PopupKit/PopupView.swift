@@ -377,9 +377,8 @@ open class PopupView: UIView {
                 completionClosure(true)
                 return
             }
-
-            UIView.animate(withDuration: self.dismissType.animationDuration, delay: 0, options: self.dismissType.animationOptions, animations: self.dismissType.animationClosure(with: self), completion: self.dismissType.animationCompletion(with: self, completionClosure: completionClosure))
-
+            
+            self.dismissType.animate(with: self, containerFrame: nil, completionClosure: completionClosure)
         }
 
     }
@@ -596,147 +595,7 @@ open class PopupView: UIView {
                 }
 
                 // Animate content if needed
-                switch self.showType {
-                case .fadeIn:
-                    self.containerView.alpha = 0.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    self.containerView.frame = finalContainerFrame
-
-                    UIView.animate(withDuration: animationDurationStandard, delay: 0, options: [.curveLinear], animations: {
-                        self.containerView.alpha = 1.0
-                    }, completion: completionBlock)
-                    break
-                case .growIn:
-                    self.containerView.alpha = 0.0
-                    // set frame before transform here...
-                    self.containerView.frame = finalContainerFrame
-                    self.containerView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-
-                    UIView.animate(withDuration: animationDurationStandard, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.alpha = 1.0
-                        self.containerView.transform = CGAffineTransform.identity
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .shrinkIn:
-                    self.containerView.alpha = 0.0
-                    // set frame before transform here
-                    self.containerView.frame = finalContainerFrame
-                    self.containerView.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
-
-                    UIView.animate(withDuration: animationDurationStandard, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.alpha = 1.0
-                        self.containerView.transform = CGAffineTransform.identity
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .slideInFromTop:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.y = -1 * finalContainerFrame.height
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: animationDurationLong, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .slideInFromBottom:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.y = self.bounds.height
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: animationDurationLong, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .slideInFromLeft:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.x = -1 * finalContainerFrame.width
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: animationDurationLong, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .slideInFromRight:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.x = self.bounds.width
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: animationDurationLong, delay: 0, options: kAnimationOptionCurveUndocumented, animations: {
-                        self.containerView.frame = finalContainerFrame
-
-                    }, completion: completionBlock)
-                    break
-                case .bounceIn:
-                    self.containerView.alpha = 0.0
-                    self.containerView.frame = finalContainerFrame
-                    self.containerView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-
-                    UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 15.0, options: [], animations: {
-                        self.containerView.alpha = 1.0
-                        self.containerView.transform = CGAffineTransform.identity
-                    }, completion: completionBlock)
-                    break
-                case .bounceInFromTop:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.y = -1 * finalContainerFrame.height
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: [], animations: {
-                        self.containerView.frame = finalContainerFrame
-                    }, completion: completionBlock)
-                    break
-                case .bounceInFromBottom:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.y = self.bounds.height
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: [], animations: {
-                        self.containerView.frame = finalContainerFrame
-                    }, completion: completionBlock)
-                    break
-                case .bounceInFromLeft:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.x = -1 * finalContainerFrame.width
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: [], animations: {
-                        self.containerView.frame = finalContainerFrame
-                    }, completion: completionBlock)
-                    break
-                case .bounceInFromRight:
-                    self.containerView.alpha = 1.0
-                    self.containerView.transform = CGAffineTransform.identity
-                    var startFrame = finalContainerFrame
-                    startFrame.origin.x = self.bounds.width
-                    self.containerView.frame = startFrame
-
-                    UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: [], animations: {
-                        self.containerView.frame = finalContainerFrame
-                    }, completion: completionBlock)
-                    break
-                default:
-                    break
-                }
+                self.showType.animate(with: self, containerFrame: finalContainerFrame, completionClosure: completionBlock)
             }
         }
     }
