@@ -195,7 +195,7 @@ open class PopupView: UIView {
                     UIView.animate(withDuration: bounce2Duration, delay: 0, options: [.curveEaseIn], animations: {
                         var finalFrame = popUpView.containerView.frame
                         finalFrame.origin.y = popUpView.bounds.height
-                        popUpView.frame = finalFrame
+                        popUpView.containerView.frame = finalFrame
 
                     }, completion: completionClosure)
                 }
