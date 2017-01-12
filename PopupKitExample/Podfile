@@ -1,6 +1,6 @@
 use_frameworks!
 
-target 'PopupKitExample' do
+target 'PopupKit_iOS_Example' do
   pod 'PopupKit', :path => "../"
 end
 

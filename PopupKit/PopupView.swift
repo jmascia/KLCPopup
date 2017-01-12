@@ -226,8 +226,8 @@ open class PopupView: UIView {
     }
 
     /// Controls where the popup will come to rest horizontally.
-
-    public enum HorizontalLayout {
+    @objc(PopupViewHorizontalLayout)
+    public enum HorizontalLayout: Int {
         case custom
         case left
         case leftOfCenter
@@ -237,8 +237,8 @@ open class PopupView: UIView {
     }
 
     /// Controls where the popup will come to rest vertically.
-
-    public enum VerticalLayout {
+    @objc(PopupViewVerticalLayout)
+    public enum VerticalLayout: Int {
         case custom
         case top
         case aboveCenter
@@ -247,7 +247,8 @@ open class PopupView: UIView {
         case bottom
     }
 
-    public enum MaskType {
+    @objc(PopupViewMaskType)
+    public enum MaskType: Int {
         /// Allow interaction with underlying views.
         case none
         /// Don't allow interaction with underlying views.
@@ -324,16 +325,16 @@ open class PopupView: UIView {
     private var isBeingDismissed = false
     private var keyboardRect = CGRect.zero
 
-    //MARK: - Closure
-    /// Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-    public var didFinishShowingCompletion: (() -> ())?
-
-
-    /// Block gets called when dismiss animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
-    public var willStartDismissingCompletion: (() -> ())?
-
-    /// Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-    public var didFinishDismissingCompletion: (() -> ())?
+//    //MARK: - Closure
+//    /// Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
+//    public var didFinishShowingCompletion: (() -> ())?
+//
+//
+//    /// Block gets called when dismiss animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
+//    public var willStartDismissingCompletion: (() -> ())?
+//
+//    /// Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
+//    public var didFinishDismissingCompletion: (() -> ())?
 
     //MARK: - Initializer
 
@@ -439,55 +440,23 @@ open class PopupView: UIView {
         }
     }
 
-
-    /// Show popup with center layout. Animation determined by showType.
-    open func show() {
-        show(with: Layout.center)
+    @objc
+    public func show(withHorizontalLayout horizontal : HorizontalLayout, verticalLayout: VerticalLayout, in view: UIView? = nil, duration: TimeInterval = 0.0) {
+        show(with: Layout.custom(horizontal: horizontal, vertical: verticalLayout), in: view, duration: duration)
     }
 
-
-    /// Show with specified layout.
-    open func show(with layout: Layout) {
-        show(with: layout, duration: 0.0)
-    }
-
-
-    /// Show with specified layout in specific view.
-    open func show(with layout: Layout, in view: UIView) {
-        let parameters: [String: Any] = [
-                "layout": layout,
-                "view": view
+    /// Show with specified layout, optionally in specific view, and dismiss after duration.
+    public func show(with layout: Layout = .center, in view: UIView? = nil, duration: TimeInterval = 0.0) {
+        var parameters: [String: Any] = [
+            "duration": duration,
+            "layout": layout
         ]
 
         show(with: parameters)
     }
-
-
-    /// Show and then dismiss after duration. 0.0 or less will be considered infinity.
-    open func show(with duration: TimeInterval) {
-        show(with: Layout.center, duration: duration)
-    }
-
-
-    /// Show with layout and dismiss after duration.
-    open func show(with layout: PopupView.Layout, duration: TimeInterval) {
-        let parameters: [String: Any] = [
-                "layout": layout,
-                "duration": duration
-        ]
-
-        show(with: parameters)
-    }
-
-
-    /// Show centered at point in view's coordinate system. If view is nil use screen base coordinates.
-    open func show(at center: CGPoint, in view: UIView) {
-        show(at: center, in: view, with: 0.0)
-    }
-
 
     /// Show centered at point in view's coordinate system, then dismiss after duration.
-    open func show(at center: CGPoint, in view: UIView, with duration: TimeInterval) {
+    public func show(at center: CGPoint, in view: UIView, with duration: TimeInterval = 0.0) {
         let parameters: [String: Any] = [
                 "center": center,
                 "duration": duration,
@@ -497,7 +466,7 @@ open class PopupView: UIView {
         show(with: parameters)
     }
 
-    open func dismiss(animated: Bool = true) {
+    public func dismiss(animated: Bool = true) {
 
         guard isShowing && !isBeingDismissed else {
             return
@@ -511,11 +480,11 @@ open class PopupView: UIView {
 
         delegate?.willStartDismissing(popUpView: self)
 
-        if let willStartDismissingCompletion = willStartDismissingCompletion {
-            willStartDismissingCompletion()
-        }
-
         DispatchQueue.main.async {
+            [weak self] in
+            guard let `self` = self else {
+                return
+            }
             let backgroundAnimation = {
                 self.backgroundView.alpha = 0.0
             }
@@ -539,10 +508,6 @@ open class PopupView: UIView {
                 self.isBeingDismissed = false
 
                 self.delegate?.didFinishDismissing(popUpView: self)
-
-                if let didFinishDismissingCompletion = self.didFinishDismissingCompletion {
-                    didFinishDismissingCompletion()
-                }
             }
 
             guard animated && self.dismissType != .none else {
@@ -639,10 +604,6 @@ open class PopupView: UIView {
                 self.isBeingDismissed = false
 
                 self.delegate?.didFinishShowing(popUpView: self)
-
-                if let didFinishShowingCompletion = self.didFinishShowingCompletion {
-                    didFinishShowingCompletion()
-                }
 
                 // Set to hide after duration if greater than zero.
                 if duration > 0.0 {
@@ -999,7 +960,7 @@ open class PopupView: UIView {
 
 //MARK: - Extension
 
-extension UIView {
+public extension UIView {
     func forEachPopupDoBlock(block: @escaping (PopupView) -> ()) {
         self.subviews.forEach { subview in
             if let popupView = subview as? PopupView {

@@ -1,6 +1,0 @@
-framework module Pods_PopupKitExample {
-  umbrella header "Pods-PopupKitExample-umbrella.h"
-
-  export *
-  module * { export * }
-}

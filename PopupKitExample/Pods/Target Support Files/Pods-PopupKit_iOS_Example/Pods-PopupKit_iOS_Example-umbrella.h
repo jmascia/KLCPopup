@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_PopupKitExampleVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_PopupKitExampleVersionString[];
+FOUNDATION_EXPORT double Pods_PopupKit_iOS_ExampleVersionNumber;
+FOUNDATION_EXPORT const unsigned char Pods_PopupKit_iOS_ExampleVersionString[];
 

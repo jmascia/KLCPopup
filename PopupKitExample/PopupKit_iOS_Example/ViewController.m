@@ -385,26 +385,33 @@ typedef NS_ENUM(NSInteger, CellType) {
                                              views:views]];
   
   // Show in popup
-  PopupViewLayout layout = PopupViewLayoutMake((PopupViewHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout],
-                                             (PopupViewVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]);
-  
-    PopupView* popup = [PopupView popupViewWithContentView:contentView
-                                                  showType:(PopupViewShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
-                                               dismissType:(PopupViewDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
-                                                  maskType:(PopupViewMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
-                            shouldDismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch shouldDismissOnContentTouch:_shouldDismissOnContentTouch];
+//  PopupViewLayout layout = PopupViewLayoutMake(,
+//                                             );
+
+    PopupView* popup = [[PopupView alloc] initWithContentView:contentView
+                                                     showType:(PopupViewShowType)[self valueForRow:_selectedRowInShowField inFieldWithTag:FieldTagShowType]
+                                                  dismissType:(PopupViewDismissType)[self valueForRow:_selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
+                                                     maskType:(PopupViewMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
+                               shouldDismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
+                                  shouldDismissOnContentTouch:_shouldDismissOnContentTouch];
   
   if (_shouldDismissAfterDelay) {
-    [popup showWithLayout:layout duration:2.0];
+    [popup showWithHorizontalLayout:(PopupViewHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
+                     verticalLayout:(PopupViewVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
+                                in:nil
+                           duration:2.0];
   } else {
-    [popup showWithLayout:layout];
+      [popup showWithHorizontalLayout:(PopupViewHorizontalLayout)[self valueForRow:_selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout]
+                       verticalLayout:(PopupViewVerticalLayout)[self valueForRow:_selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]
+                                    in:nil
+                             duration:0.0];
   }
 }
 
 
 - (void)dismissButtonPressed:(id)sender {
   if ([sender isKindOfClass:[UIView class]]) {
-    [(UIView*)sender dismissPresentingPopup];
+    [(UIView*)sender dismissPresentingPopupView];
   }
 }
 
