@@ -126,6 +126,20 @@ open class PopupView: UIView {
         }
     }
 
+    private struct PresentParameter {
+        var view: UIView?
+        var duration: TimeInterval
+        var animationCenter: CGPoint?
+        var layout: Layout
+
+        init(view: UIView? = nil, duration: TimeInterval = 0.0, animationCenter: CGPoint? = nil, layout: Layout = .center) {
+            self.view = view
+            self.duration = duration
+            self.animationCenter = animationCenter
+            self.layout = layout
+        }
+    }
+
     //MARK: - Properties
 
     /// This is the view that you want to appear in Popup.
@@ -157,24 +171,26 @@ open class PopupView: UIView {
     public weak var delegate: PopupViewDelegate?
 
     private let backgroundView: UIView
+
     internal let containerView: UIView
-    private var isBeingShown = false
-    private var isShowing = false
+
+    private var isBeingPresented = false
+
+    private var isPresenting = false
+
     private var isBeingDismissed = false
+
     private var keyboardRect = CGRect.zero
 
     private var task: DispatchWorkItem?
 
-//    //MARK: - Closure
-//    /// Block gets called after show animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-//    public var didFinishShowingCompletion: (() -> ())?
-//
-//
-//    /// Block gets called when dismiss animation starts. Be sure to use weak reference for popup within the block to avoid retain cycle.
-//    public var willStartDismissingCompletion: (() -> ())?
-//
-//    /// Block gets called after dismiss animation finishes. Be sure to use weak reference for popup within the block to avoid retain cycle.
-//    public var didFinishDismissingCompletion: (() -> ())?
+    private var canPresentPopup: Bool {
+        return !(isBeingPresented || isBeingDismissed || isPresenting)
+    }
+
+    private var canDismissPopup: Bool {
+        return isPresenting && !isBeingDismissed
+    }
 
     //MARK: - Initializer
 
@@ -272,12 +288,21 @@ open class PopupView: UIView {
     //MARK: - Public methods
 
     /// Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
-    public class func dismissAllPopups() {
-        UIApplication.shared.windows.forEach { window in
-            window.forEachPopup { popup in
-                popup.dismiss(animated: false)
+    public static func dismissAll() {
+        func recursivelyDismiss(view: UIView) {
+            for subview in view.subviews {
+                if subview is PopupView {
+                    (subview as! PopupView).dismiss(animated: false)
+                    break
+                }
+                recursivelyDismiss(view: subview)
             }
         }
+
+        for window in UIApplication.shared.windows {
+            recursivelyDismiss(view: window)
+        }
+
     }
 
     @objc(showWithHorizontalLayout: verticalLayout:inView:duration:)
@@ -287,37 +312,30 @@ open class PopupView: UIView {
 
     /// Show with specified layout, optionally in specific view, and dismiss after duration.
     public func show(with layout: Layout = .center, in view: UIView? = nil, duration: TimeInterval = 0.0) {
-        var parameters: [String: Any] = [
-                "duration": duration,
-                "layout": layout
-        ]
+        var parameter = PresentParameter(duration: duration, layout: layout)
 
         if let view = view {
-            parameters["view"] = view
+            parameter.view = view
         }
 
-        show(with: parameters)
+        show(with: parameter)
     }
 
     /// Show centered at point in view's coordinate system, then dismiss after duration.
     public func show(at center: CGPoint, in view: UIView, with duration: TimeInterval = 0.0) {
-        let parameters: [String: Any] = [
-                "center": center,
-                "duration": duration,
-                "view": view
-        ]
+        let parameter = PresentParameter(view: view, duration: duration, animationCenter: center)
 
-        show(with: parameters)
+        show(with: parameter)
     }
 
     public func dismiss(animated: Bool = true) {
 
-        guard isShowing && !isBeingDismissed else {
+        guard canDismissPopup else {
             return
         }
 
-        isBeingShown = false
-        isShowing = false
+        isBeingPresented = false
+        isPresenting = false
         isBeingDismissed = true
 
         task?.cancel()
@@ -347,8 +365,8 @@ open class PopupView: UIView {
             let completionClosure: (Bool) -> () = {
                 finished in
                 self.removeFromSuperview()
-                self.isBeingShown = false
-                self.isShowing = false
+                self.isBeingPresented = false
+                self.isPresenting = false
                 self.isBeingDismissed = false
 
                 self.delegate?.didFinishDismissing(popUpView: self)
@@ -366,13 +384,13 @@ open class PopupView: UIView {
 
     }
     
-    private func show(with parameters: [String: Any]) {
-        guard !isBeingShown && !isShowing && !isBeingDismissed else {
+    private func show(with parameter: PresentParameter) {
+        guard canPresentPopup else {
             return
         }
 
-        isBeingShown = true
-        isShowing = false
+        isBeingPresented = true
+        isPresenting = false
         isBeingDismissed = false
 
         self.delegate?.willStartShowing(popUpView: self)
@@ -381,7 +399,7 @@ open class PopupView: UIView {
             // Prepare by adding to the top window.
             var destView: UIView?
             if self.superview == nil {
-                destView = parameters["view"] as? UIView
+                destView = parameter.view
                 destView = destView ?? UIApplication.shared.windows.reversed()
                         .first {
                             $0.windowLevel == UIWindowLevelNormal
@@ -437,7 +455,7 @@ open class PopupView: UIView {
             }
 
             // Determine duration. Default to 0 if none provided.
-            let duration = parameters["duration"] as? TimeInterval ?? 0.0
+            let duration = parameter.duration
 
             // Setup completion block
             let completionBlock: (Bool) -> () = {
@@ -445,8 +463,8 @@ open class PopupView: UIView {
                 guard let `self` = self else {
                     return
                 }
-                self.isBeingShown = false
-                self.isShowing = true
+                self.isBeingPresented = false
+                self.isPresenting = true
                 self.isBeingDismissed = false
 
                 self.delegate?.didFinishShowing(popUpView: self)
@@ -497,10 +515,10 @@ open class PopupView: UIView {
 
             // Determine final position and necessary autoresizingMask for container.
             var finalContainerFrame = containerFrame
-            var containerAutoresizingMask: UIViewAutoresizing = UIViewAutoresizing(rawValue: 0)
+            var containerAutoresizingMask: UIViewAutoresizing = []
 
             // Use explicit center coordinates if provided.
-            let centerValue = parameters["center"] as? CGPoint
+            let centerValue = parameter.animationCenter
             if let centerValue = centerValue {
 
                 var centerInSelf = centerValue
@@ -513,10 +531,7 @@ open class PopupView: UIView {
                 finalContainerFrame.origin.y = centerInSelf.y - finalContainerFrame.height / 2.0
                 containerAutoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleBottomMargin, .flexibleTopMargin]
             } else {
-                // Otherwise use relative layout. Default to center if none provided.
-                let layoutValue = parameters["layout"] as? Layout
-
-                let layout = layoutValue ?? .center
+                let layout = parameter.layout
 
                 // Horizontal
                 switch layout.horizontal {
@@ -733,16 +748,16 @@ open class PopupView: UIView {
         var angle: CGFloat = 0.0
         switch orientation {
         case .portraitUpsideDown:
-            angle = CGFloat(M_PI)
+            angle = .pi
         case .landscapeLeft:
-            angle = CGFloat(-M_PI / 2.0)
+            angle = .pi / -2
             break
         case .landscapeRight:
-            angle = CGFloat(M_PI / 2.0)
+            angle = .pi / 2
             break
         default:
             // Portrait and unknown
-            angle = CGFloat(0.0)
+            angle = 0.0
         }
 
         transform = CGAffineTransform(rotationAngle: angle)
@@ -771,41 +786,6 @@ open class PopupView: UIView {
 
 #endif
 
-    //MARK: - Keyboard notification handlers
-#if !os(tvOS)
-
-    func keyboardWillShowNotification(notification: Notification) {
-        moveContainerViewForKeyboard(with: notification, isUp: true)
-    }
-
-    func keyboardWillHideNotification(notification: Notification) {
-        moveContainerViewForKeyboard(with: notification, isUp: false)
-    }
-
-    func moveContainerViewForKeyboard(with notification: Notification, isUp: Bool) {
-        guard let userInfo = notification.userInfo,
-              let animationDuration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval,
-              let animationCurve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? UIViewAnimationCurve,
-              let keyboardEndFrame = userInfo[UIKeyboardFrameEndUserInfoKey] as? CGRect,
-              let containerSuperView = containerView.superview else {
-            return
-        }
-
-        containerView.center = CGPoint(x: containerSuperView.frame.width / 2, y: containerSuperView.superview!.frame.height / 2)
-
-        var frame = containerView.frame
-        if isUp {
-            frame.origin.y -= keyboardEndFrame.height / 2
-        }
-
-        UIView.beginAnimations(nil, context: nil)
-        UIView.setAnimationDuration(animationDuration)
-        UIView.setAnimationCurve(animationCurve)
-        containerView.frame = frame
-        UIView.commitAnimations()
-    }
-
-#endif
 }
 
 //MARK: - Extension
@@ -832,25 +812,5 @@ public extension UIView {
             }
             view = v.superview
         }
-    }
-}
-
-extension PopupViewDelegate {
-    func willStartShowing(popUpView: PopupView) {
-        guard popUpView.shouldHandleKeyboard else {
-            return
-        }
-#if !os(tvOS)
-        NotificationCenter.default.addObserver(popUpView, selector: #selector(PopupView.keyboardWillShowNotification(notification:)), name: .UIKeyboardWillShow, object: nil)
-
-        NotificationCenter.default.addObserver(popUpView, selector: #selector(PopupView.keyboardWillHideNotification(notification:)), name: .UIKeyboardWillHide, object: nil)
-#endif
-    }
-
-    func didFinishDismissing(popUpView: PopupView) {
-#if !os(tvOS)
-        NotificationCenter.default.removeObserver(popUpView, name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.removeObserver(popUpView, name: .UIKeyboardWillHide, object: nil)
-#endif
     }
 }
