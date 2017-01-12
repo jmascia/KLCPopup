@@ -9,6 +9,25 @@
 import Foundation
 
 #if !os(tvOS)
+    extension PopupView {
+        func didChangeStatusBarOrientation(notification: Notification) {
+            updateForInterfaceOrientation()
+        }
+
+        func keyboardDidShow(notification: Notification) {
+            guard let rect = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else {
+                return
+            }
+
+            keyboardRect = convert(rect, from: nil)
+        }
+
+        func keyboardDidHide(notification: Notification) {
+            keyboardRect = CGRect.zero
+        }
+
+    }
+
     extension PopupViewDelegate {
         func willStartShowing(popUpView: PopupView) {
             guard popUpView.shouldHandleKeyboard else {

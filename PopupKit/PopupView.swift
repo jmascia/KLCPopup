@@ -170,17 +170,17 @@ open class PopupView: UIView {
 
     public weak var delegate: PopupViewDelegate?
 
-    private let backgroundView: UIView
-
     internal let containerView: UIView
+
+    internal var keyboardRect = CGRect.zero
+
+    private let backgroundView: UIView
 
     private var isBeingPresented = false
 
     private var isPresenting = false
 
     private var isBeingDismissed = false
-
-    private var keyboardRect = CGRect.zero
 
     private var task: DispatchWorkItem?
 
@@ -600,7 +600,7 @@ open class PopupView: UIView {
         }
     }
 
-    private func updateForInterfaceOrientation() {
+    internal func updateForInterfaceOrientation() {
 #if !os(tvOS)
         let orientation = UIApplication.shared.statusBarOrientation
 
@@ -627,21 +627,6 @@ open class PopupView: UIView {
     //MARK: - Notification Handler
 #if !os(tvOS)
 
-    func didChangeStatusBarOrientation(notification: Notification) {
-        updateForInterfaceOrientation()
-    }
-
-    func keyboardDidShow(notification: Notification) {
-        guard let rect = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else {
-            return
-        }
-
-        keyboardRect = convert(rect, from: nil)
-    }
-
-    func keyboardDidHide(notification: Notification) {
-        keyboardRect = CGRect.zero
-    }
 
 #endif
 
