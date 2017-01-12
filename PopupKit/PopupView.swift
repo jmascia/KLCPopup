@@ -451,6 +451,10 @@ open class PopupView: UIView {
             "duration": duration,
             "layout": layout
         ]
+        
+        if let view = view {
+            parameters["view"] = view
+        }
 
         show(with: parameters)
     }
@@ -612,8 +616,7 @@ open class PopupView: UIView {
             }
 
             // Add contentView to container
-            if let contentSuperView = self.contentView.superview,
-               contentSuperView != self.contentView {
+            if self.contentView.superview != self.containerView {
                 self.containerView.addSubview(self.contentView)
             }
 
