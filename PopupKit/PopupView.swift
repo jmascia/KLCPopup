@@ -110,25 +110,25 @@ open class PopupView: UIView {
                 }
             case .slideOutToTop:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.y = -1 * finalFrame.height
                     popUpView.containerView.frame = finalFrame
                 }
             case .slideOutToBottom:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.y = popUpView.bounds.height
                     popUpView.containerView.frame = finalFrame
                 }
             case .slideOutToLeft:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.x = -1 * finalFrame.width
                     popUpView.containerView.frame = finalFrame
                 }
             case .slideOutToRight:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.x = popUpView.bounds.width
                     popUpView.containerView.frame = finalFrame
                 }
@@ -138,25 +138,25 @@ open class PopupView: UIView {
                 }
             case .bounceOutToTop:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.y += animationBounceConstant
                     popUpView.containerView.frame = finalFrame
                 }
             case .bounceOutToLeft:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.x += animationBounceConstant
                     popUpView.containerView.frame = finalFrame
                 }
             case .bounceOutToRight:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.x -= animationBounceConstant
                     popUpView.containerView.frame = finalFrame
                 }
             case .bounceOutToBottom:
                 return {
-                    var finalFrame = popUpView.frame
+                    var finalFrame = popUpView.containerView.frame
                     finalFrame.origin.y -= animationBounceConstant
                     popUpView.containerView.frame = finalFrame
                 }
@@ -616,7 +616,7 @@ open class PopupView: UIView {
             }
 
             // Add contentView to container
-            if self.contentView.superview != self.containerView {
+            if self.containerView != self.contentView.superview {
                 self.containerView.addSubview(self.contentView)
             }
 
@@ -625,11 +625,11 @@ open class PopupView: UIView {
 
             // Size container to match contentView
             var containerFrame = self.containerView.frame
-            containerFrame.size = self.containerView.frame.size
+            containerFrame.size = self.contentView.frame.size
             self.containerView.frame = containerFrame
             // Position contentView to fill it
             var contentViewFrame = self.contentView.frame
-            contentViewFrame.origin = CGPoint.zero
+            contentViewFrame.origin = .zero
             self.contentView.frame = contentViewFrame
 
             // Reset containerView's constraints in case contentView is uaing autolayout.
@@ -650,7 +650,7 @@ open class PopupView: UIView {
 
             // Determine final position and necessary autoresizingMask for container.
             var finalContainerFrame = containerFrame
-            var containerAutoresizingMask: UIViewAutoresizing = []
+            var containerAutoresizingMask: UIViewAutoresizing = UIViewAutoresizing(rawValue: 0)
 
             // Use explicit center coordinates if provided.
             let centerValue = parameters["center"] as? CGPoint
@@ -679,10 +679,10 @@ open class PopupView: UIView {
                     break
                 case .leftOfCenter:
                     finalContainerFrame.origin.x = floor(self.bounds.width / 3.0 - containerFrame.width / 2.0)
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleRightMargin, .flexibleRightMargin]
+                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
                     break
                 case .center:
-                    finalContainerFrame.origin.x = floor(self.bounds.width - containerFrame.width / 2.0)
+                    finalContainerFrame.origin.x = floor((self.bounds.width - containerFrame.width) / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
                     break
                 case .rightOfCenter:
@@ -708,7 +708,7 @@ open class PopupView: UIView {
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
                     break
                 case .center:
-                    finalContainerFrame.origin.y = floor(self.bounds.height - containerFrame.height / 2.0)
+                    finalContainerFrame.origin.y = floor((self.bounds.height - containerFrame.height) / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
                     break
                 case .belowCenter:
