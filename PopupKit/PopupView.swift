@@ -32,8 +32,8 @@ open class PopupView: UIView {
     //MARK: - Enums
 
     /// Controls how the popup will be presented.
-
-    public enum ShowType {
+    @objc(PopupViewShowType)
+    public enum ShowType : Int {
         case none
         case fadeIn
         case growIn
@@ -50,8 +50,8 @@ open class PopupView: UIView {
     }
 
     /// Controls how the popup will be dismissed.
-
-    public enum DismissType {
+    @objc(PopupViewDismissType)
+    public enum DismissType: Int {
         case none
         case fadeOut
         case growOut
@@ -476,7 +476,7 @@ open class PopupView: UIView {
                 "duration": duration
         ]
 
-        show(show(with: parameters))
+        show(with: parameters)
     }
 
 
@@ -1028,15 +1028,17 @@ extension PopupViewDelegate {
         guard popUpView.shouldHandleKeyboard else {
             return
         }
-
+#if !os(tvOS)
         NotificationCenter.default.addObserver(popUpView, selector: #selector(PopupView.keyboardWillShowNotification(notification:)), name: .UIKeyboardWillShow, object: nil)
 
         NotificationCenter.default.addObserver(popUpView, selector: #selector(PopupView.keyboardWillHideNotification(notification:)), name: .UIKeyboardWillHide, object: nil)
+#endif
     }
 
     func didFinishDismissing(popUpView: PopupView) {
-
+#if !os(tvOS)
         NotificationCenter.default.removeObserver(popUpView, name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.removeObserver(popUpView, name: .UIKeyboardWillHide, object: nil)
+#endif
     }
 }

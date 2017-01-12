@@ -1,5 +1,5 @@
 PODS:
-  - PopupKit (3.1.0)
+  - PopupKit (3.1.1)
 
 DEPENDENCIES:
   - PopupKit (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PopupKit: 81aab01dc9527b9d62285495be4d4b9dbd0d3f14
+  PopupKit: d78d66e020cfcbf0ac28d5a63954f047a8a026f8
 
 PODFILE CHECKSUM: ae558466827307e8c8ac3e05cc9b019f49038c17
 

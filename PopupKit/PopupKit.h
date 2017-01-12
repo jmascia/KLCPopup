@@ -7,6 +7,3 @@ FOUNDATION_EXPORT double PopupKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char PopupKitVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <PopupKit/PublicHeader.h>
-
-
-#import <PopupKit/PopupView.h>

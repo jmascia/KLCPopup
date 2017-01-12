@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		6D09A52A1BD1FF980069F2FF /* PopupKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5291BD1FF980069F2FF /* PopupKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6D09A5481BD2002C0069F2FF /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5461BD2002C0069F2FF /* PopupView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6D09A5491BD2002C0069F2FF /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D09A5471BD2002C0069F2FF /* PopupView.m */; };
 		A8578FA01E23646E007A4001 /* PopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8578F9F1E23646E007A4001 /* PopupView.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,7 +70,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D09A5481BD2002C0069F2FF /* PopupView.h in Headers */,
 				6D09A52A1BD1FF980069F2FF /* PopupKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,7 +144,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D09A5491BD2002C0069F2FF /* PopupView.m in Sources */,
 				A8578FA01E23646E007A4001 /* PopupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
