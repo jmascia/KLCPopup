@@ -308,7 +308,7 @@ open class PopupView: UIView {
         show(with: parameters)
     }
 
-    public func dismiss(animated: Bool = true) {
+    public func dismiss(animated: Bool) {
 
         guard isShowing && !isBeingDismissed else {
             return
@@ -318,7 +318,7 @@ open class PopupView: UIView {
         isShowing = false
         isBeingDismissed = true
 
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(PopupView.dismiss(animated:)), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(PopupView.dismissWithAnimation), object: nil)
 
         delegate?.willStartDismissing(popUpView: self)
 
@@ -365,6 +365,10 @@ open class PopupView: UIView {
     }
 
     //MARK: - Private Methods
+    internal func dismissWithAnimation() {
+        dismiss(animated: true)
+    }
+    
     private func show(with parameters: [String: Any]) {
         guard !isBeingShown && !isShowing && !isBeingDismissed else {
             return
@@ -449,7 +453,7 @@ open class PopupView: UIView {
 
                 // Set to hide after duration if greater than zero.
                 if duration > 0.0 {
-                    self.perform(#selector(PopupView.dismiss(animated:)), with: nil, afterDelay: duration)
+                    self.perform(#selector(PopupView.dismissWithAnimation), with: nil, afterDelay: duration)
                 }
             }
 
