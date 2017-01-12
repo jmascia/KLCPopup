@@ -10,6 +10,7 @@
 		6D09A52A1BD1FF980069F2FF /* PopupKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5291BD1FF980069F2FF /* PopupKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D09A5481BD2002C0069F2FF /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D09A5461BD2002C0069F2FF /* PopupView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D09A5491BD2002C0069F2FF /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D09A5471BD2002C0069F2FF /* PopupView.m */; };
+		A8578FA01E23646E007A4001 /* PopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8578F9F1E23646E007A4001 /* PopupView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +21,7 @@
 		6D09A5471BD2002C0069F2FF /* PopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopupView.m; sourceTree = "<group>"; };
 		6D09A5661BD209780069F2FF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6D09A5681BD2097C0069F2FF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A8578F9F1E23646E007A4001 /* PopupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 				6D09A5471BD2002C0069F2FF /* PopupView.m */,
 				6D09A5291BD1FF980069F2FF /* PopupKit.h */,
 				6D09A52B1BD1FF980069F2FF /* Info.plist */,
+				A8578F9F1E23646E007A4001 /* PopupView.swift */,
 			);
 			path = PopupKit;
 			sourceTree = "<group>";
@@ -108,6 +111,7 @@
 						CreatedOnToolsVersion = 7.0.1;
 						DevelopmentTeam = DQAU73Z92C;
 						DevelopmentTeamName = "Ryne Cheow (Personal Team)";
+						LastSwiftMigration = 0820;
 					};
 				};
 			};
@@ -144,6 +148,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D09A5491BD2002C0069F2FF /* PopupView.m in Sources */,
+				A8578FA01E23646E007A4001 /* PopupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +250,7 @@
 		6D09A52F1BD1FF980069F2FF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -256,12 +262,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.rynecheow.PopupKit;
 				PRODUCT_NAME = PopupKit;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		6D09A5301BD1FF980069F2FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -273,6 +282,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.rynecheow.PopupKit;
 				PRODUCT_NAME = PopupKit;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
