@@ -225,7 +225,7 @@ open class PopupView: UIView {
 
 #if !os(tvOS)
         // Register for Notifications
-        NotificationCenter.default.addObserver(self, selector: #selector(PopupView.didChangeStatusBarOrientation(notification:)), name: .UIApplicationDidChangeStatusBarFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PopupView.didChangeStatusBarOrientation(notification:)), name: .UIDeviceOrientationDidChange, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(PopupView.keyboardDidShow(notification:)), name: .UIKeyboardDidShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(PopupView.keyboardDidHide(notification:)), name: .UIKeyboardDidHide, object: nil)
 #endif
@@ -602,7 +602,7 @@ open class PopupView: UIView {
 
     internal func updateForInterfaceOrientation() {
 #if !os(tvOS)
-        let orientation = UIApplication.shared.statusBarOrientation
+        let orientation = UIDevice.current.orientation
 
         var angle: CGFloat = 0.0
         switch orientation {
@@ -610,10 +610,8 @@ open class PopupView: UIView {
             angle = .pi
         case .landscapeLeft:
             angle = .pi / -2
-            break
         case .landscapeRight:
             angle = .pi / 2
-            break
         default:
             // Portrait and unknown
             angle = 0.0
@@ -624,11 +622,6 @@ open class PopupView: UIView {
 #endif
     }
 
-    //MARK: - Notification Handler
-#if !os(tvOS)
-
-
-#endif
 
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "PopupKit",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "summary": "PopupKit is a simple and flexible iOS class for presenting any custom view as a popup, forked from KLCPopup.",
   "homepage": "https://github.com/rynecheow/PopupKit",
   "authors": {
@@ -10,7 +10,7 @@
   "source_files": "PopupKit/*.swift",
   "source": {
     "git": "https://github.com/rynecheow/PopupKit.git",
-    "tag": "3.1.1"
+    "tag": "4.0.0"
   },
   "frameworks": [
     "UIKit",
