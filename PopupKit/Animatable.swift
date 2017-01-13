@@ -279,51 +279,43 @@ extension PopupView.ShowType: Animatable {
             popUpView.containerView.alpha = 0.0
             popUpView.containerView.transform = CGAffineTransform.identity
             popUpView.containerView.frame = containerFrame
-            break
         case .growIn:
             popUpView.containerView.alpha = 0.0
             popUpView.containerView.frame = containerFrame
             popUpView.containerView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-            break
         case .shrinkIn:
             popUpView.containerView.alpha = 0.0
             popUpView.containerView.frame = containerFrame
             popUpView.containerView.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
-            break
         case .slideInFromTop, .bounceInFromTop:
             popUpView.containerView.alpha = 1.0
             popUpView.containerView.transform = CGAffineTransform.identity
             var startFrame = containerFrame
             startFrame.origin.y = -1 * containerFrame.height
             popUpView.containerView.frame = startFrame
-            break
         case .slideInFromBottom, .bounceInFromBottom:
             popUpView.containerView.alpha = 1.0
             popUpView.containerView.transform = CGAffineTransform.identity
             var startFrame = containerFrame
             startFrame.origin.y = popUpView.bounds.height
             popUpView.containerView.frame = startFrame
-            break
         case .slideInFromLeft, .bounceInFromLeft:
             popUpView.containerView.alpha = 1.0
             popUpView.containerView.transform = CGAffineTransform.identity
             var startFrame = containerFrame
             startFrame.origin.x = -1 * containerFrame.width
             popUpView.containerView.frame = startFrame
-            break
         case .slideInFromRight, .bounceInFromRight:
             popUpView.containerView.alpha = 1.0
             popUpView.containerView.transform = CGAffineTransform.identity
             var startFrame = containerFrame
             startFrame.origin.x = popUpView.bounds.width
             popUpView.containerView.frame = startFrame
-            break
         case .bounceIn:
             popUpView.containerView.alpha = 0.0
             popUpView.containerView.frame = containerFrame
             popUpView.containerView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-            break
-        default:
+        case .none:
             break
         }
         
@@ -331,11 +323,9 @@ extension PopupView.ShowType: Animatable {
         switch self {
         case .fadeIn, .growIn, .shrinkIn, .slideInFromTop, .slideInFromLeft, .slideInFromBottom, .slideInFromRight:
             UIView.animate(withDuration: animationDuration, delay: 0, options: animationOptions, animations: animationClosure(with: popUpView, rect: containerFrame), completion: completionClosure)
-            break
         case .bounceIn, .bounceInFromTop, .bounceInFromBottom, .bounceInFromLeft, .bounceInFromRight:
             UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: springVelocity, options: [], animations:animationClosure(with: popUpView, rect: containerFrame), completion: completionClosure)
-            break
-        default:
+        case .none:
             break
         }
         

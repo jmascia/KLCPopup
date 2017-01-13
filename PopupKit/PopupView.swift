@@ -65,7 +65,6 @@ open class PopupView: UIView {
 
     @objc(PopupViewHorizontalLayout)
     public enum HorizontalLayout: Int {
-        case custom
         case left
         case leftOfCenter
         case center
@@ -77,7 +76,6 @@ open class PopupView: UIView {
 
     @objc(PopupViewVerticalLayout)
     public enum VerticalLayout: Int {
-        case custom
         case top
         case aboveCenter
         case center
@@ -172,7 +170,7 @@ open class PopupView: UIView {
 
     internal let containerView: UIView
 
-    internal var keyboardRect = CGRect.zero
+    internal var keyboardRect:CGRect = .zero
 
     private let backgroundView: UIView
 
@@ -206,19 +204,19 @@ open class PopupView: UIView {
 
         super.init(frame: UIScreen.main.bounds)
         isUserInteractionEnabled = true
-        backgroundColor = UIColor.clear
+        backgroundColor = .clear
         alpha = 0
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         autoresizesSubviews = true
 
-        backgroundView.backgroundColor = UIColor.clear
+        backgroundView.backgroundColor = .clear
         backgroundView.isUserInteractionEnabled = false
         backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        backgroundView.frame = self.bounds
+        backgroundView.frame = bounds
 
         containerView.autoresizesSubviews = false
         containerView.isUserInteractionEnabled = true
-        containerView.backgroundColor = UIColor.clear
+        containerView.backgroundColor = .clear
 
         addSubview(backgroundView)
         addSubview(containerView)
@@ -267,7 +265,7 @@ open class PopupView: UIView {
 
             // Try to dismiss if backgroundTouch flag set.
             if shouldDismissOnBackgroundTouch {
-                self.dismiss(animated: true)
+                dismiss(animated: true)
             }
 
             // If no mask, then return nil so touch passes through to underlying views.
@@ -278,7 +276,7 @@ open class PopupView: UIView {
         } else {
             // If view is within containerView and contentTouch flag set, then try to hide.
             if safeHitView.isDescendant(of: containerView) && shouldDismissOnContentTouch {
-                self.dismiss(animated: true)
+                dismiss(animated: true)
             }
         }
 
@@ -305,27 +303,27 @@ open class PopupView: UIView {
 
     }
 
-    @objc(showWithHorizontalLayout: verticalLayout:inView:duration:)
-    public func show(withHorizontalLayout horizontal: HorizontalLayout, verticalLayout: VerticalLayout, in view: UIView? = nil, duration: TimeInterval = 0.0) {
-        show(with: Layout.custom(horizontal: horizontal, vertical: verticalLayout), in: view, duration: duration)
+    @objc(presentWithHorizontalLayout: verticalLayout:inView:duration:)
+    public func present(withHorizontalLayout horizontal: HorizontalLayout, verticalLayout: VerticalLayout, in view: UIView? = nil, duration: TimeInterval = 0.0) {
+        present(with: Layout.custom(horizontal: horizontal, vertical: verticalLayout), in: view, duration: duration)
     }
 
     /// Show with specified layout, optionally in specific view, and dismiss after duration.
-    public func show(with layout: Layout = .center, in view: UIView? = nil, duration: TimeInterval = 0.0) {
+    public func present(with layout: Layout = .center, in view: UIView? = nil, duration: TimeInterval = 0.0) {
         var parameter = PresentParameter(duration: duration, layout: layout)
 
         if let view = view {
             parameter.view = view
         }
 
-        show(with: parameter)
+        present(with: parameter)
     }
 
     /// Show centered at point in view's coordinate system, then dismiss after duration.
-    public func show(at center: CGPoint, in view: UIView, with duration: TimeInterval = 0.0) {
+    public func present(at center: CGPoint, in view: UIView, with duration: TimeInterval = 0.0) {
         let parameter = PresentParameter(view: view, duration: duration, animationCenter: center)
 
-        show(with: parameter)
+        present(with: parameter)
     }
 
     public func dismiss(animated: Bool = true) {
@@ -383,7 +381,7 @@ open class PopupView: UIView {
 
     }
     
-    private func show(with parameter: PresentParameter) {
+    private func present(with parameter: PresentParameter) {
         guard canPresentPopup else {
             return
         }
@@ -392,7 +390,7 @@ open class PopupView: UIView {
         isPresenting = false
         isBeingDismissed = false
 
-        self.delegate?.willStartShowing(popUpView: self)
+        delegate?.willStartShowing(popUpView: self)
 
         DispatchQueue.main.async {
             // Prepare by adding to the top window.
@@ -430,27 +428,22 @@ open class PopupView: UIView {
             case .dimmed:
                 self.backgroundView.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: self.dimmedMaskAlpha)
                 backgroundAnimationBlock()
-                break
             case .none:
                 UIView.animate(withDuration: animationDurationStandard, delay: 0.0, options: [.curveLinear], animations: backgroundAnimationBlock, completion: nil)
-                break
             case .clear:
-                self.backgroundView.backgroundColor = UIColor.clear
-                break
+                self.backgroundView.backgroundColor = .clear
             case .lightBlur:
                 let blurEffect = UIBlurEffect(style: .light)
                 let visualBlur = UIVisualEffectView(effect: blurEffect)
                 visualBlur.frame = self.backgroundView.frame
                 visualBlur.contentView.addSubview(self.backgroundView)
                 self.insertSubview(visualBlur, belowSubview: self.containerView)
-                break
             case .darkBlur:
                 let blurEffect = UIBlurEffect(style: .dark)
                 let visualBlur = UIVisualEffectView(effect: blurEffect)
                 visualBlur.frame = self.backgroundView.frame
                 visualBlur.contentView.addSubview(self.backgroundView)
                 self.insertSubview(visualBlur, belowSubview: self.containerView)
-                break
             }
 
             // Determine duration. Default to 0 if none provided.
@@ -537,25 +530,18 @@ open class PopupView: UIView {
                 case .left:
                     finalContainerFrame.origin.x = 0.0
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleRightMargin]
-                    break
                 case .leftOfCenter:
                     finalContainerFrame.origin.x = floor(self.bounds.width / 3.0 - containerFrame.width / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                    break
                 case .center:
                     finalContainerFrame.origin.x = floor((self.bounds.width - containerFrame.width) / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                    break
                 case .rightOfCenter:
                     finalContainerFrame.origin.x = floor((self.bounds.width * 2.0 / 3.0) - (containerFrame.width / 2.0))
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                    break
                 case .right:
                     finalContainerFrame.origin.x = self.bounds.width - containerFrame.width
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin]
-                    break
-                default:
-                    break
                 }
 
                 // Vertical
@@ -563,25 +549,18 @@ open class PopupView: UIView {
                 case .top:
                     finalContainerFrame.origin.y = 0
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleBottomMargin]
-                    break
                 case .aboveCenter:
                     finalContainerFrame.origin.y = floor(self.bounds.width / 3.0 - containerFrame.height / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                    break
                 case .center:
                     finalContainerFrame.origin.y = floor((self.bounds.height - containerFrame.height) / 2.0)
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                    break
                 case .belowCenter:
                     finalContainerFrame.origin.y = floor((self.bounds.height * 2.0 / 3.0) - (containerFrame.height / 2.0))
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                    break
                 case .bottom:
                     finalContainerFrame.origin.y = self.bounds.height - containerFrame.height
                     containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin]
-                    break
-                default:
-                    break
                 }
 
                 self.containerView.autoresizingMask = containerAutoresizingMask
