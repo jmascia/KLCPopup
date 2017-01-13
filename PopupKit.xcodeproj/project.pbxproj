@@ -12,6 +12,8 @@
 		6DD4EE681E275BBC0015001D /* PopupKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DD4EE5A1E275BBC0015001D /* PopupKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DEB63971E275C08008208D0 /* PopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEB63931E275C08008208D0 /* PopupView.swift */; };
 		6DEB639A1E275C08008208D0 /* Animatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEB63961E275C08008208D0 /* Animatable.swift */; };
+		A896501E1E28710D007E950E /* Layoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A896501D1E28710D007E950E /* Layoutable.swift */; };
+		A89650201E287149007E950E /* KeyboardHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = A896501F1E287149007E950E /* KeyboardHandling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,8 @@
 		6DD4EE671E275BBC0015001D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6DEB63931E275C08008208D0 /* PopupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupView.swift; sourceTree = "<group>"; };
 		6DEB63961E275C08008208D0 /* Animatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animatable.swift; sourceTree = "<group>"; };
+		A896501D1E28710D007E950E /* Layoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Layoutable.swift; sourceTree = "<group>"; };
+		A896501F1E287149007E950E /* KeyboardHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,8 @@
 		6DD4EE591E275BBC0015001D /* PopupKit */ = {
 			isa = PBXGroup;
 			children = (
+				A896501F1E287149007E950E /* KeyboardHandling.swift */,
+				A896501D1E28710D007E950E /* Layoutable.swift */,
 				6DEB63961E275C08008208D0 /* Animatable.swift */,
 				6DEB63931E275C08008208D0 /* PopupView.swift */,
 				6DD4EE5B1E275BBC0015001D /* Info.plist */,
@@ -205,8 +211,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A896501E1E28710D007E950E /* Layoutable.swift in Sources */,
 				6DEB63971E275C08008208D0 /* PopupView.swift in Sources */,
 				6DEB639A1E275C08008208D0 /* Animatable.swift in Sources */,
+				A89650201E287149007E950E /* KeyboardHandling.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

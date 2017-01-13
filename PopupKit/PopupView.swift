@@ -526,42 +526,16 @@ open class PopupView: UIView {
                 let layout = parameter.layout
 
                 // Horizontal
-                switch layout.horizontal {
-                case .left:
-                    finalContainerFrame.origin.x = 0.0
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleRightMargin]
-                case .leftOfCenter:
-                    finalContainerFrame.origin.x = floor(self.bounds.width / 3.0 - containerFrame.width / 2.0)
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                case .center:
-                    finalContainerFrame.origin.x = floor((self.bounds.width - containerFrame.width) / 2.0)
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                case .rightOfCenter:
-                    finalContainerFrame.origin.x = floor((self.bounds.width * 2.0 / 3.0) - (containerFrame.width / 2.0))
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin, .flexibleRightMargin]
-                case .right:
-                    finalContainerFrame.origin.x = self.bounds.width - containerFrame.width
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleLeftMargin]
-                }
+                
+                finalContainerFrame.origin.x = layout.horizontal.originValue(with: self, rect: containerFrame)
+                
+                containerAutoresizingMask = layout.horizontal.autoresizingMask(with: containerAutoresizingMask)
 
                 // Vertical
-                switch layout.vertical {
-                case .top:
-                    finalContainerFrame.origin.y = 0
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleBottomMargin]
-                case .aboveCenter:
-                    finalContainerFrame.origin.y = floor(self.bounds.width / 3.0 - containerFrame.height / 2.0)
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                case .center:
-                    finalContainerFrame.origin.y = floor((self.bounds.height - containerFrame.height) / 2.0)
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                case .belowCenter:
-                    finalContainerFrame.origin.y = floor((self.bounds.height * 2.0 / 3.0) - (containerFrame.height / 2.0))
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin, .flexibleBottomMargin]
-                case .bottom:
-                    finalContainerFrame.origin.y = self.bounds.height - containerFrame.height
-                    containerAutoresizingMask = [containerAutoresizingMask, .flexibleTopMargin]
-                }
+                
+                finalContainerFrame.origin.y = layout.vertical.originValue(with: self, rect: containerFrame)
+                
+                containerAutoresizingMask = layout.vertical.autoresizingMask(with: containerAutoresizingMask)
 
                 self.containerView.autoresizingMask = containerAutoresizingMask
 
