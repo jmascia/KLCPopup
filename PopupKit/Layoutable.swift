@@ -24,8 +24,6 @@ extension PopupView.HorizontalLayout: Layoutable {
             return floor((popUpView.bounds.width * 2.0 / 3.0) - (rect.width / 2.0))
         case .right:
             return popUpView.bounds.width - rect.width
-        default:
-            return 0.0
         }
     }
     
@@ -41,8 +39,6 @@ extension PopupView.HorizontalLayout: Layoutable {
             return [origin, .flexibleLeftMargin, .flexibleRightMargin]
         case .right:
             return [origin, .flexibleLeftMargin]
-        default:
-            return []
         }
     }
 }
@@ -60,8 +56,6 @@ extension PopupView.VerticalLayout: Layoutable {
             return floor((popUpView.bounds.height * 2.0 / 3.0) - (rect.height / 2.0))
         case .bottom:
             return popUpView.bounds.height - rect.height
-        default:
-            return 0.0
         }
     }
     
@@ -77,8 +71,6 @@ extension PopupView.VerticalLayout: Layoutable {
             return [origin, .flexibleTopMargin, .flexibleBottomMargin]
         case .bottom:
             return [origin, .flexibleTopMargin]
-        default:
-            return []
         }
     }
 }
