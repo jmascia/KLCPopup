@@ -2,7 +2,8 @@
 //  PopupView.swift
 //  PopupKit
 //
-//  Created by Alvin Choo on 9/1/17.
+//  Created by Ryne Cheow on 11/1/17.
+//
 //
 
 import UIKit

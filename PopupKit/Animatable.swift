@@ -3,7 +3,6 @@
 //  PopupKit
 //
 //  Created by Ryne Cheow on 12/1/17.
-//  Copyright © 2017 Kullect Inc. All rights reserved.
 //
 
 import Foundation
