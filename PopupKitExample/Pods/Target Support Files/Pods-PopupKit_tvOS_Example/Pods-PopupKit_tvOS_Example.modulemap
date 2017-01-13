@@ -1,0 +1,6 @@
+framework module Pods_PopupKit_tvOS_Example {
+  umbrella header "Pods-PopupKit_tvOS_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,15 @@
+use_frameworks!
+
+project 'PopupKitExample.xcodeproj'
+
+target 'PopupKit_ObjC_Example' do
+  pod 'PopupKit', :path => "../"
+end
+
+target 'PopupKit_tvOS_Example' do
+    pod 'PopupKit', :path => "../"
+end
+
+target 'PopupKit_Swift_Example' do
+    pod 'PopupKit', :path => "../"
+end
