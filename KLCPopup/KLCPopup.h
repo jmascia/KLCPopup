@@ -117,6 +117,12 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 // Overrides alpha value for dimmed background mask. default = 0.5
 @property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
+// Override animation duration for show in.
+@property (nonatomic, assign) CGFloat showInDuration;
+
+// Overrides duration for dismiss.
+@property (nonatomic, assign) CGFloat dismissOutDuration;
+
 // If YES, then popup will get dismissed when background is touched. default = YES.
 @property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
 

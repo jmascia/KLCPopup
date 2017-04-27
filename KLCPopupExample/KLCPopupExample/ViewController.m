@@ -391,6 +391,10 @@ typedef NS_ENUM(NSInteger, CellType) {
                           dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
                              dismissOnContentTouch:_shouldDismissOnContentTouch];
   
+  // Custom duration for showIn and dismissOut
+  popup.showInDuration = 0.3;
+  popup.dismissOutDuration = 0.1;
+    
   if (_shouldDismissAfterDelay) {
     [popup showWithLayout:layout duration:2.0];
   } else {
