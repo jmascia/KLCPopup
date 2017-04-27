@@ -117,7 +117,7 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 // Overrides alpha value for dimmed background mask. default = 0.5
 @property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
-// Override animation duration for show in.
+// Overrides animation duration for show in.
 @property (nonatomic, assign) CGFloat showInDuration;
 
 // Overrides duration for dismiss.
