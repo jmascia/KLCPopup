@@ -215,6 +215,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Kullect;
 				TargetAttributes = {
+					1FA76AAD195893080075A8E4 = {
+						DevelopmentTeam = 26SQZQ89WS;
+					};
 					1FA76AD1195893080075A8E4 = {
 						TestTargetID = 1FA76AAD195893080075A8E4;
 					};
@@ -386,6 +389,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 26SQZQ89WS;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KLCPopupExample/KLCPopupExample-Prefix.pch";
 				INFOPLIST_FILE = "KLCPopupExample/KLCPopupExample-Info.plist";
@@ -400,6 +404,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 26SQZQ89WS;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KLCPopupExample/KLCPopupExample-Prefix.pch";
 				INFOPLIST_FILE = "KLCPopupExample/KLCPopupExample-Info.plist";

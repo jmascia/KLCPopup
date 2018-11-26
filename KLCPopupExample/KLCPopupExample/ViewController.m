@@ -350,7 +350,7 @@ typedef NS_ENUM(NSInteger, CellType) {
   dismissLabel.backgroundColor = [UIColor clearColor];
   dismissLabel.textColor = [UIColor whiteColor];
   dismissLabel.font = [UIFont boldSystemFontOfSize:72.0];
-  dismissLabel.text = @"Hi.";
+  dismissLabel.text = @"Text";
   
   UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
   dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -359,7 +359,7 @@ typedef NS_ENUM(NSInteger, CellType) {
   [dismissButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [dismissButton setTitleColor:[[dismissButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
   dismissButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
-  [dismissButton setTitle:@"Bye" forState:UIControlStateNormal];
+  [dismissButton setTitle:@"Dismiss" forState:UIControlStateNormal];
   dismissButton.layer.cornerRadius = 6.0;
   [dismissButton addTarget:self action:@selector(dismissButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
