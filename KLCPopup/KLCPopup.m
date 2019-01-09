@@ -93,7 +93,6 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     self.backgroundColor = [UIColor clearColor];
 		self.alpha = 0;
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.autoresizesSubviews = YES;
     
     self.shouldDismissOnBackgroundTouch = YES;
     self.shouldDismissOnContentTouch = NO;
