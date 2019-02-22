@@ -264,7 +264,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       
       if (animated && (_showType != KLCPopupShowTypeNone)) {
         // Make fade happen faster than motion. Use linear for fades.
-        [UIView animateWithDuration:0.15
+        [UIView animateWithDuration:self.dismissOutDuration ?: 0.15
                               delay:0
                             options:UIViewAnimationOptionCurveLinear
                          animations:backgroundAnimationBlock
@@ -289,14 +289,14 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
         }
       };
       
-      NSTimeInterval bounce1Duration = 0.13;
+      NSTimeInterval bounce1Duration = self.dismissOutDuration ?: 0.13;
       NSTimeInterval bounce2Duration = (bounce1Duration * 2.0);
       
       // Animate content if needed
       if (animated) {
         switch (_dismissType) {
           case KLCPopupDismissTypeFadeOut: {
-            [UIView animateWithDuration:0.15
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.15
                                   delay:0
                                 options:UIViewAnimationOptionCurveLinear
                              animations:^{
@@ -306,7 +306,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeGrowOut: {
-            [UIView animateWithDuration:0.15
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.15
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -317,7 +317,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeShrinkOut: {
-            [UIView animateWithDuration:0.15
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.15
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -328,7 +328,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeSlideOutToTop: {
-            [UIView animateWithDuration:0.30
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -341,7 +341,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeSlideOutToBottom: {
-            [UIView animateWithDuration:0.30
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -354,7 +354,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeSlideOutToLeft: {
-            [UIView animateWithDuration:0.30
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -367,7 +367,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           }
             
           case KLCPopupDismissTypeSlideOutToRight: {
-            [UIView animateWithDuration:0.30
+            [UIView animateWithDuration:self.dismissOutDuration ?: 0.30
                                   delay:0
                                 options:kAnimationOptionCurveIOS7
                              animations:^{
@@ -565,7 +565,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
       
       if (_showType != KLCPopupShowTypeNone) {
         // Make fade happen faster than motion. Use linear for fades.
-        [UIView animateWithDuration:0.15
+        [UIView animateWithDuration:self.showInDuration ?: 0.15
                               delay:0
                             options:UIViewAnimationOptionCurveLinear
                          animations:backgroundAnimationBlock
@@ -755,7 +755,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           CGRect startFrame = finalContainerFrame;
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.15
+          [UIView animateWithDuration:self.showInDuration ?: 0.15
                                 delay:0
                               options:UIViewAnimationOptionCurveLinear
                            animations:^{
@@ -773,7 +773,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.85, 0.85);
           
-          [UIView animateWithDuration:0.15
+          [UIView animateWithDuration:self.showInDuration ?: 0.15
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -794,7 +794,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(1.25, 1.25);
           
-          [UIView animateWithDuration:0.15
+          [UIView animateWithDuration:self.showInDuration ?: 0.15
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -814,7 +814,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.30
+          [UIView animateWithDuration:self.showInDuration ?: 0.30
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -831,7 +831,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = CGRectGetHeight(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.30
+          [UIView animateWithDuration:self.showInDuration ?: 0.30
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -848,7 +848,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.30
+          [UIView animateWithDuration:self.showInDuration ?: 0.30
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -865,7 +865,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = CGRectGetWidth(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.30
+          [UIView animateWithDuration:self.showInDuration ?: 0.30
                                 delay:0
                               options:kAnimationOptionCurveIOS7 // note: this curve ignores durations
                            animations:^{
@@ -883,7 +883,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           _containerView.frame = startFrame;
           _containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
           
-          [UIView animateWithDuration:0.6
+          [UIView animateWithDuration:self.showInDuration ?: 0.60
                                 delay:0.0
                usingSpringWithDamping:0.8
                 initialSpringVelocity:15.0
@@ -904,7 +904,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = -CGRectGetHeight(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
+          [UIView animateWithDuration:self.showInDuration ?: 0.60
                                 delay:0.0
                usingSpringWithDamping:0.8
                 initialSpringVelocity:10.0
@@ -923,7 +923,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.y = CGRectGetHeight(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
+          [UIView animateWithDuration:self.showInDuration ?: 0.60
                                 delay:0.0
                usingSpringWithDamping:0.8
                 initialSpringVelocity:10.0
@@ -942,7 +942,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = -CGRectGetWidth(finalContainerFrame);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
+          [UIView animateWithDuration:self.showInDuration ?: 0.60
                                 delay:0.0
                usingSpringWithDamping:0.8
                 initialSpringVelocity:10.0
@@ -961,7 +961,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
           startFrame.origin.x = CGRectGetWidth(self.bounds);
           _containerView.frame = startFrame;
           
-          [UIView animateWithDuration:0.6
+          [UIView animateWithDuration:self.showInDuration ?: 0.60
                                 delay:0.0
                usingSpringWithDamping:0.8
                 initialSpringVelocity:10.0
