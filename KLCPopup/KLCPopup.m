@@ -238,6 +238,11 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   [self showWithParameters:[NSDictionary dictionaryWithDictionary:parameters]];
 }
 
+- (void)setDimmedMaskAlpha:(CGFloat)dimmedMaskAlpha
+{
+	_dimmedMaskAlpha = dimmedMaskAlpha;
+	self.backgroundView.backgroundColor = [self.backgroundView.backgroundColor colorWithAlphaComponent:dimmedMaskAlpha];
+}
 
 - (void)dismiss:(BOOL)animated {
   
